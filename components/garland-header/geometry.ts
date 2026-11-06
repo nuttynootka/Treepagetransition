@@ -236,6 +236,11 @@ export function placeTabs(count: number): TabLayout {
   const WAVE = [20, 70, 36, 60];
   const waveFor = (fromOuter: number) => `${WAVE[fromOuter % WAVE.length]}px`;
 
+  // Three or fewer: one row, spread evenly, the middle one hanging under the logo.
+  const oneRow = count <= 3;
+  const rowX = spread(count, 20, 80);
+  const rowRibbon = (i: number) => (count === 3 && i === 1 ? "42px" : "24px");
+
   const tabs = Array.from({ length: count }, (_, i) => {
     const row = Math.floor(i / cols);
     const inRow = Math.min(cols, count - row * cols);
@@ -245,8 +250,8 @@ export function placeTabs(count: number): TabLayout {
     return {
       xNarrow: r2(((col + 0.5) / inRow) * 100),
       ribbonNarrow: narrowRibbon(row),
-      xWide: isLeft ? r2(leftX[j]) : r2(rightX[j]),
-      ribbonWide: isLeft ? waveFor(j) : waveFor(right - 1 - j),
+      xWide: oneRow ? r2(rowX[i]) : isLeft ? r2(leftX[j]) : r2(rightX[j]),
+      ribbonWide: oneRow ? rowRibbon(i) : isLeft ? waveFor(j) : waveFor(right - 1 - j),
       layer: Math.max(1, 5 - row),
     };
   });

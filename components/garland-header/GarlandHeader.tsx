@@ -1,15 +1,19 @@
 "use client";
 
-import { forwardRef, useMemo, useRef, type AnchorHTMLAttributes } from "react";
+import { forwardRef, useEffect, useId, useMemo, useRef, useState, type AnchorHTMLAttributes } from "react";
 import { placeTabs } from "./geometry";
 import { useReducedMotion, useWarmPointer } from "./hooks";
 import { Bokeh, cn, Garland, LogoFrame } from "./parts";
+import { HangingMenu } from "./HangingMenu";
 import { SnowflakeTab } from "./SnowflakeTab";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 import "./garland-header.css";
 
 export interface GarlandHeaderProps {
-  /** One snowflake per page, left to right. Half hang left of the logo, half right. */
+  /**
+   * One snowflake per entry, left to right. An entry with `items` opens a hanging menu
+   * of glass plates instead of linking to a page.
+   */
   pages: GarlandPage[];
   /** The current path, e.g. from Next's usePathname(). Its snowflake lights up. */
   activeHref: string;
@@ -48,9 +52,15 @@ const PlainLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorE
   },
 );
 
-function isActive(activeHref: string, href: string) {
+function matches(activeHref: string, href: string) {
   if (href === "/") return activeHref === "/";
   return activeHref === href || activeHref.startsWith(`${href}/`);
+}
+
+/** A snowflake is lit when you're on its page, or on any page in its menu. */
+function isActive(activeHref: string, page: GarlandPage) {
+  if (page.items) return page.items.some((item) => matches(activeHref, item.href));
+  return page.href ? matches(activeHref, page.href) : false;
 }
 
 export function GarlandHeader({
@@ -71,20 +81,49 @@ export function GarlandHeader({
   const layout = useMemo(() => placeTabs(pages.length), [pages.length]);
   // Longest label sets one shared label size, so every plate reads alike.
   const longest = Math.max(1, ...pages.map((p) => p.label.length));
+  const idBase = useId();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   useWarmPointer(rootRef, true);
+
+  // A new page: roll every menu up.
+  useEffect(() => setOpenMenu(null), [activeHref]);
+
+  // Tapping anywhere else, or pressing Escape, rolls the open menu up.
+  useEffect(() => {
+    if (!openMenu) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const root = (e.target as Element | null)?.closest?.("[data-menu-root]");
+      if (root?.getAttribute("data-menu-root") !== openMenu) setOpenMenu(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const button = document.querySelector<HTMLButtonElement>(`[aria-controls="${CSS.escape(openMenu)}"]`);
+      setOpenMenu(null);
+      button?.focus();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openMenu]);
 
   return (
     <header
       ref={rootRef}
       className={cn(
-        "gh-root relative isolate w-full select-none overflow-hidden text-[#FFF8F0]",
+        // overflow-x-clip (not hidden) so the hanging menus can drop below the header.
+        "gh-root @container relative isolate z-30 w-full select-none overflow-x-clip text-[#FFF8F0]",
         // Sizes per screen width: garland height, snowflake size, logo frame.
         "[--g:76px] sm:[--g:88px] md:[--g:100px] lg:[--g:116px]",
-        "[--flake:min(150px,31vw)] sm:[--flake:160px] md:[--flake:172px] lg:[--flake:150px] xl:[--flake:196px]",
+        "[--flake:min(124px,31vw)] sm:[--flake:150px] md:[--flake:170px] lg:[--flake:180px] xl:[--flake:196px]",
         // Glass plate width as a share of the snowflake (bigger on phones, for the label).
-        "[--plate:0.58] sm:[--plate:0.5] lg:[--plate:0.46] xl:[--plate:0.42]",
+        "[--plate:0.58] sm:[--plate:0.52] md:[--plate:0.5] lg:[--plate:0.46] xl:[--plate:0.44]",
         "[--logo-w:136px] [--logo-h:66px] sm:[--logo-w:168px] sm:[--logo-h:80px] md:[--logo-w:204px] md:[--logo-h:94px] lg:[--logo-w:236px] lg:[--logo-h:108px]",
+        // Hanging menu plates.
+        "[--menu-w:208px] [--menu-h:44px] [--menu-font:11.5px] md:[--menu-w:244px] md:[--menu-h:46px] md:[--menu-font:13px]",
         "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
       )}
@@ -101,19 +140,36 @@ export function GarlandHeader({
 
       <nav aria-label="Main">
         <ul className="m-0 list-none p-0">
-          {pages.map((page, i) => (
-            <SnowflakeTab
-              key={page.href}
-              page={page}
-              active={isActive(activeHref, page.href)}
-              placement={layout.tabs[i]}
-              crystal={crystals[i % crystals.length]}
-              mirrored={Math.floor(i / crystals.length) % 2 === 1}
-              labelChars={longest}
-              motion={!reducedMotion}
-              Link={LinkComponent}
-            />
-          ))}
+          {pages.map((page, i) => {
+            const menuId = `${idBase}-menu-${i}`;
+            const open = openMenu === menuId;
+            return (
+              <SnowflakeTab
+                key={page.href ?? page.label}
+                page={page}
+                active={isActive(activeHref, page)}
+                placement={layout.tabs[i]}
+                crystal={crystals[i % crystals.length]}
+                mirrored={Math.floor(i / crystals.length) % 2 === 1}
+                labelChars={longest}
+                motion={!reducedMotion}
+                Link={LinkComponent}
+                menu={page.items ? { id: menuId, open, onToggle: () => setOpenMenu(open ? null : menuId) } : undefined}
+              >
+                {page.items && (
+                  <HangingMenu
+                    id={menuId}
+                    label={page.label}
+                    items={page.items}
+                    open={open}
+                    activeHref={activeHref}
+                    Link={LinkComponent}
+                    onSelect={() => setOpenMenu(null)}
+                  />
+                )}
+              </SnowflakeTab>
+            );
+          })}
         </ul>
       </nav>
 

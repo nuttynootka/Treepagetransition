@@ -17,7 +17,7 @@ Requires Next.js 15.3 or newer with the **App Router** (the `app/` folder). It u
 | `components/tree-transition/TreeTransitionProvider.tsx` | Draws the overlay and changes the page at the right moment. Goes in your root layout once. |
 | `components/tree-transition/TransitionLink.tsx` | Use it in place of `next/link`'s `<Link>`. Same props. |
 | `components/tree-transition/index.ts` | Lets you import everything from one place. |
-| `app/` | The demo site: a home page plus Trees, Firewood, Wreaths, Greenery, About and Contact (placeholder text). |
+| `app/` | The demo site: Home, plus the 5 Shop pages and 3 Contact pages (placeholder text). |
 | `preview/` | Builds the single-file preview page from the same engine. |
 
 ---
@@ -181,6 +181,7 @@ A header for the top of the site: your photo of a live-greenery garland across t
 | --- | --- |
 | `components/garland-header/GarlandHeader.tsx` | The header. This is what you use. |
 | `components/garland-header/SnowflakeTab.tsx` | One hanging snowflake tab. |
+| `components/garland-header/HangingMenu.tsx` | The drop-down menu of glass plates on chains. |
 | `components/garland-header/parts.tsx` | Fairy light, garland strip, logo frame, frost. |
 | `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
 | `components/garland-header/geometry.ts` | Where every light, glint and frost crystal goes. |
@@ -208,27 +209,49 @@ A header for the top of the site: your photo of a live-greenery garland across t
 
 The fairy lights are drawn on top of the photo in two woven strands, so they look right on any garland shape.
 
-## Step 3: Change the pages
+## Step 3: Change the menu
 
 Open `app/SiteHeader.tsx`. The `pages` list sets the snowflakes, left to right:
 
 ```tsx
 const pages: GarlandPage[] = [
-  { href: "/trees", label: "TREES" },
-  { href: "/firewood", label: "FIREWOOD" },
-  { href: "/wreaths", label: "WREATHS" },
-  { href: "/greenery", label: "GREENERY" },
-  { href: "/about", label: "ABOUT" },
-  { href: "/contact", label: "CONTACT" },
+  { href: "/", label: "Home" },
+  {
+    label: "Shop",
+    items: [
+      { href: "/statement-trees", label: "Statement Trees" },
+      { href: "/wholesale-trees", label: "Wholesale Trees" },
+      { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
+      { href: "/firewood", label: "Firewood" },
+      { href: "/make-payment", label: "Make Payment" },
+    ],
+  },
+  {
+    label: "Contact",
+    items: [
+      { href: "/meet-us", label: "Meet Us" },
+      { href: "/contact-us", label: "Contact Us" },
+      { href: "/request-quote", label: "Request Quote" },
+    ],
+  },
 ];
 ```
 
-- On computers (1024px wide and up), the first half hang left of the logo and the rest hang right, in a gentle wave. An even number looks most balanced.
-- On phones and tablets they hang in rows of up to 3. Each top-row snowflake's ribbon continues behind it to the one below, like ornaments strung in pairs.
-- All labels share one text size, set by the longest label so it fits its plate. Shorter labels mean bigger text: with 8-letter labels like FIREWOOD, the text is about 10px on phones and 12px on large screens.
-- The logo links to the home page (`/`), which has no snowflake of its own.
-- Up to 6 pages fit well (two rows of 3 on phones).
-- There are 4 crystal designs. Pages 5 and 6 reuse designs 1 and 2, flipped left-to-right so they look different.
+- An entry with `href` is a snowflake that goes straight to that page (Home).
+- An entry with `items` is a snowflake that opens a **hanging menu** instead of going to a page (Shop, Contact). Its snowflake lights up while you're on any page in its menu.
+- Labels are typed in normal case and shown in capitals. Screen readers read the normal case.
+- To use "Wreaths & Boughs" instead, change the `label` (and the page heading in `app/wreaths-and-greenery/page.tsx`).
+- Each menu page is a folder in `app/` with a `page.tsx` inside. Their text is placeholder for now.
+
+### How the hanging menu works
+
+- Tapping SHOP or CONTACT drops a series of frosted glass plates on two silver chains. The chains hang from the garland, behind the snowflake. The plates unroll downward one at a time, like a rug unfurling or a rope ladder dropping, and then sway gently and settle.
+- Tapping the snowflake again, tapping anywhere else, or pressing Escape rolls the plates back up, bottom plate first, until they are hidden behind the garland.
+- Tapping a plate rolls the menu up and goes to that page, with the wand-tree transition.
+- Only one menu is open at a time. Opening the other one rolls the first one up.
+- On phones a menu near the edge shifts sideways so it stays on screen.
+- With "reduce motion" on, the menu fades in and out instead of unrolling.
+- Sizes: `--menu-w` (plate width), `--menu-h` (plate height) and `--menu-font` near the top of `GarlandHeader.tsx`. Unroll speed: `.gh-rung` in `garland-header.css`.
 
 ## Use it in another Next.js project
 
@@ -252,7 +275,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 
 | Prop | Default | What it does |
 | --- | --- | --- |
-| `pages` | (required) | `{ href, label }` for each snowflake |
+| `pages` | (required) | `{ href, label }` for a page snowflake, or `{ label, items }` for a menu snowflake |
 | `activeHref` | (required) | The current path. Pass `usePathname()`. |
 | `garlandSrc` | `/garland/garland.png` | Your garland photo |
 | `garlandFit` | `"cover"` | `"cover"` stretches one photo, `"repeat"` tiles it |
@@ -276,7 +299,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- With 6 pages the header is about 370px tall on phones, 500px on tablets and 370–420px on computers. It is not sticky, so it scrolls away with the page.
+- The header is about 240px tall on phones, 280–310px on tablets and 375–390px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
 - There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
 
 ### Using different crystal pictures

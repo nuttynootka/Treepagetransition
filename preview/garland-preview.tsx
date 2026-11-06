@@ -9,18 +9,37 @@ declare const PLACEHOLDER_LOGO: string;
 declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
-  { href: "/trees", label: "TREES" },
-  { href: "/firewood", label: "FIREWOOD" },
-  { href: "/wreaths", label: "WREATHS" },
-  { href: "/greenery", label: "GREENERY" },
-  { href: "/about", label: "ABOUT" },
-  { href: "/contact", label: "CONTACT" },
+  { href: "/", label: "Home" },
+  {
+    label: "Shop",
+    items: [
+      { href: "/statement-trees", label: "Statement Trees" },
+      { href: "/wholesale-trees", label: "Wholesale Trees" },
+      { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
+      { href: "/firewood", label: "Firewood" },
+      { href: "/make-payment", label: "Make Payment" },
+    ],
+  },
+  {
+    label: "Contact",
+    items: [
+      { href: "/meet-us", label: "Meet Us" },
+      { href: "/contact-us", label: "Contact Us" },
+      { href: "/request-quote", label: "Request Quote" },
+    ],
+  },
 ];
 
 const copy: Record<string, { title: string; body: string }> = {
-  "/": { title: "Home", body: "Tap a snowflake. The wand draws a tree of lights, the page changes under it, and frost blooms on the new snowflake's glass. The logo links back here." },
+  "/": {
+    title: "Home",
+    body: "Tap SHOP or CONTACT. Frosted glass plates unroll down on silver chains. Tap a plate and the menu rolls back up behind the garland while the wand draws its tree.",
+  },
   ...Object.fromEntries(
-    pages.map((p) => [p.href, { title: p.label, body: `Placeholder text. Your ${p.label.toLowerCase()} page content goes here. Brush or tap a snowflake to set it swinging.` }]),
+    pages.flatMap((p) => p.items ?? []).map((item) => [
+      item.href,
+      { title: item.label, body: "Placeholder text. This page's content goes here. The snowflake for its menu stays lit while you're here." },
+    ]),
   ),
 };
 

@@ -1,9 +1,18 @@
 import type { ComponentType, MouseEventHandler, PointerEventHandler, ReactNode } from "react";
 
-export interface GarlandPage {
+export interface GarlandLink {
   href: string;
-  /** Shown on the snowflake's glass plate. Up to about 9 characters fits on one line. */
+  /** Shown on a frosted glass plate in the hanging menu. */
   label: string;
+}
+
+export interface GarlandPage {
+  /** Shown on the snowflake's glass plate (in capitals). Keep it short: the longest label sets the size for all. */
+  label: string;
+  /** Where the snowflake links to. Leave out when the snowflake opens a menu instead. */
+  href?: string;
+  /** Tapping the snowflake drops down these plates instead of going to a page. */
+  items?: GarlandLink[];
 }
 
 /** Props the header passes to your link component (next/link, TransitionLink, or a plain <a>). */

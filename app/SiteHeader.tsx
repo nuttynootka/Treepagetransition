@@ -5,12 +5,26 @@ import { GarlandHeader, type GarlandPage } from "@/components/garland-header";
 import { TransitionLink } from "@/components/tree-transition";
 
 const pages: GarlandPage[] = [
-  { href: "/trees", label: "TREES" },
-  { href: "/firewood", label: "FIREWOOD" },
-  { href: "/wreaths", label: "WREATHS" },
-  { href: "/greenery", label: "GREENERY" },
-  { href: "/about", label: "ABOUT" },
-  { href: "/contact", label: "CONTACT" },
+  { href: "/", label: "Home" },
+  {
+    label: "Shop",
+    items: [
+      { href: "/statement-trees", label: "Statement Trees" },
+      { href: "/wholesale-trees", label: "Wholesale Trees" },
+      // Or "Wreaths & Boughs" if cut boughs are the only greenery you sell.
+      { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
+      { href: "/firewood", label: "Firewood" },
+      { href: "/make-payment", label: "Make Payment" },
+    ],
+  },
+  {
+    label: "Contact",
+    items: [
+      { href: "/meet-us", label: "Meet Us" },
+      { href: "/contact-us", label: "Contact Us" },
+      { href: "/request-quote", label: "Request Quote" },
+    ],
+  },
 ];
 
 export function SiteHeader() {

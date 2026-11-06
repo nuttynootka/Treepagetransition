@@ -1,7 +1,7 @@
-export default function ContactPage() {
+export default function ContactUsPage() {
   return (
     <main>
-      <h1>CONTACT</h1>
+      <h1>Contact Us</h1>
       <p>Placeholder text. Your contact page content goes here.</p>
     </main>
   );

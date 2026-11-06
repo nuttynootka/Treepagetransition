@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { crystalGlints, GLINT_COLORS, hashString, type Glint, type TabPlacement } from "./geometry";
 import { useSwing } from "./hooks";
 import { cn, Frost } from "./parts";
@@ -49,56 +49,49 @@ interface SnowflakeTabProps {
   labelChars: number;
   motion: boolean;
   Link: LinkLike;
+  /** For a menu snowflake: whether its hanging menu is down, and how to toggle it. */
+  menu?: { id: string; open: boolean; onToggle: () => void };
+  /** The hanging menu, rendered behind this snowflake. */
+  children?: ReactNode;
 }
 
-export function SnowflakeTab({ page, active, placement, crystal, mirrored, labelChars, motion, Link }: SnowflakeTabProps) {
-  const seed = useMemo(() => hashString(page.href + page.label), [page.href, page.label]);
+export function SnowflakeTab({
+  page,
+  active,
+  placement,
+  crystal,
+  mirrored,
+  labelChars,
+  motion,
+  Link,
+  menu,
+  children,
+}: SnowflakeTabProps) {
+  const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
   const glints = useMemo(() => crystalGlints(seed, 0.44), [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
 
   // Mouse or pen brushing past: swing away from where it came from.
-  const onPointerEnter = (e: PointerEvent<HTMLAnchorElement>) => {
+  const onPointerEnter = (e: PointerEvent<HTMLElement>) => {
     if (e.pointerType === "touch") return;
     const r = e.currentTarget.getBoundingClientRect();
     const dir = e.movementX !== 0 ? Math.sign(e.movementX) : e.clientX < r.left + r.width / 2 ? 1 : -1;
     kick(-dir * (0.32 + Math.min(Math.abs(e.movementX), 30) * 0.008));
   };
   // A tap or click: a small nudge away from the touch point.
-  const onPointerDown = (e: PointerEvent<HTMLAnchorElement>) => {
+  const onPointerDown = (e: PointerEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     kick(e.clientX < r.left + r.width / 2 ? -0.38 : 0.38);
   };
 
-  return (
-    <li
-      className="absolute top-[calc(var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] lg:left-[var(--xw)]"
-      style={
-        {
-          "--xn": `${placement.xNarrow}%`,
-          "--xw": `${placement.xWide}%`,
-          "--rn": placement.ribbonNarrow,
-          "--rw": placement.ribbonWide,
-          zIndex: placement.layer,
-        } as CSSProperties
-      }
-    >
-      <div ref={swingRef} data-active={active ? "true" : "false"} className="gh-flake group origin-top">
-        {/* Ribbon: starts tucked inside the greenery, ends at the crystal's top tip. */}
-        <span
-          aria-hidden
-          className="mx-auto block h-[calc(var(--g)*0.4+var(--rn))] w-px bg-linear-to-b from-[#cdb27a]/30 via-[#e9d7b0]/70 to-[#f6ead0]/90 lg:h-[calc(var(--g)*0.4+var(--rw))]"
-        />
-        <Link
-          href={page.href}
-          aria-current={active ? "page" : undefined}
-          onPointerEnter={motion ? onPointerEnter : undefined}
-          onPointerDown={motion ? onPointerDown : undefined}
-          className={cn(
-            "relative -mt-[1%] block size-[var(--flake)] rounded-full outline-none",
-            "[-webkit-tap-highlight-color:transparent] focus-visible:ring-2 focus-visible:ring-[#FFF5EB]/80",
-            "[--gh-halo:calc(var(--flake)*0.14)]",
-          )}
-        >
+  const faceClass = cn(
+    "relative -mt-[1%] block size-[var(--flake)] cursor-pointer rounded-full border-0 bg-transparent p-0 outline-none",
+    "[-webkit-tap-highlight-color:transparent] focus-visible:ring-2 focus-visible:ring-[#FFF5EB]/80",
+    "[--gh-halo:calc(var(--flake)*0.14)]",
+  );
+
+  const face = (
+    <>
           <span aria-hidden className="gh-aura pointer-events-none absolute -inset-[20%] rounded-full" />
 
           {/* The leaded-glass crystal */}
@@ -141,7 +134,7 @@ export function SnowflakeTab({ page, active, placement, crystal, mirrored, label
             <span
               key={active ? "t-on" : "t-off"}
               className={cn(
-                "gh-title relative whitespace-nowrap text-center font-semibold leading-none tracking-[0.08em]",
+                "gh-title relative whitespace-nowrap text-center font-semibold uppercase leading-none tracking-[0.08em]",
                 "font-[family-name:var(--gh-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
                 active ? "is-blooming text-[#FFF8F0]" : "text-white/90 group-hover:text-white",
               )}
@@ -150,8 +143,56 @@ export function SnowflakeTab({ page, active, placement, crystal, mirrored, label
               {page.label}
             </span>
           </span>
-        </Link>
+    </>
+  );
+
+  return (
+    <li
+      className="absolute top-[calc(var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] lg:left-[var(--xw)]"
+      style={
+        {
+          "--xn": `${placement.xNarrow}%`,
+          "--xw": `${placement.xWide}%`,
+          "--rn": placement.ribbonNarrow,
+          "--rw": placement.ribbonWide,
+          "--xfn": placement.xNarrow / 100,
+          "--xfw": placement.xWide / 100,
+          zIndex: menu?.open ? placement.layer - 1 : placement.layer,
+        } as CSSProperties
+      }
+      data-menu-root={menu ? menu.id : undefined}
+    >
+      <div ref={swingRef} data-active={active ? "true" : "false"} className="gh-flake group relative z-[1] origin-top">
+        {/* Ribbon: starts tucked inside the greenery, ends at the crystal's top tip. */}
+        <span
+          aria-hidden
+          className="mx-auto block h-[calc(var(--g)*0.4+var(--rn))] w-px bg-linear-to-b from-[#cdb27a]/30 via-[#e9d7b0]/70 to-[#f6ead0]/90 lg:h-[calc(var(--g)*0.4+var(--rw))]"
+        />
+        {menu ? (
+          <button
+            type="button"
+            aria-expanded={menu.open}
+            aria-controls={menu.id}
+            onClick={menu.onToggle}
+            onPointerEnter={motion ? onPointerEnter : undefined}
+            onPointerDown={motion ? onPointerDown : undefined}
+            className={faceClass}
+          >
+            {face}
+          </button>
+        ) : (
+          <Link
+            href={page.href ?? "/"}
+            aria-current={active ? "page" : undefined}
+            onPointerEnter={motion ? onPointerEnter : undefined}
+            onPointerDown={motion ? onPointerDown : undefined}
+            className={faceClass}
+          >
+            {face}
+          </Link>
+        )}
       </div>
+      {children}
     </li>
   );
 }
