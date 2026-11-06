@@ -80,66 +80,60 @@ export function ovalLights(count = 24, seed = 11): LightPoint[] {
 }
 
 // ---------------------------------------------------------------------------
-// Snowflake (viewBox 0 0 100 100, centre 50,50)
+// Crystal glints (percent of the snowflake box, centre 50,50)
 // ---------------------------------------------------------------------------
 
-/** Radius of the frosted glass plate, as a share of the snowflake box (58% wide). */
-export const PLATE_RADIUS = 29;
-
+/** The six arm directions of the crystal pictures (one arm points straight up). */
 const ARMS = [-90, -30, 30, 90, 150, 210];
-const SPINE_START = 28;
-const SPINE_END = 47;
-const BRANCHES = [
-  { at: 34, len: 9.5 },
-  { at: 41, len: 6 },
-];
-const BRANCH_ANGLE = 52;
 
-/** The silhouette: six arms, each with two pairs of branches and a diamond tip. */
-export function snowflakePath(): string {
-  const parts: string[] = [];
-  const pt = ([x, y]: [number, number]) => `${r2(x)} ${r2(y)}`;
-  for (const a of ARMS) {
-    parts.push(`M${pt(polar(SPINE_START, a))}L${pt(polar(SPINE_END - 2.5, a))}`);
-    for (const b of BRANCHES) {
-      const base = polar(b.at, a);
-      for (const side of [-1, 1]) {
-        const d = a + side * BRANCH_ANGLE;
-        const tip: [number, number] = [base[0] + b.len * Math.cos(rad(d)), base[1] + b.len * Math.sin(rad(d))];
-        parts.push(`M${pt(base)}L${pt(tip)}`);
-      }
-    }
-    // Diamond tip
-    const back = polar(SPINE_END - 3, a);
-    const front = polar(SPINE_END + 1.5, a);
-    const mid = polar(SPINE_END - 0.8, a);
-    const px = Math.cos(rad(a + 90)) * 1.9;
-    const py = Math.sin(rad(a + 90)) * 1.9;
-    parts.push(
-      `M${pt(back)}L${pt([mid[0] + px, mid[1] + py])}L${pt(front)}L${pt([mid[0] - px, mid[1] - py])}Z`,
-    );
-  }
-  return parts.join("");
+/** Colours of light caught in the crystal: mostly white, some from coloured Christmas lights. */
+export const GLINT_COLORS = {
+  white: "255 248 240",
+  gold: "255 214 140",
+  red: "255 92 92",
+  green: "92 255 150",
+} as const;
+export type GlintColor = keyof typeof GLINT_COLORS;
+
+export interface Glint {
+  x: number;
+  y: number;
+  /** "star" has crossed rays; "fleck" is a small coloured point of refracted light. */
+  kind: "star" | "fleck";
+  color: GlintColor;
+  /** Size as a share of the snowflake box. */
+  size: number;
+  dur: number;
+  delay: number;
+  /** Shown while the snowflake is inactive too (the rest only sparkle when active). */
+  rest: boolean;
 }
 
-/** Lights along each arm, at every branch tip, and a ring around the plate. */
-export function snowflakeLights(seed: number): LightPoint[] {
+/** Glints scattered over the crystal arms and branches, never on the glass plate. */
+export function crystalGlints(seed: number, plate: number, count = 18): Glint[] {
   const rand = seededRandom(seed);
-  const out: LightPoint[] = [];
-  const add = ([x, y]: [number, number]) => out.push({ x: r2(x), y: r2(y), ...twinkle(rand) });
-  for (const a of ARMS) {
-    add(polar(31, a));
-    add(polar(37.5, a));
-    add(polar(44, a));
-    add(polar(SPINE_END + 1.5, a));
-    for (const b of BRANCHES) {
-      const base = polar(b.at, a);
-      for (const side of [-1, 1]) {
-        const d = a + side * BRANCH_ANGLE;
-        add([base[0] + b.len * Math.cos(rad(d)), base[1] + b.len * Math.sin(rad(d))]);
-      }
-    }
-    add(polar(PLATE_RADIUS + 1.6, a + 30));
+  const innerR = plate * 50 + 3;
+  const out: Glint[] = [];
+  for (let i = 0; i < count; i++) {
+    const onArm = rand() < 0.7;
+    const arm = ARMS[Math.floor(rand() * ARMS.length)];
+    const deg = onArm ? arm + (rand() - 0.5) * 16 : arm + 30 + (rand() - 0.5) * 24;
+    const r = innerR + rand() * (46 - innerR);
+    const [x, y] = polar(r, deg);
+    const c = rand();
+    const color: GlintColor = c < 0.58 ? "white" : c < 0.72 ? "gold" : c < 0.86 ? "red" : "green";
+    const kind = rand() < 0.4 ? "star" : "fleck";
+    const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
+    out.push({
+      x: r2(x),
+      y: r2(y),
+      kind,
+      color,
+      size: r2(kind === "star" ? 0.16 + rand() * 0.1 : 0.05 + rand() * 0.035),
+      dur: r2(dur),
+      delay: r2(-rand() * dur),
+      rest: i % 2 === 0,
+    });
   }
   return out;
 }
@@ -212,7 +206,7 @@ export interface TabPlacement {
 }
 
 export function placeTabs(count: number): TabPlacement[] {
-  const NARROW = { short: 10, long: 62 };
+  const NARROW = { short: 8, long: 78 };
   const WIDE = { short: 16, long: 66 };
   const left = Math.ceil(count / 2);
   const right = count - left;
@@ -233,7 +227,7 @@ export function placeTabs(count: number): TabPlacement[] {
     const isLeft = i < left;
     const j = isLeft ? i : i - left;
     return {
-      xNarrow: r2(((i + 0.5) / count) * 100),
+      xNarrow: r2(count === 1 ? 50 : 17 + (66 * i) / (count - 1)),
       ribbonNarrow: i % 2 === 0 ? NARROW.short : NARROW.long,
       xWide: isLeft ? r2(leftX[j]) : r2(rightX[j]),
       ribbonWide: isLeft ? ribbonFor(j, left, true) : ribbonFor(j, right, false),

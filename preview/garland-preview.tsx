@@ -2,10 +2,11 @@
 // wand-tree engine, with a tiny fake router so it runs as one HTML page.
 import { forwardRef, useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { createRoot } from "react-dom/client";
-import { GarlandHeader, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
+import { GarlandHeader, type CrystalImage, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
 import { TreeTransitionEngine } from "../components/tree-transition/engine";
 
 declare const PLACEHOLDER_LOGO: string;
+declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
   { href: "/", label: "Home" },
@@ -17,7 +18,7 @@ const pages: GarlandPage[] = [
 const copy: Record<string, { title: string; body: string }> = {
   "/": { title: "Home", body: "Tap a snowflake. The wand draws a tree of lights, the page changes under it, and frost blooms on the new snowflake's glass." },
   "/workshop": { title: "The Workshop", body: "Brush the mouse across a snowflake to set it swinging, or tap one. Lights near your pointer or finger glow a little warmer." },
-  "/letters": { title: "Letters", body: "Inactive snowflakes stay readable but rest at a dimmer twinkle. The active one is fully lit with a soft aura." },
+  "/letters": { title: "Letters", body: "Inactive snowflakes stay readable but rest in shadow with only a few glints. The active one is fully lit, sparkling with white, gold, red and green light." },
   "/gifts": { title: "Gifts", body: "Try your own garland photo and logo below. They stay on your device and are never uploaded." },
 };
 
@@ -82,6 +83,7 @@ function App() {
         LinkComponent={PreviewLink}
         garlandSrc={garland}
         garlandFit={fit}
+        crystals={CRYSTALS}
         logoSrc={logo}
         logoAlt="Company logo"
       />

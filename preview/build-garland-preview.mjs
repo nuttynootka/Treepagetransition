@@ -24,6 +24,13 @@ const reactGlobals = {
 const logo = readFileSync(join(root, "public/brand/logo.svg"), "utf8");
 const logoUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logo)}`;
 
+// The crystal pictures, embedded so the preview is one file.
+const plates = [0.3516, 0.3603, 0.3749, 0.3682];
+const crystals = plates.map((plate, i) => ({
+  src: `data:image/webp;base64,${readFileSync(join(root, `public/snowflakes/crystal-${i + 1}.webp`)).toString("base64")}`,
+  plate,
+}));
+
 const js = await build({
   entryPoints: [join(here, "garland-preview.tsx")],
   bundle: true,
@@ -38,7 +45,7 @@ const js = await build({
   inject: [join(here, "react-shim.js")],
   loader: { ".css": "empty" },
   plugins: [reactGlobals],
-  define: { "process.env.NODE_ENV": '"production"', PLACEHOLDER_LOGO: JSON.stringify(logoUri) },
+  define: { "process.env.NODE_ENV": '"production"', PLACEHOLDER_LOGO: JSON.stringify(logoUri), CRYSTALS: JSON.stringify(crystals) },
 });
 
 const cssPath = join(here, "garland-preview.css");

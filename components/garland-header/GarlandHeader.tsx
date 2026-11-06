@@ -5,7 +5,7 @@ import { placeTabs } from "./geometry";
 import { useReducedMotion, useWarmPointer } from "./hooks";
 import { Bokeh, cn, Garland, LogoFrame } from "./parts";
 import { SnowflakeTab } from "./SnowflakeTab";
-import type { GarlandPage, LinkLike } from "./types";
+import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 import "./garland-header.css";
 
 export interface GarlandHeaderProps {
@@ -25,10 +25,22 @@ export interface GarlandHeaderProps {
   logo?: React.ReactNode;
   /** Where the logo links to. */
   homeHref?: string;
+  /**
+   * Crystal snowflake pictures, used in turn for each page (page 1 gets the first, and so on,
+   * starting again after the last).
+   */
+  crystals?: CrystalImage[];
   /** The link component to use, e.g. next/link or TransitionLink. Defaults to a plain <a>. */
   LinkComponent?: LinkLike;
   className?: string;
 }
+
+export const DEFAULT_CRYSTALS: CrystalImage[] = [
+  { src: "/snowflakes/crystal-1.webp", plate: 0.3516 },
+  { src: "/snowflakes/crystal-2.webp", plate: 0.3603 },
+  { src: "/snowflakes/crystal-3.webp", plate: 0.3749 },
+  { src: "/snowflakes/crystal-4.webp", plate: 0.3682 },
+];
 
 const PlainLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>(
   function PlainLink(props, ref) {
@@ -50,6 +62,7 @@ export function GarlandHeader({
   logoAlt = "Company logo",
   logo,
   homeHref = "/",
+  crystals = DEFAULT_CRYSTALS,
   LinkComponent = PlainLink,
   className,
 }: GarlandHeaderProps) {
@@ -68,7 +81,7 @@ export function GarlandHeader({
         "gh-root relative isolate w-full select-none overflow-hidden text-[#FFF8F0]",
         // Sizes per screen width: garland height, snowflake size, logo frame.
         "[--g:76px] sm:[--g:88px] md:[--g:100px] lg:[--g:116px]",
-        "[--flake:min(108px,29vw)] sm:[--flake:120px] md:[--flake:132px] lg:[--flake:152px] xl:[--flake:166px]",
+        "[--flake:min(132px,34vw)] sm:[--flake:136px] md:[--flake:148px] lg:[--flake:172px] xl:[--flake:188px]",
         "[--logo-w:136px] [--logo-h:66px] sm:[--logo-w:168px] sm:[--logo-h:80px] md:[--logo-w:204px] md:[--logo-h:94px] lg:[--logo-w:236px] lg:[--logo-h:108px]",
         "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] md:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
@@ -92,6 +105,7 @@ export function GarlandHeader({
               page={page}
               active={isActive(activeHref, page.href)}
               placement={placements[i]}
+              crystal={crystals[i % crystals.length]}
               motion={!reducedMotion}
               Link={LinkComponent}
             />

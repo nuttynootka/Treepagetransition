@@ -163,15 +163,15 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 # Garland header with snowflake page tabs
 
-A header for the top of the site: your photo of a live-greenery garland across the top, strung with soft white fairy lights; your logo centred in a frosted oval ringed with its own lights; and one hanging snowflake per page. Each snowflake is outlined in fairy lights and has a round frosted-glass plate in the middle with the page name.
+A header for the top of the site: your photo of a live-greenery garland across the top, strung with soft white fairy lights; your logo centred in a frosted oval ringed with its own lights; and one hanging crystal snowflake per page, like leaded-glass ornaments catching the light of Christmas lights. Each has a round frosted-glass plate in the middle with the page name.
 
-- The snowflake for the current page is fully lit, with brighter twinkling and a soft glowing aura.
-- The other snowflakes stay readable and clickable but rest dimmer.
+- The snowflake for the current page is fully lit: it slowly brightens and dims, glints sparkle across its facets in white, gold, red and green, and a soft aura glows behind it.
+- The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
 - When a page becomes active, frost crystals grow across its glass plate and then the title sharpens.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
-- Twinkles are slow opacity "breathing" (1.5–3 seconds per cycle), never flashing.
-- With "reduce motion" turned on, lights stay steady, nothing swings, and the frost appears without growing.
+- Garland and logo lights breathe slowly (1.5–3 seconds per cycle). Crystal glints flare briefly every few seconds. Nothing strobes.
+- With "reduce motion" turned on, lights and glints stay steady, nothing swings, and the frost appears without growing.
 
 **Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat. It has buttons to try your own garland photo and logo (they stay on your device).
 
@@ -183,8 +183,9 @@ A header for the top of the site: your photo of a live-greenery garland across t
 | `components/garland-header/SnowflakeTab.tsx` | One hanging snowflake tab. |
 | `components/garland-header/parts.tsx` | Fairy light, garland strip, logo frame, frost. |
 | `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
-| `components/garland-header/geometry.ts` | Where every light, snowflake line and frost crystal goes. |
+| `components/garland-header/geometry.ts` | Where every light, glint and frost crystal goes. |
 | `components/garland-header/garland-header.css` | The twinkle, aura and frost animations. |
+| `public/snowflakes/` | The 4 crystal snowflake pictures, cut out from your image with transparent backgrounds. |
 | `public/brand/logo.svg` | **Placeholder logo. Replace it with yours.** |
 | `public/garland/` | **Put your garland photo here** as `garland.png`. |
 | `app/SiteHeader.tsx` | How this demo site uses the header with the tree transition. |
@@ -223,7 +224,8 @@ const pages: GarlandPage[] = [
 - On tablets and computers (768px wide and up), the first half hang left of the logo and the rest hang right. An even number looks most balanced.
 - On phones they hang in one row with alternating short and long ribbons, so neighbours don't bump.
 - Labels up to about 9 letters fit on one line; longer ones wrap.
-- 3 to 6 pages fit well. More than 6 gets crowded on phones.
+- 3 to 6 pages fit well. More than 4 overlaps quite a lot on phones.
+- There are 4 crystal designs. A 5th page reuses the 1st design, and so on.
 
 ## Use it in another Next.js project
 
@@ -255,6 +257,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 | `logo` | none | Any element (like an inline `<svg>`) to use instead of `logoSrc` |
 | `logoAlt` | `"Company logo"` | Logo description for screen readers |
 | `homeHref` | `"/"` | Where the logo links to |
+| `crystals` | the 4 in `public/snowflakes/` | Crystal pictures, used in turn for each page (see below) |
 | `LinkComponent` | plain `<a>` | `next/link`'s `Link`, `TransitionLink`, or your own |
 
 ### Sizes and colours
@@ -262,13 +265,32 @@ It needs React 18 or newer and Tailwind CSS v4.
 - **Garland height, snowflake size, logo frame size:** the `[--g:…]`, `[--flake:…]` and `[--logo-w:…]`/`[--logo-h:…]` classes near the top of `GarlandHeader.tsx`, one value per screen width (`sm:` 640px+, `md:` 768px+, `lg:` 1024px+, `xl:` 1280px+).
 - **Ribbon lengths:** `NARROW` and `WIDE` in `placeTabs()` in `geometry.ts`.
 - **Light colour:** `--gh-light` (the bulb, `#FFF5EB`) and `--gh-warm` (the warm glow) at the top of `garland-header.css`.
-- **Twinkle brightness:** the `gh-rest` (inactive), `gh-soft` (garland and logo) and `gh-lit` (active) keyframes in `garland-header.css`.
+- **Garland and logo twinkle:** the `gh-soft` keyframes in `garland-header.css`.
+- **Crystal brightness:** `.gh-crystal` rules in `garland-header.css` (inactive dimness, active shimmer).
+- **Glints:** how many and which colours in `crystalGlints()` in `geometry.ts`; how they flash in the `gh-glint` and `gh-fleck` keyframes.
 - **Swing:** the period (`1.7`) and damping (`0.16`) in `useSwing()` in `hooks.ts`.
 
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 280px tall on phones and 330–370px on computers. It is not sticky, so it scrolls away with the page.
-- There are about 300 small lights. They animate only their opacity, which phones handle well.
+- The header is about 315px tall on phones and 350–405px on computers. It is not sticky, so it scrolls away with the page.
+- There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
+- Labels shrink with the plate. On phones a long label like "Workshop" is 10px, which is the smallest that stays readable; keep labels short if you can.
+
+### Using different crystal pictures
+
+1. Each picture should be square, with a transparent background, with the snowflake's round plate exactly in the centre.
+2. Save it as WebP or PNG, about 440 × 440 pixels, in `public/snowflakes/`.
+3. Measure the plate: its width inside the silver rim divided by the picture's width. For example a 160px plate in a 440px picture is `0.36`.
+4. Pass them in `app/SiteHeader.tsx`:
+
+   ```tsx
+   crystals={[
+     { src: "/snowflakes/my-flake-1.webp", plate: 0.36 },
+     { src: "/snowflakes/my-flake-2.webp", plate: 0.37 },
+   ]}
+   ```
+
+The frosted glass plate and page name are drawn over that centre circle. In the included pictures, the original plate is faded to 15% so the dark glass and white text stay readable.
 
 To rebuild the preview page after changing the component: `npm run build:garland-preview`.

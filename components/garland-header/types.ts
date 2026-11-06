@@ -19,3 +19,10 @@ export interface LinkLikeProps {
 }
 
 export type LinkLike = ComponentType<LinkLikeProps>;
+
+/** A crystal snowflake picture: a square image with a transparent background, centred on its glass plate. */
+export interface CrystalImage {
+  src: string;
+  /** Width of the glass plate (inside its silver rim) as a share of the image width, 0–1. */
+  plate: number;
+}
