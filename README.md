@@ -1,6 +1,6 @@
 # Fairy-Tale Wand Christmas Tree: page transition for Next.js
 
-When someone clicks or taps a link, an invisible wand spirals up the screen and draws a Christmas tree out of about 1,800 twinkling white lights while the page fades to black. A star lights up at the top and bursts into falling red and green sparks. 200ms later the page changes under the black screen, then the lights drift down and fade out as the new page appears. The whole thing takes about 1.9 seconds.
+When someone clicks or taps a link, an invisible wand spirals up the screen and draws a Christmas tree out of about 1,800 twinkling white lights while the page fades to black. A star lights up at the top and bursts into falling red and green sparks. 200ms later the page changes under the black screen, then the lights drift down and fade out as the new page appears. The whole thing takes about 2.2 seconds.
 
 - **Preview it:** open `preview/tree-transition-preview.html` in any browser (double-click it), or use the private preview link from the chat.
 - **Use it in your site:** copy the folder `components/tree-transition/` into your project (steps below).
@@ -104,11 +104,12 @@ function CheckoutButton() {
   | Setting | Default | What it controls |
   | --- | --- | --- |
   | `summon` | 200ms | Sparks flying from the tap point to the tree base |
-  | `draw` | 900ms | The wand drawing the tree |
+  | `draw` | 1200ms | The wand drawing the tree |
   | `navDelay` | 200ms | Gap between the star burst and the page change |
   | `dissolve` | 500ms | Lights and overlay fading out on the new page |
   | `routeTimeout` | 4000ms | If the new page takes longer than this, fade out anyway |
 
+- **Tree width:** in `engine.ts`, find `const maxR =` inside `resize()`. The first number is for phones (share of screen width), the second pair is for larger screens. Bigger numbers = wider tree.
 - **Colours:** `SPARK_COLORS` near the top of `engine.ts` (white, gold, red, green as RGB numbers).
 
 ### Reduced motion

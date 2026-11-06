@@ -11,9 +11,9 @@
  * Timeline (default values, see TIMING):
  *   0ms      overlay appears, background starts fading to black
  *   0-200    "summon": sparks fly from the tap point to the tree base
- *   200-1100 the wand spirals up and leaves ~1,800 fixed white lights
- *   1100     star lights up at the peak, red/green splash; overlay is fully black
- *   1300     onNavigate() is called (route change happens under the overlay)
+ *   200-1400 the wand spirals up and leaves ~1,800 fixed white lights
+ *   1400     star lights up at the peak, red/green splash; overlay is fully black
+ *   1600     onNavigate() is called (route change happens under the overlay)
  *   mount    reveal(): lights drift and fade, overlay fades out over 500ms
  */
 
@@ -41,7 +41,7 @@ export interface EngineOptions {
 
 export const TIMING = {
   summon: 200, // tap-point sparks travel to the tree base
-  draw: 900, // wand travels from base to peak
+  draw: 1200, // wand travels from base to peak
   navDelay: 200, // route change this long after the star splash starts
   dissolve: 500, // lights and overlay fade out after the new page mounts
   routeTimeout: 4000, // reveal anyway if the new page never reports in
@@ -288,7 +288,7 @@ export class TreeTransitionEngine {
     // Mobile: the tree fills the screen. Desktop: a centred tree, capped in size.
     const treeH = mobile ? h * 0.84 : Math.min(h * 0.84, 900);
     const baseY = (h + treeH) / 2;
-    const maxR = mobile ? w * 0.42 : Math.min(treeH * 0.4, w * 0.38);
+    const maxR = mobile ? w * 0.46 : Math.min(treeH * 0.56, w * 0.45);
     this.g = { w, h, cx: w / 2, baseY, treeH, maxR, minDim: Math.min(w, h) };
   }
 
