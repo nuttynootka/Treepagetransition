@@ -1,0 +1,74 @@
+<title>Wand Tree Transition</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;600&display=swap">
+<style>
+/* Layout: a small mock website (nav + page) with a quiet test bar below it. */
+:root {
+  --bg: #f4f6f2;
+  --surface: #ffffff;
+  --fg: #17221d;
+  --muted: #56655d;
+  --line: #d6ddd7;
+  --pine: #1d5a3d;
+  --berry: #a91d2b;
+  --on-pine: #f4f6f2;
+  --display: "Gloock", Georgia, "Times New Roman", serif;
+  --body: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1511; --surface: #16201b; --fg: #e8eee9; --muted: #9caca3; --line: #26342d;
+  --pine: #63c493; --berry: #ff6b75; --on-pine: #0e1511; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0e1511; --surface: #16201b; --fg: #e8eee9; --muted: #9caca3; --line: #26342d;
+  --pine: #63c493; --berry: #ff6b75; --on-pine: #0e1511; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--fg); font: 17px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+.wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; padding-block: 20px 40px; }
+nav { display: flex; gap: 8px; flex-wrap: wrap; }
+nav button {
+  font: 600 16px/1 var(--body); color: var(--fg); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 12px 18px; cursor: pointer;
+  touch-action: manipulation;
+}
+nav button[aria-current="page"] { background: var(--pine); color: var(--on-pine); border-color: var(--pine); }
+nav button:focus-visible, label:focus-within { outline: 2px solid var(--berry); outline-offset: 2px; }
+.eyebrow { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font: 400 clamp(2.4rem, 9vw, 3.6rem)/1.05 var(--display); margin: 4px 0 12px; text-wrap: balance; }
+#page-body { color: var(--muted); max-width: 60ch; margin: 0; }
+.bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  border-top: 1px solid var(--line); padding-top: 16px; font-size: 15px; color: var(--muted);
+}
+.bar label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+.bar input { width: 18px; height: 18px; accent-color: var(--pine); }
+#timer { font-variant-numeric: tabular-nums; }
+#tt-overlay { position: fixed; inset: 0; z-index: 999; display: none; pointer-events: none; }
+#tt-overlay canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+</style>
+
+<div class="wrap">
+  <nav aria-label="Demo pages">
+    <button type="button" data-page="home" aria-current="page">Home</button>
+    <button type="button" data-page="workshop">Workshop</button>
+    <button type="button" data-page="letters">Letters</button>
+  </nav>
+  <section aria-live="polite">
+    <p class="eyebrow">Preview page</p>
+    <h1 id="page-title">Home</h1>
+    <p id="page-body"></p>
+  </section>
+  <div class="bar">
+    <label for="reduced"><input type="checkbox" id="reduced"> Preview reduced-motion version</label>
+    <span id="timer">Last run: none yet</span>
+  </div>
+</div>
+<div id="tt-overlay" aria-hidden="true"><canvas id="tt-trail"></canvas><canvas id="tt-lights"></canvas></div>
+<script>/*__ENGINE__*/</script>
