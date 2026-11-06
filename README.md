@@ -182,6 +182,7 @@ A header for the top of the site: your photo of a live-greenery garland across t
 | `components/garland-header/GarlandHeader.tsx` | The header. This is what you use. |
 | `components/garland-header/SnowflakeTab.tsx` | One hanging snowflake tab. |
 | `components/garland-header/HangingMenu.tsx` | The drop-down menu of glass plates on chains. |
+| `components/garland-header/chain-physics.ts` | The physics that makes each plate swing, twist and settle on its own. |
 | `components/garland-header/parts.tsx` | Fairy light, garland strip, logo frame, frost. |
 | `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
 | `components/garland-header/geometry.ts` | Where every light, glint and frost crystal goes. |
@@ -245,13 +246,18 @@ const pages: GarlandPage[] = [
 
 ### How the hanging menu works
 
-- Tapping SHOP or CONTACT drops a series of frosted glass plates on two silver chains. The chains hang from the garland, behind the snowflake. The plates unroll downward one at a time, like a rug unfurling or a rope ladder dropping, and then sway gently and settle.
+- Tapping SHOP or CONTACT drops a series of frosted glass plates on silver chains. Two chains hang from the garland, behind the snowflake, to the first plate; each plate below hangs from the one above by two shorter chains nearer its middle.
+- The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
+- Opening: the plates are released one at a time from the top, each unfolding as it falls until its chains catch it, with a small random nudge so no two drops look alike. Then they sway and settle.
+- A faint, random breeze keeps each plate drifting slightly on its own. Moving the mouse across a plate, or tapping it, pushes it, and the motion travels up and down the chain.
+- Each plate also twists a few degrees toward and away from you as it moves.
+- Closing reels the plates back up, bottom plate first, until they are hidden behind the garland.
 - Tapping the snowflake again, tapping anywhere else, or pressing Escape rolls the plates back up, bottom plate first, until they are hidden behind the garland.
 - Tapping a plate rolls the menu up and goes to that page, with the wand-tree transition.
 - Only one menu is open at a time. Opening the other one rolls the first one up.
 - On phones a menu near the edge shifts sideways so it stays on screen.
-- With "reduce motion" on, the menu fades in and out instead of unrolling.
-- Sizes: `--menu-w` (plate width), `--menu-h` (plate height) and `--menu-font` near the top of `GarlandHeader.tsx`. Unroll speed: `.gh-rung` in `garland-header.css`.
+- With "reduce motion" on, the plates hang still and the menu fades in and out.
+- Sizes: `--menu-w` (plate width), `--menu-h` (plate height) and `--menu-font` near the top of `GarlandHeader.tsx`. How heavy and lively the plates feel (gravity, drag, breeze, twist, drop and reel timing): the `PHYS` settings at the top of `chain-physics.ts`.
 
 ## Use it in another Next.js project
 
