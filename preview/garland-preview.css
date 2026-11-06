@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "../components/garland-header/garland-header.css";
+
+/* One committed look: candle-lit winter night. */
+/* Layout: full-bleed header, then a narrow reading column with a quiet try-out panel. */
+:root {
+  --night: #060c0a;
+  --panel: #0d1a15;
+  --ink: #f3ede4;
+  --muted: #a9b5ad;
+  --gold: #e9d7b0;
+  --line: #22342b;
+  --font-cormorant: "Cormorant Garamond";
+  --display: "Cormorant Garamond", Palatino, Georgia, serif;
+  --body: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+body {
+  background: var(--night);
+  color: var(--ink);
+  font: 17px/1.6 var(--body);
+}
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-block: 32px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.page h1 {
+  font: 600 clamp(2.4rem, 8vw, 3.4rem) / 1.05 var(--display);
+  margin: 6px 0 12px;
+  text-wrap: balance;
+}
+.lede { margin: 0; color: var(--muted); max-width: 60ch; }
+.tryout {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tryout h2 { font: 600 1.6rem/1.2 var(--display); margin: 0; }
+.hint { margin: 0; color: var(--muted); font-size: 15px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.file {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file:focus-within, .check:focus-within { outline: 2px solid var(--gold); outline-offset: 3px; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: 15px; color: var(--muted); cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--gold); }
+#tt-overlay { position: fixed; inset: 0; z-index: 999; display: none; pointer-events: none; }
+#tt-overlay canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }

@@ -1,0 +1,9 @@
+<!-- PLACEHOLDER LOGO. Replace this file with your own logo (keep the name logo.svg),
+     or pass logoSrc="/brand/your-file.png" to <GarlandHeader>. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 90" role="img" aria-label="Your logo">
+  <g fill="none" stroke="#e9d7b0" stroke-width="1" opacity="0.8">
+    <path d="M40 30h160M40 60h160"/>
+  </g>
+  <text x="120" y="52" text-anchor="middle" fill="#f6ead0" font-family="Cormorant Garamond, Palatino, Georgia, serif" font-size="26" letter-spacing="6" font-weight="600">YOUR LOGO</text>
+  <text x="120" y="78" text-anchor="middle" fill="#cdb27a" font-family="Georgia, serif" font-size="9" letter-spacing="1.5">public/brand/logo.svg</text>
+</svg>

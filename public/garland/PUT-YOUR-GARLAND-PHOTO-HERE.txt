@@ -1,0 +1,7 @@
+Put your garland photo in this folder and name it garland.png
+
+- It should be wide (about 3000 x 400 pixels or similar) with a transparent background.
+- Until it is here, the header shows a dark green placeholder band.
+- To use another name or format, pass garlandSrc="/garland/your-file.webp" to <GarlandHeader>.
+
+See the README section "Garland header" for full steps.

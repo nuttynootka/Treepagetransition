@@ -1,0 +1,127 @@
+/*
+ * Garland header: the animation parts Tailwind utilities can't express
+ * (keyframes and the layered fairy-light glow). Layout and colour live in
+ * Tailwind classes in the .tsx files.
+ */
+
+.gh-root {
+  --gh-light: 255 245 235; /* #FFF5EB */
+  --gh-warm: 255 222 186;
+  --gh-font: var(--font-cormorant, "Cormorant Garamond"), "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+/* ---------- Fairy light ----------
+ * .gh-light            zero-size anchor at the light's position
+ *   .gh-light-twinkle  glow + bulb, breathes softly (one layer per light)
+ *   .gh-light-warm     extra glow when the pointer is near (--warm 0–1)
+ */
+.gh-light {
+  position: absolute;
+  width: 0;
+  height: 0;
+  --warm: 0;
+  --core: var(--gh-core, 3px);
+  --halo: var(--gh-halo, 14px);
+  pointer-events: none;
+}
+.gh-light > span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 9999px;
+  translate: -50% -50%;
+}
+.gh-light-twinkle {
+  width: var(--halo);
+  height: var(--halo);
+  background:
+    radial-gradient(circle, rgb(var(--gh-light)) 0 calc(var(--core) / 2), transparent calc(var(--core) / 2 + 0.6px)),
+    radial-gradient(circle, rgb(var(--gh-light) / 0.6) 0%, rgb(var(--gh-warm) / 0.22) 36%, transparent 70%);
+  opacity: 0.6;
+  animation: gh-rest var(--dur, 2.2s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+.gh-light-warm {
+  width: calc(var(--halo) * 2);
+  height: calc(var(--halo) * 2);
+  background: radial-gradient(circle, rgb(var(--gh-warm) / 0.55) 0%, rgb(var(--gh-warm) / 0.16) 38%, transparent 66%);
+  opacity: var(--warm);
+  transition: opacity 0.4s ease-out;
+}
+
+/* Garland and logo lights stay softly lit at all times. */
+.gh-glow-soft .gh-light-twinkle { animation-name: gh-soft; }
+/* Active snowflake: brighter, bigger glow. */
+.gh-flake[data-active="true"] .gh-light-twinkle { animation-name: gh-lit; }
+
+@keyframes gh-rest {
+  from { opacity: 0.32; }
+  to { opacity: 0.72; }
+}
+@keyframes gh-soft {
+  from { opacity: 0.55; }
+  to { opacity: 0.95; }
+}
+@keyframes gh-lit {
+  from { opacity: 0.78; scale: 1; }
+  to { opacity: 1; scale: 1.22; }
+}
+
+/* ---------- Active aura ---------- */
+.gh-aura {
+  background: radial-gradient(circle, rgb(var(--gh-light) / 0.3) 0%, rgb(var(--gh-warm) / 0.12) 38%, transparent 68%);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.gh-flake[data-active="true"] .gh-aura {
+  opacity: 1;
+  animation: gh-aura 3s ease-in-out infinite alternate;
+}
+@keyframes gh-aura {
+  from { opacity: 0.7; scale: 0.96; }
+  to { opacity: 1; scale: 1.04; }
+}
+
+/* ---------- Frost bloom ---------- */
+.gh-frost {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.gh-frost path {
+  fill: none;
+  stroke: rgb(236 246 255 / 0.8);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.gh-frost.is-blooming {
+  animation: gh-frost-settle 2.8s ease-out 0.35s both;
+}
+.gh-frost.is-blooming path {
+  animation: gh-frost-draw 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--fd, 0s) + 0.35s) forwards;
+}
+@keyframes gh-frost-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes gh-frost-settle {
+  0% { opacity: 1; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+.gh-title.is-blooming {
+  animation: gh-sharpen 0.9s ease-out 1s both;
+}
+@keyframes gh-sharpen {
+  from { filter: blur(3px); opacity: 0.5; letter-spacing: 0.1em; }
+  to { filter: blur(0); opacity: 1; }
+}
+
+/* ---------- Reduced motion: still lights, no frost growth ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gh-light-twinkle,
+  .gh-flake[data-active="true"] .gh-aura { animation: none !important; }
+  .gh-flake[data-active="true"] .gh-light-twinkle { opacity: 1; }
+  .gh-frost.is-blooming { animation: none; opacity: 0.3; }
+  .gh-frost.is-blooming path { animation: none; stroke-dashoffset: 0; }
+  .gh-title.is-blooming { animation: none; }
+  .gh-light-warm { transition: none; }
+}

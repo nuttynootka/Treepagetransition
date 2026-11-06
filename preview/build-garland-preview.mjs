@@ -1,0 +1,53 @@
+// Builds preview/garland-header-preview.html: one self-contained page with the
+// real garland header and wand-tree engine, for previewing without Next.js.
+// React is loaded from cdnjs by the page, so imports of "react" map to the global.
+import { build } from "esbuild";
+import postcss from "postcss";
+import tailwind from "@tailwindcss/postcss";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, "..");
+
+const reactGlobals = {
+  name: "react-globals",
+  setup(b) {
+    b.onResolve({ filter: /^react(-dom)?(\/.*)?$/ }, (args) => ({ path: args.path, namespace: "global" }));
+    b.onLoad({ filter: /.*/, namespace: "global" }, (args) => ({
+      contents: args.path.startsWith("react-dom") ? "module.exports = window.ReactDOM;" : "module.exports = window.React;",
+    }));
+  },
+};
+
+const logo = readFileSync(join(root, "public/brand/logo.svg"), "utf8");
+const logoUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logo)}`;
+
+const js = await build({
+  entryPoints: [join(here, "garland-preview.tsx")],
+  bundle: true,
+  format: "iife",
+  target: "es2019",
+  minify: true,
+  write: false,
+  jsx: "transform",
+  tsconfigRaw: { compilerOptions: { jsx: "react" } },
+  jsxFactory: "React.createElement",
+  jsxFragment: "React.Fragment",
+  inject: [join(here, "react-shim.js")],
+  loader: { ".css": "empty" },
+  plugins: [reactGlobals],
+  define: { "process.env.NODE_ENV": '"production"', PLACEHOLDER_LOGO: JSON.stringify(logoUri) },
+});
+
+const cssPath = join(here, "garland-preview.css");
+const css = await postcss([tailwind({ base: root, optimize: { minify: true } })]).process(readFileSync(cssPath, "utf8"), {
+  from: cssPath,
+});
+
+const html = readFileSync(join(here, "garland-template.html"), "utf8")
+  .replace("/*__CSS__*/", () => css.css.replace(/<\/style/gi, "<\\/style"))
+  .replace("/*__JS__*/", () => js.outputFiles[0].text.replace(/<\/script/gi, "<\\/script"));
+writeFileSync(join(here, "garland-header-preview.html"), html);
+console.log("Wrote preview/garland-header-preview.html", (html.length / 1024).toFixed(1), "KB");
