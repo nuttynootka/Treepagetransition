@@ -5,10 +5,12 @@ import { GarlandHeader, type GarlandPage } from "@/components/garland-header";
 import { TransitionLink } from "@/components/tree-transition";
 
 const pages: GarlandPage[] = [
-  { href: "/", label: "Home" },
-  { href: "/workshop", label: "Workshop" },
-  { href: "/letters", label: "Letters" },
-  { href: "/gifts", label: "Gifts" },
+  { href: "/trees", label: "TREES" },
+  { href: "/firewood", label: "FIREWOOD" },
+  { href: "/wreaths", label: "WREATHS" },
+  { href: "/greenery", label: "GREENERY" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 export function SiteHeader() {

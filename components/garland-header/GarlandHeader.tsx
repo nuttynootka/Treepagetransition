@@ -68,9 +68,9 @@ export function GarlandHeader({
 }: GarlandHeaderProps) {
   const rootRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
-  const placements = useMemo(() => placeTabs(pages.length), [pages.length]);
-  const maxNarrow = Math.max(0, ...placements.map((p) => p.ribbonNarrow));
-  const maxWide = Math.max(0, ...placements.map((p) => p.ribbonWide));
+  const layout = useMemo(() => placeTabs(pages.length), [pages.length]);
+  // Longest label sets one shared label size, so every plate reads alike.
+  const longest = Math.max(1, ...pages.map((p) => p.label.length));
 
   useWarmPointer(rootRef, true);
 
@@ -81,12 +81,14 @@ export function GarlandHeader({
         "gh-root relative isolate w-full select-none overflow-hidden text-[#FFF8F0]",
         // Sizes per screen width: garland height, snowflake size, logo frame.
         "[--g:76px] sm:[--g:88px] md:[--g:100px] lg:[--g:116px]",
-        "[--flake:min(132px,34vw)] sm:[--flake:136px] md:[--flake:148px] lg:[--flake:172px] xl:[--flake:188px]",
+        "[--flake:min(150px,31vw)] sm:[--flake:160px] md:[--flake:172px] lg:[--flake:150px] xl:[--flake:196px]",
+        // Glass plate width as a share of the snowflake (bigger on phones, for the label).
+        "[--plate:0.58] sm:[--plate:0.5] lg:[--plate:0.46] xl:[--plate:0.42]",
         "[--logo-w:136px] [--logo-h:66px] sm:[--logo-w:168px] sm:[--logo-h:80px] md:[--logo-w:204px] md:[--logo-h:94px] lg:[--logo-w:236px] lg:[--logo-h:108px]",
-        "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] md:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
+        "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
       )}
-      style={{ "--rib-n": `${maxNarrow}px`, "--rib-w": `${maxWide}px` } as React.CSSProperties}
+      style={{ "--rib-n": layout.maxNarrow, "--rib-w": layout.maxWide } as React.CSSProperties}
     >
       {/* Night backdrop */}
       <div
@@ -104,8 +106,10 @@ export function GarlandHeader({
               key={page.href}
               page={page}
               active={isActive(activeHref, page.href)}
-              placement={placements[i]}
+              placement={layout.tabs[i]}
               crystal={crystals[i % crystals.length]}
+              mirrored={Math.floor(i / crystals.length) % 2 === 1}
+              labelChars={longest}
               motion={!reducedMotion}
               Link={LinkComponent}
             />

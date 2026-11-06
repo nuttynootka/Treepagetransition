@@ -9,17 +9,19 @@ declare const PLACEHOLDER_LOGO: string;
 declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
-  { href: "/", label: "Home" },
-  { href: "/workshop", label: "Workshop" },
-  { href: "/letters", label: "Letters" },
-  { href: "/gifts", label: "Gifts" },
+  { href: "/trees", label: "TREES" },
+  { href: "/firewood", label: "FIREWOOD" },
+  { href: "/wreaths", label: "WREATHS" },
+  { href: "/greenery", label: "GREENERY" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 const copy: Record<string, { title: string; body: string }> = {
-  "/": { title: "Home", body: "Tap a snowflake. The wand draws a tree of lights, the page changes under it, and frost blooms on the new snowflake's glass." },
-  "/workshop": { title: "The Workshop", body: "Brush the mouse across a snowflake to set it swinging, or tap one. Lights near your pointer or finger glow a little warmer." },
-  "/letters": { title: "Letters", body: "Inactive snowflakes stay readable but rest in shadow with only a few glints. The active one is fully lit, sparkling with white, gold, red and green light." },
-  "/gifts": { title: "Gifts", body: "Try your own garland photo and logo below. They stay on your device and are never uploaded." },
+  "/": { title: "Home", body: "Tap a snowflake. The wand draws a tree of lights, the page changes under it, and frost blooms on the new snowflake's glass. The logo links back here." },
+  ...Object.fromEntries(
+    pages.map((p) => [p.href, { title: p.label, body: `Placeholder text. Your ${p.label.toLowerCase()} page content goes here. Brush or tap a snowflake to set it swinging.` }]),
+  ),
 };
 
 // One shared navigate function, set by the App once the engine exists.
@@ -61,10 +63,7 @@ function App() {
   navigateTo = useCallback((href: string, origin: { x: number; y: number }) => {
     const engine = engineRef.current;
     if (!engine || engine.isActive) return;
-    if (href === current) {
-      if (href === "/") return;
-      href = "/";
-    }
+    if (href === current) return;
     pendingRef.current = href;
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     engine.start({ origin, reducedMotion: reduced });

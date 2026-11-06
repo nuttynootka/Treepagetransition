@@ -197,40 +197,59 @@ export function frostStrokes(seed: number): FrostStroke[] {
 // ---------------------------------------------------------------------------
 
 export interface TabPlacement {
-  /** Narrow screens (below 768px): all flakes in one row, alternating short/long ribbons. */
+  /**
+   * Phones and tablets (below 1024px): a grid of rows, up to 3 across. Each row hangs
+   * one snowflake-height lower, so the ribbon is a CSS length that depends on --flake.
+   */
   xNarrow: number;
-  ribbonNarrow: number;
-  /** Wide screens: half the flakes on each side of the logo, inner ones hang lower. */
+  ribbonNarrow: string;
+  /** Computers (1024px and up): half the flakes on each side of the logo, in a gentle wave. */
   xWide: number;
-  ribbonWide: number;
+  ribbonWide: string;
+  /** Upper rows sit in front, so lower rows' ribbons pass behind them. */
+  layer: number;
 }
 
-export function placeTabs(count: number): TabPlacement[] {
-  const NARROW = { short: 8, long: 78 };
-  const WIDE = { short: 16, long: 66 };
+export interface TabLayout {
+  tabs: TabPlacement[];
+  /** The longest ribbon in each layout, used to size the header. */
+  maxNarrow: string;
+  maxWide: string;
+}
+
+const ROW_STEP = "(var(--flake) + 14px)";
+
+export function placeTabs(count: number): TabLayout {
+  // Narrow: up to 3 per row.
+  const cols = count <= 3 ? count : Math.min(3, Math.ceil(count / 2));
+  const rows = Math.ceil(count / cols);
+  const narrowRibbon = (row: number) => (row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`);
+
+  // Wide: left side gets the extra one when the count is odd.
   const left = Math.ceil(count / 2);
   const right = count - left;
-
   const spread = (n: number, from: number, to: number) =>
     n === 1 ? [(from + to) / 2] : Array.from({ length: n }, (_, i) => from + ((to - from) * i) / (n - 1));
+  const leftX = spread(left, 7, 37);
+  const rightX = spread(right, 63, 93);
+  // Outer to inner: a soft wave, mirrored on the right.
+  const WAVE = [20, 70, 36, 60];
+  const waveFor = (fromOuter: number) => `${WAVE[fromOuter % WAVE.length]}px`;
 
-  const leftX = spread(left, 10, 36);
-  const rightX = spread(right, 64, 90);
-  // Inner flakes (nearest the logo) hang lowest, framing it in a soft V.
-  const ribbonFor = (j: number, n: number, innerIsLast: boolean) => {
-    if (n === 1) return WIDE.long;
-    const k = innerIsLast ? j / (n - 1) : 1 - j / (n - 1);
-    return Math.round(WIDE.short + (WIDE.long - WIDE.short) * k);
-  };
-
-  return Array.from({ length: count }, (_, i) => {
+  const tabs = Array.from({ length: count }, (_, i) => {
+    const row = Math.floor(i / cols);
+    const inRow = Math.min(cols, count - row * cols);
+    const col = i - row * cols;
     const isLeft = i < left;
     const j = isLeft ? i : i - left;
     return {
-      xNarrow: r2(count === 1 ? 50 : 17 + (66 * i) / (count - 1)),
-      ribbonNarrow: i % 2 === 0 ? NARROW.short : NARROW.long,
+      xNarrow: r2(((col + 0.5) / inRow) * 100),
+      ribbonNarrow: narrowRibbon(row),
       xWide: isLeft ? r2(leftX[j]) : r2(rightX[j]),
-      ribbonWide: isLeft ? ribbonFor(j, left, true) : ribbonFor(j, right, false),
+      ribbonWide: isLeft ? waveFor(j) : waveFor(right - 1 - j),
+      layer: Math.max(1, 5 - row),
     };
   });
+  const maxWidePx = Math.max(0, ...tabs.map((t) => parseInt(t.ribbonWide, 10)));
+  return { tabs, maxNarrow: narrowRibbon(rows - 1), maxWide: `${maxWidePx}px` };
 }

@@ -6,11 +6,13 @@ import { useSwing } from "./hooks";
 import { cn, Frost } from "./parts";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 
-/** Label size scales with the snowflake, and shrinks a little for longer words. */
-function labelSize(label: string): string {
-  const n = label.length;
-  const k = n <= 4 ? 0.095 : n <= 6 ? 0.082 : n <= 8 ? 0.068 : 0.06;
-  return `max(10px, calc(var(--flake) * ${k}))`;
+/**
+ * One label size for every plate, set by the longest label so it fits edge to edge.
+ * Measured: capitals in this serif with 0.08em spacing average about 0.73em per letter.
+ */
+function labelSize(longest: number): string {
+  const fit = 0.86 / (longest * 0.73);
+  return `calc(var(--flake) * var(--plate) * ${fit.toFixed(4)})`;
 }
 
 function GlintSpark({ glint }: { glint: Glint }) {
@@ -41,13 +43,17 @@ interface SnowflakeTabProps {
   active: boolean;
   placement: TabPlacement;
   crystal: CrystalImage;
+  /** Flip the picture left-to-right, so a repeated design looks different. */
+  mirrored: boolean;
+  /** Length of the longest label in the header. */
+  labelChars: number;
   motion: boolean;
   Link: LinkLike;
 }
 
-export function SnowflakeTab({ page, active, placement, crystal, motion, Link }: SnowflakeTabProps) {
+export function SnowflakeTab({ page, active, placement, crystal, mirrored, labelChars, motion, Link }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString(page.href + page.label), [page.href, page.label]);
-  const glints = useMemo(() => crystalGlints(seed, crystal.plate), [seed, crystal.plate]);
+  const glints = useMemo(() => crystalGlints(seed, 0.44), [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
 
   // Mouse or pen brushing past: swing away from where it came from.
@@ -65,13 +71,14 @@ export function SnowflakeTab({ page, active, placement, crystal, motion, Link }:
 
   return (
     <li
-      className="absolute top-[calc(var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] md:left-[var(--xw)]"
+      className="absolute top-[calc(var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] lg:left-[var(--xw)]"
       style={
         {
           "--xn": `${placement.xNarrow}%`,
           "--xw": `${placement.xWide}%`,
-          "--rn": `${placement.ribbonNarrow}px`,
-          "--rw": `${placement.ribbonWide}px`,
+          "--rn": placement.ribbonNarrow,
+          "--rw": placement.ribbonWide,
+          zIndex: placement.layer,
         } as CSSProperties
       }
     >
@@ -79,7 +86,7 @@ export function SnowflakeTab({ page, active, placement, crystal, motion, Link }:
         {/* Ribbon: starts tucked inside the greenery, ends at the crystal's top tip. */}
         <span
           aria-hidden
-          className="mx-auto block h-[calc(var(--g)*0.4+var(--rn))] w-px bg-linear-to-b from-[#cdb27a]/30 via-[#e9d7b0]/70 to-[#f6ead0]/90 md:h-[calc(var(--g)*0.4+var(--rw))]"
+          className="mx-auto block h-[calc(var(--g)*0.4+var(--rn))] w-px bg-linear-to-b from-[#cdb27a]/30 via-[#e9d7b0]/70 to-[#f6ead0]/90 lg:h-[calc(var(--g)*0.4+var(--rw))]"
         />
         <Link
           href={page.href}
@@ -103,7 +110,7 @@ export function SnowflakeTab({ page, active, placement, crystal, motion, Link }:
             height={440}
             draggable={false}
             decoding="async"
-            className="gh-crystal pointer-events-none absolute inset-0 h-full w-full select-none"
+            className={cn("gh-crystal pointer-events-none absolute inset-0 h-full w-full select-none", mirrored && "-scale-x-100")}
           />
 
           {/* Glints of light caught in the facets */}
@@ -113,16 +120,20 @@ export function SnowflakeTab({ page, active, placement, crystal, motion, Link }:
             ))}
           </span>
 
-          {/* Frosted glass plate, sized to sit inside the crystal's silver rim */}
+          {/* Frosted glass plate with a silver rim, sized by --plate so the label fits */}
           <span
-            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md"
-            style={{ width: `${crystal.plate * 100}%`, height: `${crystal.plate * 100}%` }}
-          >
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 size-[calc(var(--plate)*100%+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+          />
+          <span className="absolute left-1/2 top-1/2 flex size-[calc(var(--plate)*100%)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
             <span
               aria-hidden
               className={cn(
                 "absolute inset-0 rounded-full transition-colors duration-700",
-                active ? "bg-[radial-gradient(circle_at_50%_30%,rgba(255,245,235,0.16),rgba(6,14,11,0.45)_75%)]" : "bg-black/30",
+                "shadow-[inset_0_1px_0_rgba(255,255,255,0.28),inset_0_-6px_12px_rgba(0,0,0,0.35)]",
+                active
+                  ? "bg-[linear-gradient(170deg,rgba(255,245,235,0.16),rgba(9,18,14,0.72)_55%)]"
+                  : "bg-[linear-gradient(170deg,rgba(255,255,255,0.07),rgba(7,14,11,0.8)_55%)]",
               )}
             />
             {/* Remounts each time this tab becomes active, so the bloom replays. */}
@@ -130,11 +141,11 @@ export function SnowflakeTab({ page, active, placement, crystal, motion, Link }:
             <span
               key={active ? "t-on" : "t-off"}
               className={cn(
-                "gh-title relative px-[4%] text-center font-semibold leading-[1.05] tracking-[0.02em] text-balance",
+                "gh-title relative whitespace-nowrap text-center font-semibold leading-none tracking-[0.08em]",
                 "font-[family-name:var(--gh-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
                 active ? "is-blooming text-[#FFF8F0]" : "text-white/90 group-hover:text-white",
               )}
-              style={{ fontSize: labelSize(page.label) }}
+              style={{ fontSize: labelSize(labelChars) }}
             >
               {page.label}
             </span>

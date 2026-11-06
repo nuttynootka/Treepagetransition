@@ -17,7 +17,7 @@ Requires Next.js 15.3 or newer with the **App Router** (the `app/` folder). It u
 | `components/tree-transition/TreeTransitionProvider.tsx` | Draws the overlay and changes the page at the right moment. Goes in your root layout once. |
 | `components/tree-transition/TransitionLink.tsx` | Use it in place of `next/link`'s `<Link>`. Same props. |
 | `components/tree-transition/index.ts` | Lets you import everything from one place. |
-| `app/` | A 4-page demo site that uses the transition and the garland header. You don't copy this into your site. |
+| `app/` | The demo site: a home page plus Trees, Firewood, Wreaths, Greenery, About and Contact (placeholder text). |
 | `preview/` | Builds the single-file preview page from the same engine. |
 
 ---
@@ -214,18 +214,21 @@ Open `app/SiteHeader.tsx`. The `pages` list sets the snowflakes, left to right:
 
 ```tsx
 const pages: GarlandPage[] = [
-  { href: "/", label: "Home" },
-  { href: "/workshop", label: "Workshop" },
-  { href: "/letters", label: "Letters" },
-  { href: "/gifts", label: "Gifts" },
+  { href: "/trees", label: "TREES" },
+  { href: "/firewood", label: "FIREWOOD" },
+  { href: "/wreaths", label: "WREATHS" },
+  { href: "/greenery", label: "GREENERY" },
+  { href: "/about", label: "ABOUT" },
+  { href: "/contact", label: "CONTACT" },
 ];
 ```
 
-- On tablets and computers (768px wide and up), the first half hang left of the logo and the rest hang right. An even number looks most balanced.
-- On phones they hang in one row with alternating short and long ribbons, so neighbours don't bump.
-- Labels up to about 9 letters fit on one line; longer ones wrap.
-- 3 to 6 pages fit well. More than 4 overlaps quite a lot on phones.
-- There are 4 crystal designs. A 5th page reuses the 1st design, and so on.
+- On computers (1024px wide and up), the first half hang left of the logo and the rest hang right, in a gentle wave. An even number looks most balanced.
+- On phones and tablets they hang in rows of up to 3. Each top-row snowflake's ribbon continues behind it to the one below, like ornaments strung in pairs.
+- All labels share one text size, set by the longest label so it fits its plate. Shorter labels mean bigger text: with 8-letter labels like FIREWOOD, the text is about 10px on phones and 12px on large screens.
+- The logo links to the home page (`/`), which has no snowflake of its own.
+- Up to 6 pages fit well (two rows of 3 on phones).
+- There are 4 crystal designs. Pages 5 and 6 reuse designs 1 and 2, flipped left-to-right so they look different.
 
 ## Use it in another Next.js project
 
@@ -273,9 +276,8 @@ It needs React 18 or newer and Tailwind CSS v4.
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 315px tall on phones and 350–405px on computers. It is not sticky, so it scrolls away with the page.
+- With 6 pages the header is about 370px tall on phones, 500px on tablets and 370–420px on computers. It is not sticky, so it scrolls away with the page.
 - There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
-- Labels shrink with the plate. On phones a long label like "Workshop" is 10px, which is the smallest that stays readable; keep labels short if you can.
 
 ### Using different crystal pictures
 
@@ -291,6 +293,6 @@ It needs React 18 or newer and Tailwind CSS v4.
    ]}
    ```
 
-The frosted glass plate and page name are drawn over that centre circle. In the included pictures, the original plate is faded to 15% so the dark glass and white text stay readable.
+The frosted glass plate (with its own silver rim) and the page name are drawn over that centre. Its size is set by `--plate` in `GarlandHeader.tsx`, not by the picture, so the labels always fit. The `plate` number is kept for reference.
 
 To rebuild the preview page after changing the component: `npm run build:garland-preview`.
