@@ -5,6 +5,8 @@ When someone clicks or taps a link, an invisible wand spirals up the screen and 
 - **Preview it:** open `preview/tree-transition-preview.html` in any browser (double-click it), or use the private preview link from the chat.
 - **Use it in your site:** copy the folder `components/tree-transition/` into your project (steps below).
 
+> This repo also holds a second, separate component: the **wreath door product preview** (an e-commerce wreath preview on a 3D front door). It is not part of this page transition. See [`components/wreath-door/README.md`](components/wreath-door/README.md).
+
 Requires Next.js 15.3 or newer with the **App Router** (the `app/` folder). It uses `<Link>`'s `onNavigate` prop, which was added in Next.js 15.3. It does not need Tailwind or any other library.
 
 ---

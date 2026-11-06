@@ -1,0 +1,10 @@
+/* Tailwind for the single-file preview. Same setup as app/door/door.css, plus the preview's fonts. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@source "../../components/wreath-door";
+@source "./door-preview-app.tsx";
+
+@theme {
+  --font-serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}

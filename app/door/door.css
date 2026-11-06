@@ -1,0 +1,10 @@
+/*
+ * Tailwind for the wreath door demo only. No preflight (Tailwind's reset), so
+ * the tree-transition demo pages are not restyled. Utilities are left
+ * un-layered on purpose so they win over this app's plain element styles
+ * in globals.css (for example `p { color }`).
+ */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@source "../../components/wreath-door";
+@source "./";

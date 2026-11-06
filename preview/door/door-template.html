@@ -1,0 +1,30 @@
+<title>Wreath Door Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Figtree:wght@400;600&display=swap">
+<style>
+/* Layout: product grid beside a sticky front-door stage; phones get a full-screen preview.
+   One deliberate night-time look (dark only), so colors are set once. */
+:root {
+  --bg: #0f1011;
+  --fg: #ece8e1;
+  --muted: #a39c90;
+  --brass: #d9b77a;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.55 "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+  overflow-x: hidden;
+}
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+/*__CSS__*/
+</style>
+<div id="root"></div>
+<script>/*__APP__*/</script>
