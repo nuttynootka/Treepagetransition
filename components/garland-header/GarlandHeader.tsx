@@ -1,12 +1,12 @@
 "use client";
 
-import { forwardRef, useEffect, useId, useMemo, useRef, useState, type AnchorHTMLAttributes } from "react";
+import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState, type AnchorHTMLAttributes } from "react";
 import { placeTabs } from "./geometry";
 import { useReducedMotion, useWarmPointer } from "./hooks";
 import { NOBLE_STAR_LOGO } from "./logo-outline";
 import { Bokeh, cn, Garland, LogoSign } from "./parts";
 import { HangingMenu } from "./HangingMenu";
-import { SnowflakeTab } from "./SnowflakeTab";
+import { estimatePlate, SnowflakeTab } from "./SnowflakeTab";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 import "./garland-header.css";
 
@@ -92,6 +92,19 @@ export function GarlandHeader({
   const idBase = useId();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+  // Every glass centre is the same size: as big as the largest one any snowflake needs.
+  // Before the browser measures, a CSS estimate stands in.
+  const [plateNeeds, setPlateNeeds] = useState<Record<number, number>>({});
+  const measured = Object.keys(plateNeeds).length === pages.length;
+  const plateSize = measured
+    ? `${Math.max(...Object.values(plateNeeds))}px`
+    : `max(${pages
+        .map((p, i) => `${estimatePlate(p.label)}, calc(var(--flake) * ${crystals[i % crystals.length].plate})`)
+        .join(", ")})`;
+  const reportPlate = useCallback((i: number, px: number) => {
+    setPlateNeeds((prev) => (prev[i] === px ? prev : { ...prev, [i]: px }));
+  }, []);
+
   useWarmPointer(rootRef, true);
 
   // A new page: roll every menu up.
@@ -171,6 +184,8 @@ export function GarlandHeader({
                 motion={!reducedMotion}
                 Link={LinkComponent}
                 menu={page.items ? { id: menuId, open, onToggle: () => setOpenMenu(open ? null : menuId) } : undefined}
+                plateSize={plateSize}
+                onMeasure={(px) => reportPlate(i, px)}
               >
                 {page.items && (
                   <HangingMenu

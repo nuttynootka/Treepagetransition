@@ -11,7 +11,7 @@ import type { CrystalImage, GarlandPage, LinkLike } from "./types";
  * word, this estimates it: capitals in this serif with 0.04em spacing are about 0.72em
  * each. Every label uses the same font size (--label-size).
  */
-function estimatePlate(label: string): string {
+export function estimatePlate(label: string): string {
   return `calc(var(--label-size) * ${(label.length * 0.72 + 0.15).toFixed(2)})`;
 }
 
@@ -49,6 +49,10 @@ interface SnowflakeTabProps {
   Link: LinkLike;
   /** For a menu snowflake: whether its hanging menu is down, and how to toggle it. */
   menu?: { id: string; open: boolean; onToggle: () => void };
+  /** Size of the glass centre (CSS length), shared by all snowflakes so they match. */
+  plateSize: string;
+  /** Reports the centre size (px) this snowflake's own word and crystal need. */
+  onMeasure: (px: number) => void;
   /** The hanging menu, rendered behind this snowflake. */
   children?: ReactNode;
 }
@@ -62,6 +66,8 @@ export function SnowflakeTab({
   motion,
   Link,
   menu,
+  plateSize,
+  onMeasure,
   children,
 }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
@@ -73,8 +79,8 @@ export function SnowflakeTab({
   }, [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
 
-  // Size the glass centre to just fit the word: the circle around the word's box,
-  // plus a hair of margin. Re-measured when the font loads or the size changes.
+  // Work out the glass centre this word needs (the header makes every centre as big as
+  // the largest). Re-measured when the font loads or the size changes.
   const turnRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -90,12 +96,14 @@ export function SnowflakeTab({
       // than the round opening in the middle of the crystal picture, or a dark ring shows.
       const opening = turn.offsetWidth * crystal.plate;
       const d = Math.max(Math.hypot(w, capHeight) + 1.5, opening);
-      turn.style.setProperty("--plate-d", `${d.toFixed(1)}px`);
+      onMeasure(Math.round(d * 10) / 10);
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(label);
+    ro.observe(turn);
     return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.label, crystal.plate]);
 
   // Mouse or pen brushing past: swing away from where it came from.
@@ -125,7 +133,7 @@ export function SnowflakeTab({
           <span
             ref={turnRef}
             className="gh-turn pointer-events-none absolute inset-0"
-            style={{ ...turnStyle, "--plate-d": `max(${estimatePlate(page.label)}, calc(var(--flake) * ${crystal.plate}))` } as CSSProperties}
+            style={{ ...turnStyle, "--plate-d": plateSize } as CSSProperties}
           >
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
