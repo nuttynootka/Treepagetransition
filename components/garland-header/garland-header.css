@@ -189,8 +189,9 @@
    * so it drops from behind the logo. The ladder sits inside that snowflake's li,
    * so subtract the li's own left edge. */
   --xf: var(--xfn);
-  width: var(--menu-w);
-  left: calc(50cqw - var(--menu-w) / 2 - var(--xf) * 100cqw + var(--flake) / 2);
+  /* Zero width at the centre line: plates (each as wide as its label) are placed around it. */
+  width: 0;
+  left: calc(50cqw - var(--xf) * 100cqw + var(--flake) / 2);
   pointer-events: none;
   visibility: hidden;
   /* Stay visible until the plates have been reeled back up (see closeDuration). */

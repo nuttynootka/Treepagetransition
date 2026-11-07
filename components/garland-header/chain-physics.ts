@@ -45,7 +45,7 @@ const PHYS = {
   reelGap: 0.1,
   reelTime: 0.28,
   /** Chain length between plates. */
-  gap: 20,
+  gap: 15,
   /** Where chains attach, as a share of plate width from each side: corners for the garland chains,
    *  closer to the middle between plates, so each plate can pivot on its own. */
   leadAttach: 0.2,
@@ -87,7 +87,10 @@ export class ChainLadder {
   private els: HTMLElement[];
   private chains: [HTMLElement, HTMLElement][];
   private reduced: boolean;
-  private W = 200;
+  /** Each plate's own width (plates hug their labels). x = 0 is the menu's centre line. */
+  private widths: number[] = [];
+  /** Half the distance between the two garland chains. */
+  private anchorHalf = 40;
   private H = 44;
   private lead = 160;
   private raf = 0;
@@ -121,20 +124,22 @@ export class ChainLadder {
       }),
     }));
     // Default sizes until the component measures the real ones.
-    this.setGeometry(this.W, this.H, this.lead);
+    this.setGeometry(this.els.map(() => 160), this.H, this.lead);
   }
 
   setReducedMotion(reduced: boolean) {
     this.reduced = reduced;
   }
 
-  /** Plate width and height, and the long lead chain from the garland to the first plate. */
-  setGeometry(W: number, H: number, lead: number) {
-    this.W = W;
+  /** Each plate's width, the plates' height, and the long lead chain from the garland to the first plate. */
+  setGeometry(widths: number[], H: number, lead: number) {
+    this.widths = widths;
     this.H = H;
     this.lead = Math.max(20, lead);
+    this.anchorHalf = (0.5 - PHYS.leadAttach) * widths[0];
     this.plates.forEach((pl, i) => {
-      const top = (0.5 - (i === 0 ? PHYS.leadAttach : PHYS.innerAttach)) * W;
+      const W = widths[i] ?? widths[0];
+      const top = i === 0 ? this.anchorHalf : (0.5 - PHYS.innerAttach) * W;
       const bottom = (0.5 - PHYS.innerAttach) * W;
       pl.local = [
         { x: -top, y: 0 },
@@ -188,7 +193,7 @@ export class ChainLadder {
     const pl = this.plates[i];
     if (!pl || pl.mode !== "free" || this.reduced) return;
     const h = PHYS.substep;
-    const reach = Math.hypot(this.W, this.H);
+    const reach = Math.hypot(this.widths[i] ?? 160, this.H);
     const c = this.centre(pl);
     for (const pt of pl.p) {
       const w = Math.max(0.25, 1 - Math.hypot(pt.x - x, pt.y - y) / reach);
@@ -246,7 +251,7 @@ export class ChainLadder {
 
   /** Where plate i sits when rolled up: on top of the plate above, or at the garland. */
   private holdTarget(i: number): { x: number; y: number }[] {
-    const f = i > 0 ? this.poseOf(this.plates[i - 1]) : { x: this.W / 2, y: 0, angle: 0 };
+    const f = i > 0 ? this.poseOf(this.plates[i - 1]) : { x: 0, y: 0, angle: 0 };
     const c = Math.cos(f.angle);
     const s = Math.sin(f.angle);
     return this.plates[i].local.map((q) => ({ x: f.x + q.x * c - q.y * s, y: f.y + q.x * s + q.y * c }));
@@ -272,7 +277,7 @@ export class ChainLadder {
     this.plates.forEach((pl) => {
       pl.mode = "free";
       pl.p.forEach((q, k) => {
-        q.x = q.px = this.W / 2 + pl.local[k].x;
+        q.x = q.px = pl.local[k].x;
         q.y = q.py = top + pl.local[k].y;
       });
       pl.fold = 0;
@@ -348,8 +353,8 @@ export class ChainLadder {
     }
 
     // 2. Satisfy chains and plate shapes.
-    const aL = { x: this.W * PHYS.leadAttach, y: 0 };
-    const aR = { x: this.W * (1 - PHYS.leadAttach), y: 0 };
+    const aL = { x: -this.anchorHalf, y: 0 };
+    const aR = { x: this.anchorHalf, y: 0 };
     const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y);
     for (let it = 0; it < PHYS.iterations; it++) {
       for (let i = 0; i < n; i++) {
@@ -439,7 +444,7 @@ export class ChainLadder {
       const angle = Math.atan2(b.y - a.y, b.x - a.x);
       const hidden = pl.mode === "held" || pl.fold < -86;
       el.style.transform =
-        `translate3d(${(mx - this.W / 2).toFixed(2)}px, ${my.toFixed(2)}px, 0) perspective(700px) ` +
+        `translate3d(${(mx - (this.widths[i] ?? 0) / 2).toFixed(2)}px, ${my.toFixed(2)}px, 0) perspective(700px) ` +
         `rotate(${angle.toFixed(4)}rad) rotateY(${pl.twist.toFixed(4)}rad) rotateX(${pl.fold.toFixed(2)}deg)`;
       el.style.opacity = hidden ? "0" : "1";
       // Lets the plate's reflection slide across the glass as it twists.
@@ -449,7 +454,7 @@ export class ChainLadder {
       const parent = i > 0 ? this.plates[i - 1] : null;
       const ups = parent
         ? [parent.p[BL], parent.p[BR]]
-        : [{ x: this.W * PHYS.leadAttach, y: 0 }, { x: this.W * (1 - PHYS.leadAttach), y: 0 }];
+        : [{ x: -this.anchorHalf, y: 0 }, { x: this.anchorHalf, y: 0 }];
       const downs = [pl.p[TL], pl.p[TR]];
       for (let s = 0; s < 2; s++) {
         const c = this.chains[i][s];

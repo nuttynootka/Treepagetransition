@@ -180,7 +180,7 @@ export function plateGlints(seed: number): PlateGlint[] {
       x: r2(x),
       y: r2(y),
       kind,
-      size: r2(kind === "star" ? 22 + rand() * 12 : 6 + rand() * 4),
+      size: r2(kind === "star" ? 14 + rand() * 8 : 4 + rand() * 3),
       dur: r2(dur),
       delay: r2(-rand() * dur),
     });

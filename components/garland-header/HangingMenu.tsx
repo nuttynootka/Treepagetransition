@@ -42,7 +42,8 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
     const flakes = root.closest("nav")?.querySelectorAll(".gh-flake > a, .gh-flake > button") ?? [];
     const bottom = Math.max(0, ...Array.from(flakes, (f) => f.getBoundingClientRect().bottom));
     const top = root.getBoundingClientRect().top;
-    engine.setGeometry(root.offsetWidth, first.offsetHeight, bottom ? bottom - top + 8 : 160);
+    const widths = plateRefs.current.slice(0, items.length).map((el) => el?.offsetWidth ?? 160);
+    engine.setGeometry(widths, first.offsetHeight, bottom ? bottom - top + 8 : 160);
   };
 
   useEffect(() => {
@@ -51,8 +52,9 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
     const engine = new ChainLadder({ plates, chains, reducedMotion: false });
     engineRef.current = engine;
     measure();
+    // Plates size to their labels, so re-measure when they change (for example once the font loads).
     const ro = new ResizeObserver(measure);
-    if (rootRef.current) ro.observe(rootRef.current);
+    plates.forEach((el) => ro.observe(el));
     return () => {
       ro.disconnect();
       engine.destroy();
@@ -112,7 +114,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
           <div
             key={item.href}
             ref={(el) => void (plateRefs.current[i] = el)}
-            className="gh-plate-body absolute left-0 top-0 w-full origin-top"
+            className="gh-plate-body absolute left-0 top-0 w-max origin-top"
             style={{ "--gc": PLATE_LIGHT_COLORS[i % PLATE_LIGHT_COLORS.length] } as CSSProperties}
             onPointerMove={onPointerMove(i)}
             onPointerDown={onPointerDown(i)}
@@ -122,12 +124,12 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
               aria-current={current ? "page" : undefined}
               onClick={onSelect}
               className={cn(
-                "gh-menu-plate group/plate relative block h-[var(--menu-h)] rounded-[11px] p-[1.5px] outline-none",
+                "gh-menu-plate group/plate relative block h-[var(--menu-h)] rounded-[8px] p-[1.5px] outline-none",
                 "[-webkit-tap-highlight-color:transparent] focus-visible:ring-2 focus-visible:ring-[#FFF5EB]/80",
                 current && "is-current",
               )}
             >
-              <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[9.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
+              <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
                 <span
                   aria-hidden
                   className={cn(
@@ -141,7 +143,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
                 <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
                 <span
                   className={cn(
-                    "relative px-3 text-center font-semibold uppercase leading-none tracking-[0.08em] whitespace-nowrap",
+                    "relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.04em] whitespace-nowrap",
                     "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
                     current ? "text-[#FFF8F0]" : "text-white/90 group-hover/plate:text-white",
                   )}

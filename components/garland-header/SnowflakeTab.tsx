@@ -8,10 +8,11 @@ import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 
 /**
  * One label size for every plate, set by the longest label so it fits edge to edge.
- * Measured: capitals in this serif with 0.08em spacing average about 0.73em per letter.
+ * Snug fit: capitals in this serif with 0.04em spacing measure about 0.73em per letter, and the
+ * longest label fills 90% of the plate, leaving a thin margin inside the rim.
  */
 function labelSize(longest: number): string {
-  const fit = 0.86 / (longest * 0.73);
+  const fit = 0.9 / (longest * 0.73);
   return `calc(var(--flake) * var(--plate) * ${fit.toFixed(4)})`;
 }
 
@@ -134,7 +135,7 @@ export function SnowflakeTab({
             <span
               key={active ? "t-on" : "t-off"}
               className={cn(
-                "gh-title relative whitespace-nowrap text-center font-semibold uppercase leading-none tracking-[0.08em]",
+                "gh-title relative whitespace-nowrap text-center font-semibold uppercase leading-none tracking-[0.04em]",
                 "font-[family-name:var(--gh-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
                 active ? "is-blooming text-[#FFF8F0]" : "text-white/90 group-hover:text-white",
               )}

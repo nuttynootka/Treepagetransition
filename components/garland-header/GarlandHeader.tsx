@@ -118,12 +118,12 @@ export function GarlandHeader({
         "gh-root @container relative isolate z-30 w-full select-none overflow-x-clip text-[#FFF8F0]",
         // Sizes per screen width: garland height, snowflake size, logo frame.
         "[--g:76px] sm:[--g:88px] md:[--g:100px] lg:[--g:116px]",
-        "[--flake:min(124px,31vw)] sm:[--flake:150px] md:[--flake:170px] lg:[--flake:180px] xl:[--flake:196px]",
-        // Glass plate width as a share of the snowflake (bigger on phones, for the label).
-        "[--plate:0.58] sm:[--plate:0.52] md:[--plate:0.5] lg:[--plate:0.46] xl:[--plate:0.44]",
+        "[--flake:min(86px,24vw)] sm:[--flake:98px] md:[--flake:110px] lg:[--flake:117px] xl:[--flake:127px]",
+        // Glass plate width as a share of the snowflake: just big enough for the longest label.
+        "[--plate:0.67] sm:[--plate:0.6] md:[--plate:0.56] lg:[--plate:0.55] xl:[--plate:0.54]",
         "[--logo-w:136px] [--logo-h:66px] sm:[--logo-w:168px] sm:[--logo-h:80px] md:[--logo-w:204px] md:[--logo-h:94px] lg:[--logo-w:236px] lg:[--logo-h:108px]",
         // Hanging menu plates.
-        "[--menu-w:208px] [--menu-h:44px] [--menu-font:11.5px] md:[--menu-w:244px] md:[--menu-h:46px] md:[--menu-font:13px]",
+        "[--menu-h:26px] [--menu-font:10.5px] md:[--menu-h:28px] md:[--menu-font:11.5px]",
         "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
       )}

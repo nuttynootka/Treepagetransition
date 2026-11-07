@@ -257,7 +257,7 @@ const pages: GarlandPage[] = [
 - Tapping a plate rolls the menu up and goes to that page, with the wand-tree transition.
 - Only one menu is open at a time. Opening the other one rolls the first one up.
 - With "reduce motion" on, the plates hang still and the menu fades in and out.
-- Sizes: `--menu-w` (plate width), `--menu-h` (plate height) and `--menu-font` near the top of `GarlandHeader.tsx`. How heavy and lively the plates feel (gravity, drag, breeze, twist, drop and reel timing): the `PHYS` settings at the top of `chain-physics.ts`.
+- Each plate is only as wide as its label, with a few pixels of glass on each side. Height and text size: `--menu-h` and `--menu-font` near the top of `GarlandHeader.tsx`. How heavy and lively the plates feel (gravity, drag, breeze, twist, drop and reel timing): the `PHYS` settings at the top of `chain-physics.ts`.
 
 ## Use it in another Next.js project
 
@@ -305,7 +305,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 240px tall on phones, 280–310px on tablets and 375–390px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
+- The header is about 200px tall on phones, 225–250px on tablets and 310–320px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
 - There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
 
 ### Using different crystal pictures
