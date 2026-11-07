@@ -138,6 +138,56 @@ export function crystalGlints(seed: number, plate: number, count = 18): Glint[] 
   return out;
 }
 
+/**
+ * Christmas-light colours caught by the menu's glass plates, one per plate, in order.
+ * Plain RGB numbers, used as rgb(var(--gc)).
+ */
+export const PLATE_LIGHT_COLORS = [
+  "255 70 70", // red
+  "70 225 120", // green
+  "255 196 80", // gold
+  "90 150 255", // blue
+  "255 132 56", // orange
+  "205 110 255", // violet
+];
+
+export interface PlateGlint {
+  /** Percent of the plate box. */
+  x: number;
+  y: number;
+  kind: "star" | "fleck";
+  /** Size in px. */
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+/** A few glints along a plate's edges and bevel, where light catches glass. */
+export function plateGlints(seed: number): PlateGlint[] {
+  const rand = seededRandom(seed);
+  const out: PlateGlint[] = [];
+  const edgePoint = () => {
+    const side = rand();
+    if (side < 0.38) return { x: 6 + rand() * 88, y: 6 + rand() * 6 }; // top edge
+    if (side < 0.76) return { x: 6 + rand() * 88, y: 88 + rand() * 6 }; // bottom bevel
+    return { x: side < 0.88 ? 3 + rand() * 3 : 94 + rand() * 3, y: 20 + rand() * 60 }; // ends
+  };
+  for (let i = 0; i < 6; i++) {
+    const kind = i < 2 ? "star" : "fleck";
+    const { x, y } = edgePoint();
+    const dur = kind === "star" ? 2.8 + rand() * 2.2 : 1.6 + rand() * 1.4;
+    out.push({
+      x: r2(x),
+      y: r2(y),
+      kind,
+      size: r2(kind === "star" ? 22 + rand() * 12 : 6 + rand() * 4),
+      dur: r2(dur),
+      delay: r2(-rand() * dur),
+    });
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Frost crystals for the glass plate (viewBox 0 0 100 100, circle r=50)
 // ---------------------------------------------------------------------------

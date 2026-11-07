@@ -246,7 +246,8 @@ const pages: GarlandPage[] = [
 
 ### How the hanging menu works
 
-- Tapping SHOP or CONTACT drops a series of frosted glass plates on silver chains. Two chains hang from the garland, behind the snowflake, to the first plate; each plate below hangs from the one above by two shorter chains nearer its middle.
+- Tapping SHOP or CONTACT drops a series of frosted glass plates on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
+- Each plate catches one Christmas-light colour, in order: red, green, gold, blue, orange, violet. It shows as small glints along the plate's edges and a faint tinted reflection that slides across the glass as the plate twists. The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
 - The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
 - Opening: the plates are released one at a time from the top, each unfolding as it falls until its chains catch it, with a small random nudge so no two drops look alike. Then they sway and settle.
 - A faint, random breeze keeps each plate drifting slightly on its own. Moving the mouse across a plate, or tapping it, pushes it, and the motion travels up and down the chain.
@@ -255,7 +256,6 @@ const pages: GarlandPage[] = [
 - Tapping the snowflake again, tapping anywhere else, or pressing Escape rolls the plates back up, bottom plate first, until they are hidden behind the garland.
 - Tapping a plate rolls the menu up and goes to that page, with the wand-tree transition.
 - Only one menu is open at a time. Opening the other one rolls the first one up.
-- On phones a menu near the edge shifts sideways so it stays on screen.
 - With "reduce motion" on, the plates hang still and the menu fades in and out.
 - Sizes: `--menu-w` (plate width), `--menu-h` (plate height) and `--menu-font` near the top of `GarlandHeader.tsx`. How heavy and lively the plates feel (gravity, drag, breeze, twist, drop and reel timing): the `PHYS` settings at the top of `chain-physics.ts`.
 

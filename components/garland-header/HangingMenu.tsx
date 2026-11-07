@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties, type PointerEvent } from "react";
 import { ChainLadder, closeDuration } from "./chain-physics";
+import { hashString, PLATE_LIGHT_COLORS, plateGlints } from "./geometry";
 import { useReducedMotion } from "./hooks";
 import { cn } from "./parts";
 import type { GarlandLink, LinkLike } from "./types";
@@ -29,17 +30,19 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
   const chainRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const engineRef = useRef<ChainLadder | null>(null);
   const reducedMotion = useReducedMotion();
+  const glints = useMemo(() => items.map((item) => plateGlints(hashString(item.href))), [items]);
 
-  // Measure plate size and how far the first plate hangs (just below the snowflake).
+  // Measure plate size, and how far the first plate hangs: just below the lowest
+  // snowflake, since the menu drops down the middle, behind the logo and snowflakes.
   const measure = () => {
     const root = rootRef.current;
     const engine = engineRef.current;
     const first = plateRefs.current[0];
     if (!root || !engine || !first) return;
-    const button = root.closest("[data-menu-root]")?.querySelector("button");
+    const flakes = root.closest("nav")?.querySelectorAll(".gh-flake > a, .gh-flake > button") ?? [];
+    const bottom = Math.max(0, ...Array.from(flakes, (f) => f.getBoundingClientRect().bottom));
     const top = root.getBoundingClientRect().top;
-    const lead = button ? button.getBoundingClientRect().bottom - top + 6 : 160;
-    engine.setGeometry(root.offsetWidth, first.offsetHeight, lead);
+    engine.setGeometry(root.offsetWidth, first.offsetHeight, bottom ? bottom - top + 8 : 160);
   };
 
   useEffect(() => {
@@ -110,6 +113,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
             key={item.href}
             ref={(el) => void (plateRefs.current[i] = el)}
             className="gh-plate-body absolute left-0 top-0 w-full origin-top"
+            style={{ "--gc": PLATE_LIGHT_COLORS[i % PLATE_LIGHT_COLORS.length] } as CSSProperties}
             onPointerMove={onPointerMove(i)}
             onPointerDown={onPointerDown(i)}
           >
@@ -133,6 +137,8 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
                       : "bg-[linear-gradient(170deg,rgba(255,255,255,0.08),rgba(7,14,11,0.8)_60%)] group-hover/plate:bg-[linear-gradient(170deg,rgba(255,245,235,0.16),rgba(9,18,14,0.74)_60%)]",
                   )}
                 />
+                {/* A reflection of that plate's light, sliding across the glass as the plate twists. */}
+                <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
                 <span
                   className={cn(
                     "relative px-3 text-center font-semibold uppercase leading-none tracking-[0.08em] whitespace-nowrap",
@@ -142,6 +148,27 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
                 >
                   {item.label}
                 </span>
+              </span>
+              <span aria-hidden className="pointer-events-none absolute inset-0">
+                {glints[i].map((g, k) => (
+                  <span
+                    key={k}
+                    data-fairy-light=""
+                    className={cn("gh-glint", g.kind === "star" ? "gh-glint-star" : "gh-glint-fleck")}
+                    style={
+                      {
+                        left: `${g.x}%`,
+                        top: `${g.y}%`,
+                        "--gs": `${g.size}px`,
+                        "--dur": `${g.dur}s`,
+                        "--delay": `${g.delay}s`,
+                      } as CSSProperties
+                    }
+                  >
+                    <span className="gh-glint-spark" />
+                    <span className="gh-light-warm" />
+                  </span>
+                ))}
               </span>
             </Link>
           </div>

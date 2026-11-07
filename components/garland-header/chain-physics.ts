@@ -48,7 +48,7 @@ const PHYS = {
   gap: 20,
   /** Where chains attach, as a share of plate width from each side: corners for the garland chains,
    *  closer to the middle between plates, so each plate can pivot on its own. */
-  leadAttach: 0.14,
+  leadAttach: 0.2,
   innerAttach: 0.34,
   /** Small random sideways push and twist each plate gets as it drops, so no two drops look alike. */
   dropKick: 70,
@@ -442,6 +442,8 @@ export class ChainLadder {
         `translate3d(${(mx - this.W / 2).toFixed(2)}px, ${my.toFixed(2)}px, 0) perspective(700px) ` +
         `rotate(${angle.toFixed(4)}rad) rotateY(${pl.twist.toFixed(4)}rad) rotateX(${pl.fold.toFixed(2)}deg)`;
       el.style.opacity = hidden ? "0" : "1";
+      // Lets the plate's reflection slide across the glass as it twists.
+      el.style.setProperty("--tw", pl.twist.toFixed(3));
 
       // Chains from the holder down to this plate's top corners.
       const parent = i > 0 ? this.plates[i - 1] : null;
