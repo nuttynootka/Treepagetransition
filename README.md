@@ -202,6 +202,7 @@ A header for the top of the site: your photo of a live-greenery garland across t
 - Noble fir: dense, short, blue-green to silvery needles that curve upward, on stiff sprigs.
 - Western red cedar: flat, lacy, bright yellow-green sprays on orange-brown stems, drooping below the garland and tucked in along the top.
 - Layers go from dark at the back to bright in front, with a soft shadow under each sprig. It runs the full width of the screen and is repainted to fit when the window changes size.
+- Fairy lights are scattered through the whole garland, from the top sprigs to the hanging cedar and edge to edge, about one per 8px of width. Each is placed only where there is painted foliage, so none float in a gap (`lightsOnFoliage` in `parts.tsx`).
 - To adjust it, edit `LAYERS` (how many sprigs of each kind, how bright, how long) and the colours in `drawFir` and `drawCedar`.
 - To use a photo of a real garland instead, pass `garlandSrc="/garland/your-photo.webp"` to `<GarlandHeader>`.
 

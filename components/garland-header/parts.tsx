@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { paintGarland } from "./garland-painter";
 import { frostStrokes, garlandLights, ovalLights, seededRandom, type LightPoint } from "./geometry";
 import { useImageStatus } from "./hooks";
@@ -37,8 +37,12 @@ interface GarlandProps {
  */
 export function Garland({ src, fit }: GarlandProps) {
   const status = useImageStatus(src);
-  const lights = useMemo(() => garlandLights(), []);
   const usePhoto = !!src && status !== "missing";
+  // Painted garland: lights are placed on the painted foliage once it's drawn.
+  // Photo garland: two strands woven through the middle.
+  const strands = useMemo(() => garlandLights(), []);
+  const [painted, setPainted] = useState<LightPoint[] | null>(null);
+  const lights = usePhoto ? strands : painted ?? [];
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[var(--gt)] z-10 h-[var(--g)]">
@@ -57,7 +61,7 @@ export function Garland({ src, fit }: GarlandProps) {
           />
         )
       ) : (
-        <PaintedGarland />
+        <PaintedGarland onLights={setPainted} />
       )}
       <div className="gh-glow-soft absolute inset-0 [--gh-core:2.2px] [--gh-halo:9px] md:[--gh-core:2.7px] md:[--gh-halo:11px]">
         {lights.map((l, i) => (
@@ -69,7 +73,7 @@ export function Garland({ src, fit }: GarlandProps) {
 }
 
 /** Canvas the painter draws on; repainted when the header changes size. */
-function PaintedGarland() {
+function PaintedGarland({ onLights }: { onLights: (lights: LightPoint[]) => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -92,6 +96,7 @@ function PaintedGarland() {
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       paintGarland(ctx, width, height, thickness);
+      onLights(lightsOnFoliage(ctx, canvas.width, canvas.height, width));
     };
     paint();
     const ro = new ResizeObserver(() => {
@@ -102,6 +107,7 @@ function PaintedGarland() {
       ro.disconnect();
       cancelAnimationFrame(frame);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <>
@@ -113,6 +119,41 @@ function PaintedGarland() {
       />
     </>
   );
+}
+
+/**
+ * Fairy lights spread through the whole garland, top sprigs to drooping cedar,
+ * edge to edge. The width is split into columns (about one light per 8px), and
+ * each column's light goes at a random height where the painted canvas actually
+ * has foliage, so no light floats in a gap. Positions are percent of the garland
+ * band, so they can sit above (negative) or below (over 100%) it.
+ */
+function lightsOnFoliage(ctx: CanvasRenderingContext2D, pxW: number, pxH: number, width: number): LightPoint[] {
+  const data = ctx.getImageData(0, 0, pxW, pxH).data;
+  const rand = seededRandom(97);
+  const count = Math.max(16, Math.round(width / 8));
+  const canvasTop = -0.4; // canvas starts 40% of a band above the band
+  const canvasSpan = 1.8; // and is 1.8 bands tall
+  const out: LightPoint[] = [];
+  for (let i = 0; i < count; i++) {
+    for (let attempt = 0; attempt < 14; attempt++) {
+      const fx = (i + 0.15 + rand() * 0.7) / count;
+      // Mostly within the garland's body, sometimes out in the top sprigs or hanging cedar.
+      const fy = 0.1 + Math.pow(rand(), 0.9) * 0.8;
+      const px = Math.min(pxW - 1, Math.floor(fx * pxW));
+      const py = Math.min(pxH - 1, Math.floor(fy * pxH));
+      if (data[(py * pxW + px) * 4 + 3] < 200) continue;
+      const dur = 1.5 + rand() * 1.5;
+      out.push({
+        x: Math.round(fx * 10000) / 100,
+        y: Math.round((canvasTop + fy * canvasSpan) * 10000) / 100,
+        dur: Math.round(dur * 100) / 100,
+        delay: Math.round(-rand() * dur * 100) / 100,
+      });
+      break;
+    }
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
