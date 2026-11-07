@@ -170,7 +170,7 @@ A header for the top of the site: your photo of a live-greenery garland across t
 - When a page becomes active, frost crystals grow across its glass plate and then the title sharpens.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
-- Garland and sign lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (2.4–4.8 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
+- Garland and sign lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (4.5–9 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
 - With "reduce motion" turned on, lights and glints stay steady, nothing swings, and the frost appears without growing.
 
 **Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat.
