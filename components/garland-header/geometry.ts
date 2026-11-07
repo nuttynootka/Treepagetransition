@@ -189,60 +189,6 @@ export function plateGlints(seed: number): PlateGlint[] {
 }
 
 // ---------------------------------------------------------------------------
-// Frost crystals for the glass plate (viewBox 0 0 100 100, circle r=50)
-// ---------------------------------------------------------------------------
-
-export interface FrostStroke {
-  d: string;
-  /** Seconds after the bloom starts. */
-  delay: number;
-  width: number;
-}
-
-/**
- * Dendrite-style frost: crystals start at the rim and grow inward, with side
- * branches at 60°, like frost creeping across a cold window.
- */
-export function frostStrokes(seed: number): FrostStroke[] {
-  const rand = seededRandom(seed);
-  const out: FrostStroke[] = [];
-  const seeds = 7;
-  for (let i = 0; i < seeds; i++) {
-    const rimDeg = (i / seeds) * 360 + (rand() - 0.5) * 36;
-    const start = polar(49, rimDeg);
-    let dir = rimDeg + 180 + (rand() - 0.5) * 30;
-    const len = 18 + rand() * 13;
-    const segs = 3;
-    const pts: [number, number][] = [start];
-    for (let s = 0; s < segs; s++) {
-      dir += (rand() - 0.5) * 16;
-      const [x, y] = pts[pts.length - 1];
-      pts.push([x + (len / segs) * Math.cos(rad(dir)), y + (len / segs) * Math.sin(rad(dir))]);
-    }
-    const lineD = (p: [number, number][]) => p.map((q, k) => `${k ? "L" : "M"}${r2(q[0])} ${r2(q[1])}`).join("");
-    const startDelay = r2(rand() * 0.2);
-    out.push({ d: lineD(pts), delay: startDelay, width: 0.8 });
-
-    // Side branches along the main crystal.
-    for (const f of [0.3, 0.55, 0.78]) {
-      const idx = Math.min(segs - 1, Math.floor(f * segs));
-      const a = pts[idx];
-      const b = pts[idx + 1];
-      const local = f * segs - idx;
-      const base: [number, number] = [a[0] + (b[0] - a[0]) * local, a[1] + (b[1] - a[1]) * local];
-      const segDir = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
-      const bl = len * (1 - f) * (0.45 + rand() * 0.2);
-      for (const side of [-1, 1]) {
-        const d = segDir + side * 60;
-        const tip: [number, number] = [base[0] + bl * Math.cos(rad(d)), base[1] + bl * Math.sin(rad(d))];
-        out.push({ d: lineD([base, tip]), delay: r2(startDelay + 0.18 + f * 0.4), width: 0.5 });
-      }
-    }
-  }
-  return out;
-}
-
-// ---------------------------------------------------------------------------
 // Where each snowflake hangs
 // ---------------------------------------------------------------------------
 

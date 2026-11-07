@@ -130,22 +130,14 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
               )}
             >
               <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-5px_10px_rgba(0,0,0,0.35)] transition-colors duration-300",
-                    current
-                      ? "bg-[linear-gradient(170deg,rgba(255,245,235,0.2),rgba(9,18,14,0.7)_60%)]"
-                      : "bg-[linear-gradient(170deg,rgba(255,255,255,0.08),rgba(7,14,11,0.8)_60%)] group-hover/plate:bg-[linear-gradient(170deg,rgba(255,245,235,0.16),rgba(9,18,14,0.74)_60%)]",
-                  )}
-                />
+                {/* Same light frosted glass as the snowflake centres. */}
+                <span aria-hidden className={cn("gh-frost-glass absolute inset-0", current && "is-active")} />
                 {/* A reflection of that plate's light, sliding across the glass as the plate twists. */}
                 <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
                 <span
                   className={cn(
-                    "relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.04em] whitespace-nowrap",
-                    "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
-                    current ? "text-[#FFF8F0]" : "text-white/90 group-hover/plate:text-white",
+                    "gh-etched relative px-[7px] text-center font-bold uppercase leading-none tracking-[0.04em] whitespace-nowrap",
+                    "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)]",
                   )}
                 >
                   {item.label}

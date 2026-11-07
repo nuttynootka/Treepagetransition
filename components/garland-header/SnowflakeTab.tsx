@@ -1,19 +1,18 @@
 "use client";
 
-import { useMemo, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { crystalGlints, GLINT_COLORS, hashString, type Glint, type TabPlacement } from "./geometry";
 import { useSwing } from "./hooks";
-import { cn, Frost } from "./parts";
+import { cn } from "./parts";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 
 /**
- * One label size for every plate, set by the longest label so it fits edge to edge.
- * Snug fit: capitals in this serif with 0.04em spacing measure about 0.73em per letter, and the
- * longest label fills 90% of the plate, leaving a thin margin inside the rim.
+ * The glass centre is sized to just fit its own word. Before the browser measures the
+ * word, this estimates it: capitals in this serif with 0.04em spacing are about 0.73em
+ * each, plus a thin margin. Every label uses the same font size (--label-size).
  */
-function labelSize(longest: number): string {
-  const fit = 0.9 / (longest * 0.73);
-  return `calc(var(--flake) * var(--plate) * ${fit.toFixed(4)})`;
+function estimatePlate(label: string): string {
+  return `calc(var(--label-size) * ${(label.length * 0.73 + 0.75).toFixed(2)})`;
 }
 
 function GlintSpark({ glint }: { glint: Glint }) {
@@ -46,8 +45,6 @@ interface SnowflakeTabProps {
   crystal: CrystalImage;
   /** Flip the picture left-to-right, so a repeated design looks different. */
   mirrored: boolean;
-  /** Length of the longest label in the header. */
-  labelChars: number;
   motion: boolean;
   Link: LinkLike;
   /** For a menu snowflake: whether its hanging menu is down, and how to toggle it. */
@@ -62,7 +59,6 @@ export function SnowflakeTab({
   placement,
   crystal,
   mirrored,
-  labelChars,
   motion,
   Link,
   menu,
@@ -76,6 +72,27 @@ export function SnowflakeTab({
     return { "--turn-dur": `${dur.toFixed(2)}s`, "--turn-delay": `${(-((seed >> 10) % 1000) / 100).toFixed(2)}s` } as CSSProperties;
   }, [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
+
+  // Size the glass centre to just fit the word: the circle around the word's box,
+  // plus a hair of margin. Re-measured when the font loads or the size changes.
+  const turnRef = useRef<HTMLSpanElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const label = labelRef.current;
+    const turn = turnRef.current;
+    if (!label || !turn) return;
+    const fit = () => {
+      const fontPx = parseFloat(getComputedStyle(label).fontSize) || 12;
+      const w = label.offsetWidth;
+      const capHeight = fontPx * 0.72;
+      const d = Math.hypot(w, capHeight) + fontPx * 0.55;
+      turn.style.setProperty("--plate-d", `${d.toFixed(1)}px`);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(label);
+    return () => ro.disconnect();
+  }, [page.label]);
 
   // Mouse or pen brushing past: swing away from where it came from.
   const onPointerEnter = (e: PointerEvent<HTMLElement>) => {
@@ -101,7 +118,7 @@ export function SnowflakeTab({
           <span aria-hidden className="gh-aura pointer-events-none absolute -inset-[20%] rounded-full" />
 
           {/* Everything that turns slowly on the ribbon, like the crystals in the reference video. */}
-          <span className="gh-turn pointer-events-none absolute inset-0" style={turnStyle}>
+          <span ref={turnRef} className="gh-turn pointer-events-none absolute inset-0" style={{ ...turnStyle, "--plate-d": estimatePlate(page.label) } as CSSProperties}>
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
             <span className={cn("gh-crystal absolute inset-0 isolate", mirrored && "-scale-x-100")}>
@@ -138,36 +155,25 @@ export function SnowflakeTab({
               ))}
             </span>
 
-            {/* Frosted glass plate with a silver rim, sized by --plate so the label fits */}
+            {/* Silver rim around the glass centre */}
             <span
               aria-hidden
-              className="absolute left-1/2 top-1/2 size-[calc(var(--plate)*100%+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+              className="absolute left-1/2 top-1/2 size-[calc(var(--plate-d)+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
             />
-          <span className="absolute left-1/2 top-1/2 flex size-[calc(var(--plate)*100%)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
-            <span
-              aria-hidden
-              className={cn(
-                "absolute inset-0 rounded-full transition-colors duration-700",
-                "shadow-[inset_0_1px_0_rgba(255,255,255,0.28),inset_0_-6px_12px_rgba(0,0,0,0.35)]",
-                active
-                  ? "bg-[linear-gradient(170deg,rgba(255,245,235,0.16),rgba(9,18,14,0.72)_55%)]"
-                  : "bg-[linear-gradient(170deg,rgba(255,255,255,0.07),rgba(7,14,11,0.8)_55%)]",
-              )}
-            />
-            {/* Remounts each time this tab becomes active, so the bloom replays. */}
-            <Frost key={active ? "on" : "off"} seed={seed} blooming={active} />
-            <span
-              key={active ? "t-on" : "t-off"}
-              className={cn(
-                "gh-title relative whitespace-nowrap text-center font-semibold uppercase leading-none tracking-[0.04em]",
-                "font-[family-name:var(--gh-font)] [text-shadow:0_1px_3px_rgba(0,0,0,0.75)]",
-                active ? "is-blooming text-[#FFF8F0]" : "text-white/90 group-hover:text-white",
-              )}
-              style={{ fontSize: labelSize(labelChars) }}
-            >
-              {page.label}
+            {/* Solid, light frosted glass centre, just big enough for its word, etched dark. */}
+            <span className="absolute left-1/2 top-1/2 flex size-[var(--plate-d)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
+              <span aria-hidden className={cn("gh-frost-glass absolute inset-0 rounded-full", active && "is-active")} />
+              <span
+                ref={labelRef}
+                className={cn(
+                  "gh-title gh-etched relative whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
+                  "font-[family-name:var(--gh-font)] text-[length:var(--label-size)]",
+                  active && "is-blooming",
+                )}
+              >
+                {page.label}
+              </span>
             </span>
-          </span>
           </span>
     </>
   );

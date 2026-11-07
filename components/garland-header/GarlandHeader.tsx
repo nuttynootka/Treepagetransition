@@ -89,8 +89,6 @@ export function GarlandHeader({
   const rootRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
   const layout = useMemo(() => placeTabs(pages.length), [pages.length]);
-  // Longest label sets one shared label size, so every plate reads alike.
-  const longest = Math.max(1, ...pages.map((p) => p.label.length));
   const idBase = useId();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -131,10 +129,10 @@ export function GarlandHeader({
         "[--g:58px] sm:[--g:66px] md:[--g:76px] lg:[--g:84px] xl:[--g:92px]",
         "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
         "[--flake:min(86px,24vw)] sm:[--flake:98px] md:[--flake:110px] lg:[--flake:117px] xl:[--flake:127px]",
-        // Glass plate width as a share of the snowflake: just big enough for the longest label.
-        "[--plate:0.67] sm:[--plate:0.6] md:[--plate:0.56] lg:[--plate:0.55] xl:[--plate:0.54]",
+        // One text size for every menu word (snowflakes and hanging plates alike).
+        "[--label-size:10.5px] md:[--label-size:11.5px] lg:[--label-size:12px]",
         // Hanging menu plates.
-        "[--menu-h:26px] [--menu-font:10.5px] md:[--menu-h:28px] md:[--menu-font:11.5px]",
+        "[--menu-h:26px] [--menu-font:var(--label-size)] md:[--menu-h:28px]",
         "h-[calc(var(--gt)+var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--gt)+var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
       )}
@@ -170,7 +168,6 @@ export function GarlandHeader({
                 placement={layout.tabs[i]}
                 crystal={crystals[i % crystals.length]}
                 mirrored={Math.floor(i / crystals.length) % 2 === 1}
-                labelChars={longest}
                 motion={!reducedMotion}
                 Link={LinkComponent}
                 menu={page.items ? { id: menuId, open, onToggle: () => setOpenMenu(open ? null : menuId) } : undefined}

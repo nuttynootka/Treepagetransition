@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { paintGarland } from "./garland-painter";
-import { frostStrokes, garlandLights, ovalLights, seededRandom, type LightPoint } from "./geometry";
+import { garlandLights, ovalLights, seededRandom, type LightPoint } from "./geometry";
 import { useImageStatus } from "./hooks";
 import type { LinkLike } from "./types";
 
@@ -210,22 +210,6 @@ export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, outline, Link }:
 }
 
 // ---------------------------------------------------------------------------
-
-/** Frost crystals that grow in from the rim of a glass plate. */
-export function Frost({ seed, blooming }: { seed: number; blooming: boolean }) {
-  const strokes = useMemo(() => frostStrokes(seed), [seed]);
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 100 100"
-      className={cn("gh-frost pointer-events-none absolute inset-0 h-full w-full", blooming && "is-blooming")}
-    >
-      {strokes.map((s, i) => (
-        <path key={i} d={s.d} pathLength={1} strokeWidth={s.width} style={{ "--fd": `${s.delay}s` } as CSSProperties} />
-      ))}
-    </svg>
-  );
-}
 
 /** A few soft, out-of-focus lights far behind the garland, for depth. */
 export function Bokeh() {

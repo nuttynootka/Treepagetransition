@@ -163,16 +163,17 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 # Garland header with snowflake page tabs
 
-A header for the top of the site: your photo of a live-greenery garland across the top, strung with soft white fairy lights; your logo centred in a frosted oval ringed with its own lights; and one hanging crystal snowflake per page, like leaded-glass ornaments catching the light of Christmas lights. Each has a round frosted-glass plate in the middle with the page name.
+A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it with its own string of lights; and one hanging crystal snowflake per menu item, like cut-crystal ornaments catching the light of Christmas lights. Each has a round centre of light frosted glass with its word etched in dark, sized to just fit the word.
 
 - Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
-- When a page becomes active, frost crystals grow across its glass plate and then the title sharpens.
+- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 10.5px on phones, 11.5px on tablets, 12px on computers), on the snowflakes and the hanging plates alike. Each snowflake's glass centre is measured in the browser to just fit its word, so each snowflake has a different-sized centre.
+- When a page becomes active, its word sharpens into focus.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
 - Garland and sign lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (4.5–9 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
-- With "reduce motion" turned on, lights and glints stay steady, nothing swings, and the frost appears without growing.
+- With "reduce motion" turned on, lights and glints stay steady, and nothing swings or turns.
 
 **Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat.
 
@@ -184,10 +185,10 @@ A header for the top of the site: your photo of a live-greenery garland across t
 | `components/garland-header/SnowflakeTab.tsx` | One hanging snowflake tab. |
 | `components/garland-header/HangingMenu.tsx` | The drop-down menu of glass plates on chains. |
 | `components/garland-header/chain-physics.ts` | The physics that makes each plate swing, twist and settle on its own. |
-| `components/garland-header/parts.tsx` | Fairy light, garland strip, logo frame, frost. |
+| `components/garland-header/parts.tsx` | Fairy light, garland, logo sign, background lights. |
 | `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
-| `components/garland-header/geometry.ts` | Where every light, glint and frost crystal goes. |
-| `components/garland-header/garland-header.css` | The twinkle, aura and frost animations. |
+| `components/garland-header/geometry.ts` | Where every light and glint goes, and where each snowflake hangs. |
+| `components/garland-header/garland-header.css` | The twinkle, crystal light, glass and aura styles. |
 | `public/snowflakes/` | The 4 crystal snowflake pictures, cut out from your image with transparent backgrounds. |
 | `public/brand/noble-star-forest.webp` | Your logo (the wood sign). |
 | `components/garland-header/garland-painter.ts` | Paints the noble fir and western red cedar garland. |
@@ -243,7 +244,7 @@ const pages: GarlandPage[] = [
 
 ### How the hanging menu works
 
-- Tapping SHOP or CONTACT drops a series of frosted glass plates on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
+- Tapping SHOP or CONTACT drops a series of light frosted glass plates (the same glass as the snowflake centres, words etched in dark) on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
 - Each plate catches one Christmas-light colour, in order: red, green, gold, blue, orange, violet. It shows as small glints along the plate's edges and a faint tinted reflection that slides across the glass as the plate twists. The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
 - The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
 - Opening: the garland chains lower the first plate with an ease in and out, quick enough that it briefly runs ahead of the chains and gets a soft, bouncy catch. Each plate below starts folded up against the bottom of the plate above and swings down on that edge with a little flutter, its chains paying out quickly so it drops a short way, once the plate above is about half unfolded. Each gets a small random nudge so no two openings look alike. Then they sway and settle.
@@ -321,6 +322,6 @@ It needs React 18 or newer and Tailwind CSS v4.
    ]}
    ```
 
-The frosted glass plate (with its own silver rim) and the page name are drawn over that centre. Its size is set by `--plate` in `GarlandHeader.tsx`, not by the picture, so the labels always fit. The `plate` number is kept for reference.
+The light frosted glass centre (with its own silver rim) and the word are drawn over that centre. Its size comes from the word, not the picture, so every word fits. The `plate` number is kept for reference.
 
 To rebuild the preview page after changing the component: `npm run build:garland-preview`.
