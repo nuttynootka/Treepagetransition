@@ -37,13 +37,21 @@ const PHYS = {
   twistDamping: 2 * 0.14 * (2 * Math.PI / 2.4),
   twistFromSwing: 0.0045,
   maxTwist: 0.21, // ≈ 12°
-  /** Unfurl: each plate flips down from edge-on with a small flutter. */
-  foldStiffness: (2 * Math.PI / 0.55) ** 2,
-  foldDamping: 2 * 0.32 * (2 * Math.PI / 0.55),
-  /** Seconds between releasing plates on the way down, and reeling them in on the way up. */
-  dropGap: 0.16,
-  reelGap: 0.1,
-  reelTime: 0.28,
+  /** Unfurl: each plate swings down from folded flat against the bottom of the plate
+   *  above, on a smooth, lightly damped hinge. */
+  foldStiffness: (2 * Math.PI / 0.62) ** 2,
+  foldDamping: 2 * 0.62 * (2 * Math.PI / 0.62),
+  /** Opening: the garland chains lower the first plate over this long, easing in and out
+   *  (gentler than free fall, so the chains never go slack and catch with a jerk). */
+  leadTime: 0.85,
+  /** Chains between plates lengthen over this long once a plate is let go. */
+  gapTime: 0.34,
+  /** A plate is let go this long after the one above, once that one is mostly unfolded. */
+  releaseGap: 0.13,
+  releaseFold: -28,
+  /** Closing: seconds between reeling plates in, and how long each takes. */
+  reelGap: 0.09,
+  reelTime: 0.34,
   /** Chain length between plates. */
   gap: 15,
   /** Where chains attach, as a share of plate width from each side: corners for the garland chains,
@@ -51,7 +59,7 @@ const PHYS = {
   leadAttach: 0.2,
   innerAttach: 0.34,
   /** Small random sideways push and twist each plate gets as it drops, so no two drops look alike. */
-  dropKick: 70,
+  dropKick: 36,
   /** Faint random twisting from the breeze (rad/s²). */
   breezeTwist: 0.5,
 };
@@ -68,6 +76,9 @@ interface Plate {
   from: { x: number; y: number }[];
   fold: number;
   foldV: number;
+  /** Fold and twist one physics step ago, for smooth drawing between steps. */
+  prevFold: number;
+  prevTwist: number;
   foldFrom: number;
   twist: number;
   twistV: number;
@@ -114,6 +125,8 @@ export class ChainLadder {
       from: [],
       fold: -90,
       foldV: 0,
+      prevFold: -90,
+      prevTwist: 0,
       foldFrom: -90,
       twist: 0,
       twistV: 0,
@@ -225,7 +238,8 @@ export class ChainLadder {
       this.step(PHYS.substep);
       this.acc -= PHYS.substep;
     }
-    this.render();
+    // Draw between the last two physics steps, so motion stays even at any screen refresh rate.
+    this.render(this.acc / PHYS.substep);
     if (this.state === "closed") {
       this.raf = 0;
       return;
@@ -249,9 +263,19 @@ export class ChainLadder {
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, angle: Math.atan2(b.y - a.y, b.x - a.x) };
   }
 
-  /** Where plate i sits when rolled up: on top of the plate above, or at the garland. */
-  private holdTarget(i: number): { x: number; y: number }[] {
-    const f = i > 0 ? this.poseOf(this.plates[i - 1]) : { x: 0, y: 0, angle: 0 };
+  /**
+   * Where plate i sits when rolled up: folded against the bottom edge of the plate above
+   * (its top on that plate's bottom chain points), or for the first plate, at the garland.
+   * `prev` gives the position one step ago, so a plate let go keeps its holder's motion.
+   */
+  private holdTarget(i: number, prev = false): { x: number; y: number }[] {
+    let f = { x: 0, y: 0, angle: 0 };
+    if (i > 0) {
+      const par = this.plates[i - 1].p;
+      const a = prev ? { x: par[BL].px, y: par[BL].py } : par[BL];
+      const b = prev ? { x: par[BR].px, y: par[BR].py } : par[BR];
+      f = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, angle: Math.atan2(b.y - a.y, b.x - a.x) };
+    }
     const c = Math.cos(f.angle);
     const s = Math.sin(f.angle);
     return this.plates[i].local.map((q) => ({ x: f.x + q.x * c - q.y * s, y: f.y + q.x * s + q.y * c }));
@@ -265,9 +289,9 @@ export class ChainLadder {
         q.x = q.px = t[k].x;
         q.y = q.py = t[k].y;
       });
-      pl.fold = -90;
+      pl.fold = pl.prevFold = -90;
       pl.foldV = 0;
-      pl.twist = pl.twistV = 0;
+      pl.twist = pl.twistV = pl.prevTwist = 0;
     });
   }
 
@@ -301,7 +325,11 @@ export class ChainLadder {
     // Schedule: release plates top to bottom when opening, reel them in bottom to top when closing.
     if (this.state === "opening") {
       this.plates.forEach((pl, i) => {
-        if (pl.mode === "held" && t - this.openAt >= i * PHYS.dropGap) {
+        const parent = i > 0 ? this.plates[i - 1] : null;
+        const ready = parent
+          ? parent.mode === "free" && t - parent.modeAt >= PHYS.releaseGap && parent.fold > PHYS.releaseFold
+          : t >= this.openAt;
+        if (pl.mode === "held" && ready) {
           // Let go, carrying the velocity of whatever was holding it, plus a small random nudge.
           this.setMode(pl, "free");
           const r1 = hash(i * 7.1 + this.opens * 3.7);
@@ -326,6 +354,11 @@ export class ChainLadder {
         this.holdAll();
         return;
       }
+    }
+
+    for (const pl of this.plates) {
+      pl.prevFold = pl.fold;
+      pl.prevTwist = pl.twist;
     }
 
     const drag = Math.max(0, 1 - PHYS.drag * h);
@@ -362,7 +395,9 @@ export class ChainLadder {
         if (pl.mode !== "free") continue;
         const parent = i > 0 ? this.plates[i - 1] : null;
         const parentMoves = parent?.mode === "free";
-        const len = i === 0 ? this.lead : PHYS.gap;
+        // Chains pay out smoothly after a plate is let go, instead of all at once.
+        const since = t - pl.modeAt;
+        const len = i === 0 ? this.lead * ease(since / PHYS.leadTime) : PHYS.gap * ease(since / PHYS.gapTime);
         const upL = parent ? parent.p[BL] : aL;
         const upR = parent ? parent.p[BR] : aR;
         rope(upL, pl.p[TL], len, parentMoves ? 1 : 0, 1);
@@ -383,12 +418,12 @@ export class ChainLadder {
       if (pl.mode === "free") continue;
       const target = this.holdTarget(i);
       if (pl.mode === "held") {
-        const src = i > 0 ? this.plates[i - 1].p : null;
+        const before = i > 0 ? this.holdTarget(i, true) : target;
         pl.p.forEach((q, k) => {
           q.x = target[k].x;
           q.y = target[k].y;
-          q.px = src ? src[k].px : target[k].x;
-          q.py = src ? src[k].py : target[k].y;
+          q.px = before[k].x;
+          q.py = before[k].y;
         });
       } else {
         const k = Math.min(1, (t - pl.modeAt) / PHYS.reelTime);
@@ -433,29 +468,32 @@ export class ChainLadder {
     }
   }
 
-  private render() {
+  private render(alpha = 1) {
     const n = this.plates.length;
+    const at = (q: Pt) => ({ x: q.px + (q.x - q.px) * alpha, y: q.py + (q.y - q.py) * alpha });
     for (let i = 0; i < n; i++) {
       const pl = this.plates[i];
       const el = this.els[i];
-      const [a, b] = [pl.p[TL], pl.p[TR]];
+      const fold = pl.prevFold + (pl.fold - pl.prevFold) * alpha;
+      const twist = pl.prevTwist + (pl.twist - pl.prevTwist) * alpha;
+      const [a, b] = [at(pl.p[TL]), at(pl.p[TR])];
       const mx = (a.x + b.x) / 2;
       const my = (a.y + b.y) / 2;
       const angle = Math.atan2(b.y - a.y, b.x - a.x);
-      const hidden = pl.mode === "held" || pl.fold < -86;
+      const hidden = pl.mode === "held" || fold < -86;
       el.style.transform =
         `translate3d(${(mx - (this.widths[i] ?? 0) / 2).toFixed(2)}px, ${my.toFixed(2)}px, 0) perspective(700px) ` +
-        `rotate(${angle.toFixed(4)}rad) rotateY(${pl.twist.toFixed(4)}rad) rotateX(${pl.fold.toFixed(2)}deg)`;
+        `rotate(${angle.toFixed(4)}rad) rotateY(${twist.toFixed(4)}rad) rotateX(${fold.toFixed(2)}deg)`;
       el.style.opacity = hidden ? "0" : "1";
       // Lets the plate's reflection slide across the glass as it twists.
-      el.style.setProperty("--tw", pl.twist.toFixed(3));
+      el.style.setProperty("--tw", twist.toFixed(3));
 
       // Chains from the holder down to this plate's top corners.
       const parent = i > 0 ? this.plates[i - 1] : null;
       const ups = parent
-        ? [parent.p[BL], parent.p[BR]]
+        ? [at(parent.p[BL]), at(parent.p[BR])]
         : [{ x: -this.anchorHalf, y: 0 }, { x: this.anchorHalf, y: 0 }];
-      const downs = [pl.p[TL], pl.p[TR]];
+      const downs = [a, b];
       for (let s = 0; s < 2; s++) {
         const c = this.chains[i][s];
         const dx = downs[s].x - ups[s].x;
@@ -471,6 +509,12 @@ export class ChainLadder {
       }
     }
   }
+}
+
+/** Smooth start and stop, 0..1 (smootherstep). */
+function ease(k: number) {
+  const x = Math.max(0, Math.min(1, k));
+  return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
 /** Repeatable pseudo-random number in [0, 1). */
