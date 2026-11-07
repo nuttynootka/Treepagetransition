@@ -7,12 +7,12 @@ import { cn } from "./parts";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 
 /**
- * The glass centre is sized to just fit its own word. Before the browser measures the
+ * Half the width of the frosted fade behind a word. Before the browser measures the
  * word, this estimates it: capitals in this serif with 0.04em spacing are about 0.72em
  * each. Every label uses the same font size (--label-size).
  */
 export function estimatePlate(label: string): string {
-  return `calc(var(--label-size) * ${(label.length * 0.72 + 0.15).toFixed(2)})`;
+  return `calc(var(--label-size) * ${(label.length * 0.36 + 1.3).toFixed(2)})`;
 }
 
 function GlintSpark({ glint }: { glint: Glint }) {
@@ -49,10 +49,6 @@ interface SnowflakeTabProps {
   Link: LinkLike;
   /** For a menu snowflake: whether its hanging menu is down, and how to toggle it. */
   menu?: { id: string; open: boolean; onToggle: () => void };
-  /** Size of the glass centre (CSS length), shared by all snowflakes so they match. */
-  plateSize: string;
-  /** Reports the centre size (px) this snowflake's own word and crystal need. */
-  onMeasure: (px: number) => void;
   /** The hanging menu, rendered behind this snowflake. */
   children?: ReactNode;
 }
@@ -66,8 +62,6 @@ export function SnowflakeTab({
   motion,
   Link,
   menu,
-  plateSize,
-  onMeasure,
   children,
 }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
@@ -79,8 +73,8 @@ export function SnowflakeTab({
   }, [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
 
-  // Work out the glass centre this word needs (the header makes every centre as big as
-  // the largest). Re-measured when the font loads or the size changes.
+  // Size the frosted fade behind the word to the word itself. Re-measured when the font
+  // loads or the size changes.
   const turnRef = useRef<HTMLSpanElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
@@ -89,22 +83,14 @@ export function SnowflakeTab({
     if (!label || !turn) return;
     const fit = () => {
       const fontPx = parseFloat(getComputedStyle(label).fontSize) || 12;
-      // The word's width without the letter-spacing after its last letter.
-      const w = label.offsetWidth - fontPx * 0.04;
-      const capHeight = fontPx * 0.66;
-      // The smallest circle whose edge just clears the ends of the word, but never smaller
-      // than the round opening in the middle of the crystal picture, or a dark ring shows.
-      const opening = turn.offsetWidth * crystal.plate;
-      const d = Math.max(Math.hypot(w, capHeight) + 1.5, opening);
-      onMeasure(Math.round(d * 10) / 10);
+      turn.style.setProperty("--fade-w", `${(label.offsetWidth / 2 + fontPx * 1.3).toFixed(1)}px`);
+      turn.style.setProperty("--fade-h", `${(fontPx * 1.8).toFixed(1)}px`);
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(label);
-    ro.observe(turn);
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page.label, crystal.plate]);
+  }, [page.label]);
 
   // Mouse or pen brushing past: swing away from where it came from.
   const onPointerEnter = (e: PointerEvent<HTMLElement>) => {
@@ -133,7 +119,7 @@ export function SnowflakeTab({
           <span
             ref={turnRef}
             className="gh-turn pointer-events-none absolute inset-0 origin-[50%_40%]"
-            style={{ ...turnStyle, "--plate-d": plateSize, "--star-cy": `${STAR_CENTRE_Y * 100}%` } as CSSProperties}
+            style={{ ...turnStyle, "--fade-w": estimatePlate(page.label), "--fade-h": "calc(var(--label-size) * 1.8)", "--star-cy": `${STAR_CENTRE_Y * 100}%` } as CSSProperties}
           >
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
@@ -162,6 +148,13 @@ export function SnowflakeTab({
                 className="gh-fire absolute inset-0"
                 style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
               />
+              {/* Behind the word, the facets fade to soft frosted crystal so the word stays
+                  legible. Masked to the star, so a long word runs on into the points. */}
+              <span
+                aria-hidden
+                className={cn("gh-text-fade absolute inset-0", active && "is-active")}
+                style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
+              />
             </span>
 
             {/* Glints of light caught in the facets */}
@@ -171,24 +164,16 @@ export function SnowflakeTab({
               ))}
             </span>
 
-            {/* Silver rim around the glass centre */}
+            {/* The word, etched dark straight onto the star, centred where the points meet. */}
             <span
-              aria-hidden
-              className="absolute left-1/2 top-[var(--star-cy)] size-[calc(var(--plate-d)+3px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
-            />
-            {/* Solid, light frosted glass centre, just big enough for its word, etched dark. */}
-            <span className="absolute left-1/2 top-[var(--star-cy)] flex size-[var(--plate-d)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
-              <span aria-hidden className={cn("gh-frost-glass absolute inset-0 rounded-full", active && "is-active")} />
-              <span
-                ref={labelRef}
-                className={cn(
-                  "gh-title gh-etched relative -mr-[0.04em] whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
-                  "font-[family-name:var(--gh-font)] text-[length:var(--label-size)]",
-                  active && "is-blooming",
-                )}
-              >
-                {page.label}
-              </span>
+              ref={labelRef}
+              className={cn(
+                "gh-title gh-etched absolute left-1/2 top-[var(--star-cy)] -mr-[0.04em] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
+                "font-[family-name:var(--gh-font)] text-[length:var(--label-size)]",
+                active && "is-blooming",
+              )}
+            >
+              {page.label}
             </span>
           </span>
     </>

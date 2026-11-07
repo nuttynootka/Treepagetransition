@@ -163,7 +163,7 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 # Garland header with snowflake page tabs
 
-A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging faceted 8-point crystal star per menu item, the same north-star shape as the star on the sign, catching the light of Christmas lights. Each has a round centre of light frosted glass with its word etched in dark, sized to just fit the word.
+A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging faceted 8-point crystal star per menu item, the same north-star shape as the star on the sign, catching the light of Christmas lights. Each word is etched in dark straight onto its star, with the facets fading to soft frosted crystal behind it so it stays readable.
 
 - Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
@@ -324,7 +324,7 @@ It needs React 18 or newer and Tailwind CSS v4.
    ]}
    ```
 
-The light frosted glass centre (with its own silver rim) and the word are drawn over that centre. Its size comes from the word, not the picture, so every word fits. The `plate` number is kept for reference.
+The word and its frosted fade are drawn over the star's centre. The `plate` number is no longer used for sizing and is kept for compatibility.
 
 To rebuild the preview page after changing the component: `npm run build:garland-preview`.
 

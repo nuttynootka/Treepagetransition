@@ -93,6 +93,22 @@ def render(light, seed):
             e[seam] = 1 if k in (1, 2) else -0.6
             edges[m] = e
 
+    # A cleanly cut hub where the points meet (16 radial facets, no crossing seams), so the
+    # word placed here sits on calm, bright crystal.
+    hub = 0.115 * S
+    ang = np.arctan2(yy - cy, xx - cx)
+    rad = np.hypot(xx - cx, yy - cy)
+    # octagon radius in each direction
+    sector = np.pi / 8
+    a_mod = np.mod(ang + sector / 2, np.pi / 4) - np.pi / 8
+    oct_r = hub * np.cos(np.pi / 8) / np.cos(a_mod)
+    inside = rad <= oct_r
+    facet = np.floor((ang + np.pi) / (np.pi / 8)).astype(int) % 16
+    shades = 0.72 + 0.28 * np.cos(facet * np.pi / 8 - np.arctan2(L[1], L[0]))
+    rgb[inside] = (shades * (0.92 + 0.12 * (rad / hub)))[inside]
+    alpha[inside] = 0.96
+    edges[inside] = 0
+
     rgb = np.where(edges > 0, np.maximum(rgb, 1.05), rgb)
     rgb = np.where(edges < 0, rgb * 0.55, rgb)
     # Slightly cool clear crystal.
