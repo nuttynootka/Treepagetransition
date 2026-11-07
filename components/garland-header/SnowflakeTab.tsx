@@ -8,11 +8,11 @@ import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 
 /**
  * The glass centre is sized to just fit its own word. Before the browser measures the
- * word, this estimates it: capitals in this serif with 0.04em spacing are about 0.73em
- * each, plus a thin margin. Every label uses the same font size (--label-size).
+ * word, this estimates it: capitals in this serif with 0.04em spacing are about 0.72em
+ * each. Every label uses the same font size (--label-size).
  */
 function estimatePlate(label: string): string {
-  return `calc(var(--label-size) * ${(label.length * 0.73 + 0.75).toFixed(2)})`;
+  return `calc(var(--label-size) * ${(label.length * 0.72 + 0.15).toFixed(2)})`;
 }
 
 function GlintSpark({ glint }: { glint: Glint }) {
@@ -83,9 +83,11 @@ export function SnowflakeTab({
     if (!label || !turn) return;
     const fit = () => {
       const fontPx = parseFloat(getComputedStyle(label).fontSize) || 12;
-      const w = label.offsetWidth;
-      const capHeight = fontPx * 0.72;
-      const d = Math.hypot(w, capHeight) + fontPx * 0.55;
+      // The word's width without the letter-spacing after its last letter.
+      const w = label.offsetWidth - fontPx * 0.04;
+      const capHeight = fontPx * 0.66;
+      // The smallest circle whose edge just clears the ends of the word.
+      const d = Math.hypot(w, capHeight) + 1.5;
       turn.style.setProperty("--plate-d", `${d.toFixed(1)}px`);
     };
     fit();
@@ -158,7 +160,7 @@ export function SnowflakeTab({
             {/* Silver rim around the glass centre */}
             <span
               aria-hidden
-              className="absolute left-1/2 top-1/2 size-[calc(var(--plate-d)+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+              className="absolute left-1/2 top-1/2 size-[calc(var(--plate-d)+3px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
             />
             {/* Solid, light frosted glass centre, just big enough for its word, etched dark. */}
             <span className="absolute left-1/2 top-1/2 flex size-[var(--plate-d)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
@@ -166,7 +168,7 @@ export function SnowflakeTab({
               <span
                 ref={labelRef}
                 className={cn(
-                  "gh-title gh-etched relative whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
+                  "gh-title gh-etched relative -mr-[0.04em] whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
                   "font-[family-name:var(--gh-font)] text-[length:var(--label-size)]",
                   active && "is-blooming",
                 )}
