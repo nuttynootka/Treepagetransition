@@ -34,7 +34,7 @@ export function SiteHeader() {
       pages={pages}
       activeHref={pathname}
       LinkComponent={TransitionLink}
-      logoAlt="Company logo"
+      logoAlt="Noble Star Forest"
     />
   );
 }

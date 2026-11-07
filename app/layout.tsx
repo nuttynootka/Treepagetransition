@@ -12,7 +12,7 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-export const metadata: Metadata = { title: "Garland Header Demo" };
+export const metadata: Metadata = { title: "Noble Star Forest" };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#060c0a" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

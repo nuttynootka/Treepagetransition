@@ -149,7 +149,7 @@ export function SnowflakeTab({
 
   return (
     <li
-      className="absolute top-[calc(var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] lg:left-[var(--xw)]"
+      className="absolute top-[calc(var(--gt)+var(--g)*0.6)] w-[var(--flake)] -translate-x-1/2 left-[var(--xn)] lg:left-[var(--xw)]"
       style={
         {
           "--xn": `${placement.xNarrow}%`,

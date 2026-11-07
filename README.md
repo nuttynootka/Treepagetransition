@@ -173,7 +173,7 @@ A header for the top of the site: your photo of a live-greenery garland across t
 - Garland and logo lights breathe slowly (1.5–3 seconds per cycle). Crystal glints flare briefly every few seconds. Nothing strobes.
 - With "reduce motion" turned on, lights and glints stay steady, nothing swings, and the frost appears without growing.
 
-**Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat. It has buttons to try your own garland photo and logo (they stay on your device).
+**Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat.
 
 ## What's in it
 
@@ -188,27 +188,22 @@ A header for the top of the site: your photo of a live-greenery garland across t
 | `components/garland-header/geometry.ts` | Where every light, glint and frost crystal goes. |
 | `components/garland-header/garland-header.css` | The twinkle, aura and frost animations. |
 | `public/snowflakes/` | The 4 crystal snowflake pictures, cut out from your image with transparent backgrounds. |
-| `public/brand/logo.svg` | **Placeholder logo. Replace it with yours.** |
-| `public/garland/` | **Put your garland photo here** as `garland.png`. |
+| `public/brand/noble-star-forest.webp` | Your logo (the wood sign). |
+| `components/garland-header/garland-painter.ts` | Paints the noble fir and western red cedar garland. |
+| `components/garland-header/logo-outline.ts` | The sign's shape, for its string of lights. |
 | `app/SiteHeader.tsx` | How this demo site uses the header with the tree transition. |
 
-## Step 1: Add your logo
+## The logo and the garland
 
-1. Get your logo as an SVG (best, stays sharp) or a PNG with a transparent background, at least 600px wide.
-2. In this project, open the folder `public`, then the folder `brand`.
-3. Delete `logo.svg` and put your file there.
-4. If your file is called exactly `logo.svg`, you're done. If it has another name (for example `acme.png`), open `app/SiteHeader.tsx` and add `logoSrc="/brand/acme.png"` inside `<GarlandHeader ... />`, next to `logoAlt`.
-5. In the same place, change `logoAlt="Company logo"` to your company name. Screen readers read this out.
+**Logo.** The Noble Star Forest sign is `public/brand/noble-star-forest.webp` (your logo, cropped and resized to 1000px wide). It is centred on the page, twice as tall as the garland is thick, and centred on the garland so the garland runs behind it. Its string of fairy lights follows the sign's outline, tree tops included; those points are in `components/garland-header/logo-outline.ts`. To change the size, change the garland thickness (`--g` near the top of `GarlandHeader.tsx`); the sign is always twice that.
 
-## Step 2: Add your garland photo
+**Garland.** The noble fir and western red cedar garland is painted in code by `components/garland-header/garland-painter.ts`, from the reference photos (which are not used in the site):
 
-1. You need a **wide** photo of a garland with a **transparent background** (PNG or WebP). About 3000 × 400 pixels works well. A photo of a real garland on a plain background can be cut out with any "remove background" tool.
-2. Open the folder `public`, then `garland`, and put the photo there named `garland.png`.
-3. Reload the page. The dark green placeholder band is replaced by your photo.
-4. Different name or format? Add `garlandSrc="/garland/your-file.webp"` to `<GarlandHeader ... />` in `app/SiteHeader.tsx`.
-5. If your photo is a short piece that repeats seamlessly, add `garlandFit="repeat"` and it is tiled across the width. The default (`"cover"`) stretches one photo across and crops the sides on narrow screens, so keep the most important greenery near the middle.
-
-The fairy lights are drawn on top of the photo in two woven strands, so they look right on any garland shape.
+- Noble fir: dense, short, blue-green to silvery needles that curve upward, on stiff sprigs.
+- Western red cedar: flat, lacy, bright yellow-green sprays on orange-brown stems, drooping below the garland and tucked in along the top.
+- Layers go from dark at the back to bright in front, with a soft shadow under each sprig. It runs the full width of the screen and is repainted to fit when the window changes size.
+- To adjust it, edit `LAYERS` (how many sprigs of each kind, how bright, how long) and the colours in `drawFir` and `drawCedar`.
+- To use a photo of a real garland instead, pass `garlandSrc="/garland/your-photo.webp"` to `<GarlandHeader>`.
 
 ## Step 3: Change the menu
 
@@ -271,7 +266,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 
    Then create a file called `postcss.config.mjs` next to `package.json` containing exactly what is in this repo's `postcss.config.mjs`, and add `@import "tailwindcss";` as the first line of your global CSS file (usually `app/globals.css`).
 2. **Copy** the folder `components/garland-header/` (all 7 files) into your project's `components/` folder.
-3. **Copy** `public/brand/logo.svg` and your garland photo into the same places in your project's `public/` folder.
+3. **Copy** `public/brand/noble-star-forest.webp` and the `public/snowflakes/` folder into the same places in your project's `public/` folder.
 4. **Font (optional):** the snowflake labels use Cormorant Garamond if it is loaded, through a CSS variable called `--font-cormorant`. Copy the `Cormorant_Garamond` lines from this repo's `app/layout.tsx` into your layout. Without it, labels fall back to Palatino or Georgia.
 5. **Create** `app/SiteHeader.tsx` like the one in this repo, and put `<SiteHeader />` at the top of `<body>` in `app/layout.tsx`.
    - Using the tree transition too? Keep `LinkComponent={TransitionLink}`.
@@ -283,11 +278,13 @@ It needs React 18 or newer and Tailwind CSS v4.
 | --- | --- | --- |
 | `pages` | (required) | `{ href, label }` for a page snowflake, or `{ label, items }` for a menu snowflake |
 | `activeHref` | (required) | The current path. Pass `usePathname()`. |
-| `garlandSrc` | `/garland/garland.png` | Your garland photo |
+| `garlandSrc` | none (painted garland) | Optional photo of a garland to use instead |
 | `garlandFit` | `"cover"` | `"cover"` stretches one photo, `"repeat"` tiles it |
-| `logoSrc` | `/brand/logo.svg` | Your logo file |
+| `logoSrc` | `/brand/noble-star-forest.webp` | Your logo file |
+| `logoRatio` | 1.8349 | The logo's width divided by its height |
+| `logoOutline` | the sign's outline | Points for the logo's lights; leave out for an oval |
 | `logo` | none | Any element (like an inline `<svg>`) to use instead of `logoSrc` |
-| `logoAlt` | `"Company logo"` | Logo description for screen readers |
+| `logoAlt` | `"Noble Star Forest"` | Logo description for screen readers |
 | `homeHref` | `"/"` | Where the logo links to |
 | `crystals` | the 4 in `public/snowflakes/` | Crystal pictures, used in turn for each page (see below) |
 | `LinkComponent` | plain `<a>` | `next/link`'s `Link`, `TransitionLink`, or your own |
@@ -305,7 +302,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 200px tall on phones, 225–250px on tablets and 310–320px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
+- The header is about 245px tall on phones, 275–305px on tablets and 335–360px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
 - There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
 
 ### Using different crystal pictures

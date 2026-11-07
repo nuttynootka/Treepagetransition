@@ -3,9 +3,10 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { createRoot } from "react-dom/client";
 import { GarlandHeader, type CrystalImage, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
+import { NOBLE_STAR_LOGO } from "../components/garland-header/logo-outline";
 import { TreeTransitionEngine } from "../components/tree-transition/engine";
 
-declare const PLACEHOLDER_LOGO: string;
+declare const LOGO_URI: string;
 declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
@@ -59,9 +60,6 @@ const PreviewLink = forwardRef<HTMLAnchorElement, LinkLikeProps>(function Previe
 
 function App() {
   const [current, setCurrent] = useState("/");
-  const [garland, setGarland] = useState<string | undefined>();
-  const [logo, setLogo] = useState(PLACEHOLDER_LOGO);
-  const [fit, setFit] = useState<"cover" | "repeat">("cover");
   const engineRef = useRef<TreeTransitionEngine | null>(null);
   const pendingRef = useRef<string | null>(null);
 
@@ -88,10 +86,6 @@ function App() {
     engine.start({ origin, reducedMotion: reduced });
   }, [current]);
 
-  const pick = (set: (url: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) set(URL.createObjectURL(file));
-  };
 
   return (
     <>
@@ -99,35 +93,16 @@ function App() {
         pages={pages}
         activeHref={current}
         LinkComponent={PreviewLink}
-        garlandSrc={garland}
-        garlandFit={fit}
         crystals={CRYSTALS}
-        logoSrc={logo}
-        logoAlt="Company logo"
+        logoSrc={LOGO_URI}
+        logoOutline={NOBLE_STAR_LOGO.outline}
+        logoAlt="Noble Star Forest"
       />
       <main className="page">
         <section aria-live="polite">
           <p className="eyebrow">Preview page</p>
           <h1>{copy[current].title}</h1>
           <p className="lede">{copy[current].body}</p>
-        </section>
-        <section className="tryout" aria-labelledby="try-title">
-          <h2 id="try-title">Try your own images</h2>
-          <p className="hint">Pick files from your phone or computer. Use a garland photo with a transparent background (PNG or WebP).</p>
-          <div className="controls">
-            <label className="file" htmlFor="garland-file">
-              Choose garland photo
-              <input id="garland-file" type="file" accept="image/*" onChange={pick(setGarland)} />
-            </label>
-            <label className="file" htmlFor="logo-file">
-              Choose logo
-              <input id="logo-file" type="file" accept="image/*" onChange={pick(setLogo)} />
-            </label>
-            <label className="check" htmlFor="repeat-fit">
-              <input id="repeat-fit" type="checkbox" checked={fit === "repeat"} onChange={(e) => setFit(e.target.checked ? "repeat" : "cover")} />
-              Tile the garland sideways
-            </label>
-          </div>
         </section>
       </main>
     </>

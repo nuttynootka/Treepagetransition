@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
-import { frostStrokes, garlandLights, ovalLights, type LightPoint } from "./geometry";
+import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { paintGarland } from "./garland-painter";
+import { frostStrokes, garlandLights, ovalLights, seededRandom, type LightPoint } from "./geometry";
 import { useImageStatus } from "./hooks";
 import type { LinkLike } from "./types";
 
@@ -25,47 +26,40 @@ export function FairyLight({ light, className }: { light: LightPoint; className?
 // ---------------------------------------------------------------------------
 
 interface GarlandProps {
+  /** Optional photo of a garland to use instead of the painted one. */
   src?: string;
   fit: "cover" | "repeat";
 }
 
 /**
- * Your garland photo across the top, with two light strands woven over it.
- * If the photo is missing, a dark evergreen band stands in and says where
- * the file goes.
+ * The garland across the top, between y = --gt and --gt + --g: painted noble fir
+ * and western red cedar (or your own photo), with two light strands woven over it.
  */
 export function Garland({ src, fit }: GarlandProps) {
   const status = useImageStatus(src);
   const lights = useMemo(() => garlandLights(), []);
+  const usePhoto = !!src && status !== "missing";
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[var(--g)]">
-      {status === "missing" ? (
-        <div className="absolute inset-x-0 top-0 h-[88%] overflow-hidden rounded-b-[45%_40%] bg-[radial-gradient(120%_140%_at_50%_0%,#2a5a3f_0%,#18392a_45%,#0d2219_100%)] shadow-[0_14px_24px_-6px_rgba(0,0,0,0.7),inset_0_-10px_18px_rgba(0,0,0,0.45)]">
-          <div className="absolute inset-0 opacity-40 bg-[repeating-linear-gradient(115deg,rgba(120,180,140,0.18)_0_2px,transparent_2px_9px),repeating-linear-gradient(65deg,rgba(20,50,35,0.5)_0_3px,transparent_3px_11px)]" />
-          <p className="absolute left-2 top-1.5 z-10 m-0 rounded-full bg-black/55 px-2 py-0.5 text-[9px] tracking-wide text-white/70 sm:left-3 sm:top-2 sm:text-[10px]">
-            <span className="sm:hidden">Add garland photo</span>
-            <span className="hidden sm:inline">
-              Garland photo goes here: <span className="font-mono">public/garland/garland.png</span>
-            </span>
-          </p>
-        </div>
-      ) : fit === "repeat" ? (
-        <div
-          className="absolute inset-0 bg-repeat-x drop-shadow-[0_12px_14px_rgba(0,0,0,0.65)]"
-          style={{ backgroundImage: `url("${src}")`, backgroundSize: "auto 100%", backgroundPosition: "center top" }}
-        />
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[var(--gt)] z-10 h-[var(--g)]">
+      {usePhoto ? (
+        fit === "repeat" ? (
+          <div
+            className="absolute inset-0 bg-repeat-x drop-shadow-[0_12px_14px_rgba(0,0,0,0.65)]"
+            style={{ backgroundImage: `url("${src}")`, backgroundSize: "auto 100%", backgroundPosition: "center top" }}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center drop-shadow-[0_12px_14px_rgba(0,0,0,0.65)]"
+          />
+        )
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center drop-shadow-[0_12px_14px_rgba(0,0,0,0.65)]"
-        />
+        <PaintedGarland />
       )}
-      {/* Seats the garland against the top edge. */}
-      <div className="absolute inset-x-0 top-0 h-1/3 bg-linear-to-b from-black/45 to-transparent" />
-      <div className="gh-glow-soft absolute inset-0 [--gh-core:2.6px] [--gh-halo:13px] md:[--gh-core:3.2px] md:[--gh-halo:16px]">
+      <div className="gh-glow-soft absolute inset-0 [--gh-core:2.4px] [--gh-halo:12px] md:[--gh-core:3px] md:[--gh-halo:15px]">
         {lights.map((l, i) => (
           <FairyLight key={i} light={l} className={l.dense ? "hidden sm:block" : undefined} />
         ))}
@@ -74,41 +68,101 @@ export function Garland({ src, fit }: GarlandProps) {
   );
 }
 
+/** Canvas the painter draws on; repainted when the header changes size. */
+function PaintedGarland() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    let frame = 0;
+    let last = "";
+    const paint = () => {
+      frame = 0;
+      const band = canvas.parentElement!;
+      const width = band.clientWidth;
+      const thickness = band.clientHeight;
+      const height = Math.round(thickness * 1.8);
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const key = `${width}x${thickness}@${dpr}`;
+      if (!width || !thickness || key === last) return;
+      last = key;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      paintGarland(ctx, width, height, thickness);
+    };
+    paint();
+    const ro = new ResizeObserver(() => {
+      if (!frame) frame = requestAnimationFrame(paint);
+    });
+    ro.observe(canvas.parentElement!);
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+  return (
+    <>
+      {/* Shows at once, before the canvas paints: a dark evergreen band. */}
+      <div className="absolute inset-x-0 top-[12%] h-[76%] rounded-full bg-[#0f2a1f] blur-md" />
+      <canvas
+        ref={ref}
+        className="absolute inset-x-0 -top-[40%] h-[180%] w-full drop-shadow-[0_10px_12px_rgba(0,0,0,0.6)]"
+      />
+    </>
+  );
+}
+
 // ---------------------------------------------------------------------------
 
-interface LogoFrameProps {
+interface LogoSignProps {
   href: string;
   logo?: ReactNode;
-  logoSrc?: string;
+  logoSrc: string;
   logoAlt: string;
+  /** Width / height of the logo image. */
+  ratio: number;
+  /** Points (percent of the logo box) for the light string; an oval if not given. */
+  outline?: [number, number][];
   Link: LinkLike;
 }
 
-/** The centred logo in a frosted oval, ringed by its own always-on lights. */
-export function LogoFrame({ href, logo, logoSrc, logoAlt, Link }: LogoFrameProps) {
-  const lights = useMemo(() => ovalLights(), []);
+/**
+ * The logo, centred on the page and on the garland, twice as tall as the garland
+ * is thick, with its own always-on string of fairy lights around its edge.
+ */
+export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, outline, Link }: LogoSignProps) {
+  const lights = useMemo<LightPoint[]>(() => {
+    if (!outline) return ovalLights();
+    const rand = seededRandom(31);
+    return outline.map(([x, y]) => {
+      const dur = 1.5 + rand() * 1.5;
+      return { x, y, dur: Math.round(dur * 100) / 100, delay: Math.round(-rand() * dur * 100) / 100 };
+    });
+  }, [outline]);
   return (
     <Link
       href={href}
       aria-label={`${logoAlt}, home`}
-      className="absolute left-1/2 top-[calc(var(--g)*0.5)] z-20 block h-[var(--logo-h)] w-[var(--logo-w)] -translate-x-1/2 -translate-y-1/2 rounded-[50%] outline-none focus-visible:ring-2 focus-visible:ring-[#FFF5EB]/80 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0b1a14]"
+      className="absolute left-1/2 top-[var(--sign-top)] z-20 block h-[var(--sign-h)] -translate-x-1/2 outline-none focus-visible:ring-2 focus-visible:ring-[#FFF5EB]/80 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0b1a14]"
     >
-      <span
-        aria-hidden
-        className="absolute inset-0 rounded-[50%] border border-[#e9d7b0]/40 bg-[#07110d]/65 shadow-[0_12px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-md"
-      />
-      {/* The light string's wire, just outside the frame. */}
-      <span aria-hidden className="absolute -inset-[5px] rounded-[50%] border border-[#cdb27a]/25" />
-      <span aria-hidden className="gh-glow-soft absolute -inset-[5px] [--gh-core:3px] [--gh-halo:14px] md:[--gh-core:3.4px] md:[--gh-halo:17px]">
-        {lights.map((l, i) => (
-          <FairyLight key={i} light={l} />
-        ))}
-      </span>
-      <span className="relative flex h-full w-full items-center justify-center px-[16%] py-[14%]">
+      <span className="relative block h-full" style={{ aspectRatio: String(ratio) }}>
         {logo ?? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logoSrc} alt={logoAlt} className="max-h-full max-w-full object-contain" draggable={false} />
+          <img
+            src={logoSrc}
+            alt={logoAlt}
+            draggable={false}
+            className="block h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.65)]"
+          />
         )}
+        <span aria-hidden className="gh-glow-soft pointer-events-none absolute inset-0 [--gh-core:2.6px] [--gh-halo:13px] md:[--gh-core:3.2px] md:[--gh-halo:16px]">
+          {lights.map((l, i) => (
+            <FairyLight key={i} light={l} />
+          ))}
+        </span>
       </span>
     </Link>
   );

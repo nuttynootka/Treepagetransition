@@ -273,7 +273,8 @@ export function placeTabs(count: number): TabLayout {
   // Narrow: up to 3 per row.
   const cols = count <= 3 ? count : Math.min(3, Math.ceil(count / 2));
   const rows = Math.ceil(count / cols);
-  const narrowRibbon = (row: number) => (row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`);
+  const narrowRibbon = (row: number) =>
+    count <= 3 ? "calc(var(--g) / 2 + 10px)" : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;
 
   // Wide: left side gets the extra one when the count is odd.
   const left = Math.ceil(count / 2);
@@ -287,9 +288,12 @@ export function placeTabs(count: number): TabLayout {
   const waveFor = (fromOuter: number) => `${WAVE[fromOuter % WAVE.length]}px`;
 
   // Three or fewer: one row, spread evenly, the middle one hanging under the logo.
+  // The sign reaches half a garland-thickness below the garland, so on phones every
+  // snowflake hangs clear of it, and on computers the middle one does.
   const oneRow = count <= 3;
   const rowX = spread(count, 20, 80);
-  const rowRibbon = (i: number) => (count === 3 && i === 1 ? "42px" : "24px");
+  const clearSign = "calc(var(--g) / 2 + 10px)";
+  const rowRibbon = (i: number) => (count === 3 && i === 1 ? clearSign : "24px");
 
   const tabs = Array.from({ length: count }, (_, i) => {
     const row = Math.floor(i / cols);
@@ -305,6 +309,10 @@ export function placeTabs(count: number): TabLayout {
       layer: Math.max(1, 5 - row),
     };
   });
-  const maxWidePx = Math.max(0, ...tabs.map((t) => parseInt(t.ribbonWide, 10)));
-  return { tabs, maxNarrow: narrowRibbon(rows - 1), maxWide: `${maxWidePx}px` };
+  const maxWide = oneRow
+    ? count === 3
+      ? clearSign
+      : "24px"
+    : `${Math.max(0, ...tabs.map((t) => parseInt(t.ribbonWide, 10)))}px`;
+  return { tabs, maxNarrow: narrowRibbon(rows - 1), maxWide };
 }

@@ -3,7 +3,8 @@
 import { forwardRef, useEffect, useId, useMemo, useRef, useState, type AnchorHTMLAttributes } from "react";
 import { placeTabs } from "./geometry";
 import { useReducedMotion, useWarmPointer } from "./hooks";
-import { Bokeh, cn, Garland, LogoFrame } from "./parts";
+import { NOBLE_STAR_LOGO } from "./logo-outline";
+import { Bokeh, cn, Garland, LogoSign } from "./parts";
 import { HangingMenu } from "./HangingMenu";
 import { SnowflakeTab } from "./SnowflakeTab";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
@@ -17,12 +18,19 @@ export interface GarlandHeaderProps {
   pages: GarlandPage[];
   /** The current path, e.g. from Next's usePathname(). Its snowflake lights up. */
   activeHref: string;
-  /** Your garland photo: a wide image with a transparent background. */
+  /**
+   * Optional photo of a garland (wide, transparent background) to use instead of the
+   * painted noble fir and western red cedar garland.
+   */
   garlandSrc?: string;
   /** "cover" stretches one photo across the width. "repeat" tiles it sideways (needs a seamless photo). */
   garlandFit?: "cover" | "repeat";
   /** Your logo file. Ignored if you pass `logo`. */
   logoSrc?: string;
+  /** The logo's width divided by its height. */
+  logoRatio?: number;
+  /** Points (percent of the logo box) for the logo's light string. Leave out for an oval of lights. */
+  logoOutline?: [number, number][];
   /** Describes the logo for screen readers, e.g. your company name. */
   logoAlt?: string;
   /** Any element to use as the logo instead of an image file (for example an inline SVG). */
@@ -66,10 +74,12 @@ function isActive(activeHref: string, page: GarlandPage) {
 export function GarlandHeader({
   pages,
   activeHref,
-  garlandSrc = "/garland/garland.png",
+  garlandSrc,
   garlandFit = "cover",
-  logoSrc = "/brand/logo.svg",
-  logoAlt = "Company logo",
+  logoSrc = NOBLE_STAR_LOGO.src,
+  logoRatio = NOBLE_STAR_LOGO.ratio,
+  logoOutline = logoSrc === NOBLE_STAR_LOGO.src ? NOBLE_STAR_LOGO.outline : undefined,
+  logoAlt = "Noble Star Forest",
   logo,
   homeHref = "/",
   crystals = DEFAULT_CRYSTALS,
@@ -116,15 +126,16 @@ export function GarlandHeader({
       className={cn(
         // overflow-x-clip (not hidden) so the hanging menus can drop below the header.
         "gh-root @container relative isolate z-30 w-full select-none overflow-x-clip text-[#FFF8F0]",
-        // Sizes per screen width: garland height, snowflake size, logo frame.
-        "[--g:76px] sm:[--g:88px] md:[--g:100px] lg:[--g:116px]",
+        // Garland thickness per screen width. The sign is twice as tall (--sign-h), starts
+        // 4px from the top, and the garland runs behind its middle (--gt = garland top).
+        "[--g:58px] sm:[--g:66px] md:[--g:76px] lg:[--g:84px] xl:[--g:92px]",
+        "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
         "[--flake:min(86px,24vw)] sm:[--flake:98px] md:[--flake:110px] lg:[--flake:117px] xl:[--flake:127px]",
         // Glass plate width as a share of the snowflake: just big enough for the longest label.
         "[--plate:0.67] sm:[--plate:0.6] md:[--plate:0.56] lg:[--plate:0.55] xl:[--plate:0.54]",
-        "[--logo-w:136px] [--logo-h:66px] sm:[--logo-w:168px] sm:[--logo-h:80px] md:[--logo-w:204px] md:[--logo-h:94px] lg:[--logo-w:236px] lg:[--logo-h:108px]",
         // Hanging menu plates.
         "[--menu-h:26px] [--menu-font:10.5px] md:[--menu-h:28px] md:[--menu-font:11.5px]",
-        "h-[calc(var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--g)+var(--rib-w)+var(--flake)+36px)]",
+        "h-[calc(var(--gt)+var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--gt)+var(--g)+var(--rib-w)+var(--flake)+36px)]",
         className,
       )}
       style={{ "--rib-n": layout.maxNarrow, "--rib-w": layout.maxWide } as React.CSSProperties}
@@ -136,7 +147,15 @@ export function GarlandHeader({
       />
       <Bokeh />
 
-      <LogoFrame href={homeHref} logo={logo} logoSrc={logoSrc} logoAlt={logoAlt} Link={LinkComponent} />
+      <LogoSign
+        href={homeHref}
+        logo={logo}
+        logoSrc={logoSrc}
+        logoAlt={logoAlt}
+        ratio={logoRatio}
+        outline={logoOutline}
+        Link={LinkComponent}
+      />
 
       <nav aria-label="Main">
         <ul className="m-0 list-none p-0">
