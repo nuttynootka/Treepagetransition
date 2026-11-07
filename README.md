@@ -168,7 +168,7 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 - Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
-- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 10.5px on phones, 11.5px on tablets, 12px on computers), on the snowflakes and the hanging plates alike. Each snowflake's glass centre is measured in the browser and is the smallest circle whose edge just clears the ends of its word, so each snowflake has a different-sized centre.
+- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 10.5px on phones, 11.5px on tablets, 12px on computers), on the snowflakes and the hanging plates alike. Each snowflake's glass centre is measured in the browser and is the smallest circle whose edge just clears the ends of its word, so each snowflake has a different-sized centre. It is never smaller than the round opening in the middle of the crystal picture, so no dark ring shows around a short word like US.
 - When a page becomes active, its word sharpens into focus.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
@@ -226,7 +226,7 @@ const pages: GarlandPage[] = [
     ],
   },
   {
-    label: "Contact",
+    label: "Us",
     items: [
       { href: "/meet-us", label: "Meet Us" },
       { href: "/contact-us", label: "Contact Us" },
@@ -244,7 +244,7 @@ const pages: GarlandPage[] = [
 
 ### How the hanging menu works
 
-- Tapping SHOP or CONTACT drops a series of light frosted glass plates (the same glass as the snowflake centres, words etched in dark) on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
+- Tapping SHOP or US drops a series of light frosted glass plates (the same glass as the snowflake centres, words etched in dark) on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
 - Each plate catches one Christmas-light colour, in order: red, green, gold, blue, orange, violet. It shows as small glints along the plate's edges and a faint tinted reflection that slides across the glass as the plate twists. The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
 - The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
 - Opening: the garland chains lower the first plate with an ease in and out, quick enough that it briefly runs ahead of the chains and gets a soft, bouncy catch. Each plate below starts folded up against the bottom of the plate above and swings down on that edge with a little flutter, its chains paying out quickly so it drops a short way, once the plate above is about half unfolded. Each gets a small random nudge so no two openings look alike. Then they sway and settle.

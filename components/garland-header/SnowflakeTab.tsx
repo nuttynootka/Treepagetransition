@@ -86,15 +86,17 @@ export function SnowflakeTab({
       // The word's width without the letter-spacing after its last letter.
       const w = label.offsetWidth - fontPx * 0.04;
       const capHeight = fontPx * 0.66;
-      // The smallest circle whose edge just clears the ends of the word.
-      const d = Math.hypot(w, capHeight) + 1.5;
+      // The smallest circle whose edge just clears the ends of the word, but never smaller
+      // than the round opening in the middle of the crystal picture, or a dark ring shows.
+      const opening = turn.offsetWidth * crystal.plate;
+      const d = Math.max(Math.hypot(w, capHeight) + 1.5, opening);
       turn.style.setProperty("--plate-d", `${d.toFixed(1)}px`);
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(label);
     return () => ro.disconnect();
-  }, [page.label]);
+  }, [page.label, crystal.plate]);
 
   // Mouse or pen brushing past: swing away from where it came from.
   const onPointerEnter = (e: PointerEvent<HTMLElement>) => {
@@ -120,7 +122,11 @@ export function SnowflakeTab({
           <span aria-hidden className="gh-aura pointer-events-none absolute -inset-[20%] rounded-full" />
 
           {/* Everything that turns slowly on the ribbon, like the crystals in the reference video. */}
-          <span ref={turnRef} className="gh-turn pointer-events-none absolute inset-0" style={{ ...turnStyle, "--plate-d": estimatePlate(page.label) } as CSSProperties}>
+          <span
+            ref={turnRef}
+            className="gh-turn pointer-events-none absolute inset-0"
+            style={{ ...turnStyle, "--plate-d": `max(${estimatePlate(page.label)}, calc(var(--flake) * ${crystal.plate}))` } as CSSProperties}
+          >
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
             <span className={cn("gh-crystal absolute inset-0 isolate", mirrored && "-scale-x-100")}>

@@ -22,7 +22,7 @@ const pages: GarlandPage[] = [
     ],
   },
   {
-    label: "Contact",
+    label: "Us",
     items: [
       { href: "/meet-us", label: "Meet Us" },
       { href: "/contact-us", label: "Contact Us" },
@@ -34,7 +34,7 @@ const pages: GarlandPage[] = [
 const copy: Record<string, { title: string; body: string }> = {
   "/": {
     title: "Home",
-    body: "Tap SHOP or CONTACT. Frosted glass plates unroll down on silver chains. Tap a plate and the menu rolls back up behind the garland while the wand draws its tree.",
+    body: "Tap SHOP or US. Frosted glass plates unroll down on silver chains. Tap a plate and the menu rolls back up behind the garland while the wand draws its tree.",
   },
   ...Object.fromEntries(
     pages.flatMap((p) => p.items ?? []).map((item) => [

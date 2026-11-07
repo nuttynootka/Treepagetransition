@@ -18,7 +18,7 @@ const pages: GarlandPage[] = [
     ],
   },
   {
-    label: "Contact",
+    label: "Us",
     items: [
       { href: "/meet-us", label: "Meet Us" },
       { href: "/contact-us", label: "Contact Us" },
