@@ -12,7 +12,7 @@ import type { CrystalImage, GarlandPage, LinkLike } from "./types";
  * each. Every label uses the same font size (--label-size).
  */
 export function estimatePlate(label: string): string {
-  return `calc(var(--label-size) * ${(label.length * 0.36 + 1.3).toFixed(2)})`;
+  return `calc(var(--label-size) * ${(label.length * 0.36 + 0.8).toFixed(2)})`;
 }
 
 function GlintSpark({ glint }: { glint: Glint }) {
@@ -83,8 +83,8 @@ export function SnowflakeTab({
     if (!label || !turn) return;
     const fit = () => {
       const fontPx = parseFloat(getComputedStyle(label).fontSize) || 12;
-      turn.style.setProperty("--fade-w", `${(label.offsetWidth / 2 + fontPx * 1.3).toFixed(1)}px`);
-      turn.style.setProperty("--fade-h", `${(fontPx * 1.8).toFixed(1)}px`);
+      turn.style.setProperty("--fade-w", `${(label.offsetWidth / 2 + fontPx * 0.8).toFixed(1)}px`);
+      turn.style.setProperty("--fade-h", `${(fontPx * 1.35).toFixed(1)}px`);
     };
     fit();
     const ro = new ResizeObserver(fit);
@@ -119,7 +119,7 @@ export function SnowflakeTab({
           <span
             ref={turnRef}
             className="gh-turn pointer-events-none absolute inset-0 origin-[50%_40%]"
-            style={{ ...turnStyle, "--fade-w": estimatePlate(page.label), "--fade-h": "calc(var(--label-size) * 1.8)", "--star-cy": `${STAR_CENTRE_Y * 100}%` } as CSSProperties}
+            style={{ ...turnStyle, "--fade-w": estimatePlate(page.label), "--fade-h": "calc(var(--label-size) * 1.35)", "--star-cy": `${STAR_CENTRE_Y * 100}%` } as CSSProperties}
           >
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
