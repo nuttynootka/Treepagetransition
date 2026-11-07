@@ -165,7 +165,8 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 A header for the top of the site: your photo of a live-greenery garland across the top, strung with soft white fairy lights; your logo centred in a frosted oval ringed with its own lights; and one hanging crystal snowflake per page, like leaded-glass ornaments catching the light of Christmas lights. Each has a round frosted-glass plate in the middle with the page name.
 
-- The snowflake for the current page is fully lit: it slowly brightens and dims, glints sparkle across its facets in white, gold, red and green, and a soft aura glows behind it.
+- Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
+- The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
 - When a page becomes active, frost crystals grow across its glass plate and then the title sharpens.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.

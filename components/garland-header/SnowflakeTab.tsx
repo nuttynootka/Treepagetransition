@@ -69,7 +69,12 @@ export function SnowflakeTab({
   children,
 }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
-  const glints = useMemo(() => crystalGlints(seed, 0.44), [seed]);
+  const glints = useMemo(() => crystalGlints(seed, 0.44, 12), [seed]);
+  // Each crystal turns on its ribbon at its own pace (3.6–5.2s each way).
+  const turnStyle = useMemo(() => {
+    const dur = 3.6 + (seed % 1000) / 625;
+    return { "--turn-dur": `${dur.toFixed(2)}s`, "--turn-delay": `${(-((seed >> 10) % 1000) / 100).toFixed(2)}s` } as CSSProperties;
+  }, [seed]);
   const { ref: swingRef, kick } = useSwing<HTMLDivElement>(motion);
 
   // Mouse or pen brushing past: swing away from where it came from.
@@ -95,30 +100,49 @@ export function SnowflakeTab({
     <>
           <span aria-hidden className="gh-aura pointer-events-none absolute -inset-[20%] rounded-full" />
 
-          {/* The leaded-glass crystal */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={crystal.src}
-            alt=""
-            width={440}
-            height={440}
-            draggable={false}
-            decoding="async"
-            className={cn("gh-crystal pointer-events-none absolute inset-0 h-full w-full select-none", mirrored && "-scale-x-100")}
-          />
+          {/* Everything that turns slowly on the ribbon, like the crystals in the reference video. */}
+          <span className="gh-turn pointer-events-none absolute inset-0" style={turnStyle}>
+            {/* The leaded-glass crystal, with light sweeping across its facets and
+                coloured Christmas lights reflecting in them. */}
+            <span className={cn("gh-crystal absolute inset-0 isolate", mirrored && "-scale-x-100")}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={crystal.src}
+                alt=""
+                width={440}
+                height={440}
+                draggable={false}
+                decoding="async"
+                className="absolute inset-0 h-full w-full select-none"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={crystal.src} alt="" draggable={false} className="gh-shine gh-shine-a absolute inset-0 h-full w-full" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={crystal.src} alt="" draggable={false} className="gh-shine gh-shine-b absolute inset-0 h-full w-full" />
+              {/* Iridescent sheen in Christmas-light colours across whole facets, like the
+                  coated crystal in the reference videos; it shifts as the crystal turns. */}
+              <span
+                className="gh-iris absolute inset-0"
+                style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
+              />
+              <span
+                className="gh-fire absolute inset-0"
+                style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
+              />
+            </span>
 
-          {/* Glints of light caught in the facets */}
-          <span aria-hidden className="gh-glints pointer-events-none absolute inset-0">
-            {glints.map((g, i) => (
-              <GlintSpark key={i} glint={g} />
-            ))}
-          </span>
+            {/* Glints of light caught in the facets */}
+            <span aria-hidden className="gh-glints absolute inset-0">
+              {glints.map((g, i) => (
+                <GlintSpark key={i} glint={g} />
+              ))}
+            </span>
 
-          {/* Frosted glass plate with a silver rim, sized by --plate so the label fits */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 size-[calc(var(--plate)*100%+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
-          />
+            {/* Frosted glass plate with a silver rim, sized by --plate so the label fits */}
+            <span
+              aria-hidden
+              className="absolute left-1/2 top-1/2 size-[calc(var(--plate)*100%+5px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+            />
           <span className="absolute left-1/2 top-1/2 flex size-[calc(var(--plate)*100%)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
             <span
               aria-hidden
@@ -143,6 +167,7 @@ export function SnowflakeTab({
             >
               {page.label}
             </span>
+          </span>
           </span>
     </>
   );

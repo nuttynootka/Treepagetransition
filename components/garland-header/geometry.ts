@@ -122,7 +122,7 @@ export function crystalGlints(seed: number, plate: number, count = 18): Glint[] 
     const [x, y] = polar(r, deg);
     const c = rand();
     const color: GlintColor = c < 0.58 ? "white" : c < 0.72 ? "gold" : c < 0.86 ? "red" : "green";
-    const kind = rand() < 0.4 ? "star" : "fleck";
+    const kind = rand() < 0.25 ? "star" : "fleck";
     const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
     out.push({
       x: r2(x),
