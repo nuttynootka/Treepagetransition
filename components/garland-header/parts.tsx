@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { paintGarland } from "./garland-painter";
-import { garlandLights, ovalLights, seededRandom, type LightPoint } from "./geometry";
+import { garlandLights, seededRandom, type LightPoint } from "./geometry";
 import { useImageStatus } from "./hooks";
+import type { LogoStar } from "./noble-star-logo";
 import type { LinkLike } from "./types";
 
 export const cn = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ");
@@ -165,24 +166,16 @@ interface LogoSignProps {
   logoAlt: string;
   /** Width / height of the logo image. */
   ratio: number;
-  /** Points (percent of the logo box) for the light string; an oval if not given. */
-  outline?: [number, number][];
+  /** The logo's star, which glows and twinkles. */
+  star?: LogoStar;
   Link: LinkLike;
 }
 
 /**
  * The logo, centred on the page and on the garland, twice as tall as the garland
- * is thick, with its own always-on string of fairy lights around its edge.
+ * is thick. The 8-point star in "STAR" glows and twinkles like a real star.
  */
-export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, outline, Link }: LogoSignProps) {
-  const lights = useMemo<LightPoint[]>(() => {
-    if (!outline) return ovalLights();
-    const rand = seededRandom(31);
-    return outline.map(([x, y]) => {
-      const dur = 1.5 + rand() * 1.5;
-      return { x, y, dur: Math.round(dur * 100) / 100, delay: Math.round(-rand() * dur * 100) / 100 };
-    });
-  }, [outline]);
+export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, star, Link }: LogoSignProps) {
   return (
     <Link
       href={href}
@@ -199,17 +192,40 @@ export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, outline, Link }:
             className="block h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.65)]"
           />
         )}
-        <span aria-hidden className="gh-glow-soft pointer-events-none absolute inset-0 [--gh-core:2.2px] [--gh-halo:9px] md:[--gh-core:2.7px] md:[--gh-halo:11px]">
-          {lights.map((l, i) => (
-            <FairyLight key={i} light={l} />
-          ))}
-        </span>
+        {star && <TwinklingStar star={star} />}
       </span>
     </Link>
   );
 }
 
-// ---------------------------------------------------------------------------
+/**
+ * The sign's star, lit like a real star: a soft halo that slowly swells, fine rays
+ * along its 8 points that lengthen and fade, a hot white centre, and a faint,
+ * irregular shimmer between warm and icy white.
+ */
+function TwinklingStar({ star }: { star: LogoStar }) {
+  return (
+    <span
+      aria-hidden
+      className="gh-star pointer-events-none absolute"
+      style={{ left: `${star.left}%`, top: `${star.top}%`, width: `${star.width}%`, height: `${star.height}%` }}
+    >
+      <span className="gh-star-centre absolute" style={{ left: `${star.cx}%`, top: `${star.cy}%` }}>
+        <span className="gh-star-halo gh-star-halo-warm" />
+        <span className="gh-star-halo gh-star-halo-ice" />
+      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={star.src} alt="" draggable={false} className="gh-star-img absolute inset-0 h-full w-full" />
+      <span className="gh-star-centre absolute" style={{ left: `${star.cx}%`, top: `${star.cy}%` }}>
+        <span className="gh-star-ray gh-star-ray-v" />
+        <span className="gh-star-ray gh-star-ray-h" />
+        <span className="gh-star-ray gh-star-ray-d1" />
+        <span className="gh-star-ray gh-star-ray-d2" />
+        <span className="gh-star-core" />
+      </span>
+    </span>
+  );
+}
 
 /** A few soft, out-of-focus lights far behind the garland, for depth. */
 export function Bokeh() {

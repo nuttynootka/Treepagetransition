@@ -3,7 +3,7 @@
 import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState, type AnchorHTMLAttributes } from "react";
 import { placeTabs } from "./geometry";
 import { useReducedMotion, useWarmPointer } from "./hooks";
-import { NOBLE_STAR_LOGO } from "./logo-outline";
+import { NOBLE_STAR_LOGO, type LogoStar } from "./noble-star-logo";
 import { Bokeh, cn, Garland, LogoSign } from "./parts";
 import { HangingMenu } from "./HangingMenu";
 import { estimatePlate, SnowflakeTab } from "./SnowflakeTab";
@@ -29,8 +29,8 @@ export interface GarlandHeaderProps {
   logoSrc?: string;
   /** The logo's width divided by its height. */
   logoRatio?: number;
-  /** Points (percent of the logo box) for the logo's light string. Leave out for an oval of lights. */
-  logoOutline?: [number, number][];
+  /** Where the logo's star is, so it can glow and twinkle. Leave out for no star effect. */
+  logoStar?: LogoStar;
   /** Describes the logo for screen readers, e.g. your company name. */
   logoAlt?: string;
   /** Any element to use as the logo instead of an image file (for example an inline SVG). */
@@ -78,7 +78,7 @@ export function GarlandHeader({
   garlandFit = "cover",
   logoSrc = NOBLE_STAR_LOGO.src,
   logoRatio = NOBLE_STAR_LOGO.ratio,
-  logoOutline = logoSrc === NOBLE_STAR_LOGO.src ? NOBLE_STAR_LOGO.outline : undefined,
+  logoStar = logoSrc === NOBLE_STAR_LOGO.src ? NOBLE_STAR_LOGO.star : undefined,
   logoAlt = "Noble Star Forest",
   logo,
   homeHref = "/",
@@ -164,7 +164,7 @@ export function GarlandHeader({
         logoSrc={logoSrc}
         logoAlt={logoAlt}
         ratio={logoRatio}
-        outline={logoOutline}
+        star={logoStar}
         Link={LinkComponent}
       />
 

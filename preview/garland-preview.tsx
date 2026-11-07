@@ -3,7 +3,9 @@
 import { forwardRef, useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { createRoot } from "react-dom/client";
 import { GarlandHeader, type CrystalImage, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
-import { NOBLE_STAR_LOGO } from "../components/garland-header/logo-outline";
+import { NOBLE_STAR_LOGO } from "../components/garland-header/noble-star-logo";
+
+declare const STAR_URI: string;
 import { TreeTransitionEngine } from "../components/tree-transition/engine";
 
 declare const LOGO_URI: string;
@@ -95,7 +97,7 @@ function App() {
         LinkComponent={PreviewLink}
         crystals={CRYSTALS}
         logoSrc={LOGO_URI}
-        logoOutline={NOBLE_STAR_LOGO.outline}
+        logoStar={{ ...NOBLE_STAR_LOGO.star, src: STAR_URI }}
         logoAlt="Noble Star Forest"
       />
       <main className="page">

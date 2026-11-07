@@ -22,6 +22,7 @@ const reactGlobals = {
 };
 
 const logoUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/noble-star-forest.webp")).toString("base64")}`;
+const starUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/noble-star.webp")).toString("base64")}`;
 
 // The crystal pictures, embedded so the preview is one file.
 const plates = [0.3516, 0.3603, 0.3749, 0.3682];
@@ -44,7 +45,7 @@ const js = await build({
   inject: [join(here, "react-shim.js")],
   loader: { ".css": "empty" },
   plugins: [reactGlobals],
-  define: { "process.env.NODE_ENV": '"production"', LOGO_URI: JSON.stringify(logoUri), CRYSTALS: JSON.stringify(crystals) },
+  define: { "process.env.NODE_ENV": '"production"', LOGO_URI: JSON.stringify(logoUri), STAR_URI: JSON.stringify(starUri), CRYSTALS: JSON.stringify(crystals) },
 });
 
 const cssPath = join(here, "garland-preview.css");

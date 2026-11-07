@@ -163,7 +163,7 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 # Garland header with snowflake page tabs
 
-A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it with its own string of lights; and one hanging crystal snowflake per menu item, like cut-crystal ornaments catching the light of Christmas lights. Each has a round centre of light frosted glass with its word etched in dark, sized to just fit the word.
+A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging crystal snowflake per menu item, like cut-crystal ornaments catching the light of Christmas lights. Each has a round centre of light frosted glass with its word etched in dark, sized to just fit the word.
 
 - Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
@@ -172,7 +172,7 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 - When a page becomes active, its word sharpens into focus.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
-- Garland and sign lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (4.5–9 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
+- Garland lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (4.5–9 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
 - With "reduce motion" turned on, lights and glints stay steady, and nothing swings or turns.
 
 **Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat.
@@ -192,12 +192,13 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 | `public/snowflakes/` | The 4 crystal snowflake pictures, cut out from your image with transparent backgrounds. |
 | `public/brand/noble-star-forest.webp` | Your logo (the wood sign). |
 | `components/garland-header/garland-painter.ts` | Paints the noble fir and western red cedar garland. |
-| `components/garland-header/logo-outline.ts` | The sign's shape, for its string of lights. |
+| `components/garland-header/noble-star-logo.ts` | The sign's image, shape ratio, and where its star is. |
+| `public/brand/noble-star.webp` | The star cut out of the sign, drawn over it so it can glow. |
 | `app/SiteHeader.tsx` | How this demo site uses the header with the tree transition. |
 
 ## The logo and the garland
 
-**Logo.** The Noble Star Forest sign is `public/brand/noble-star-forest.webp` (your logo, cropped and resized to 1000px wide). It is centred on the page, twice as tall as the garland is thick, and centred on the garland so the garland runs behind it. Its string of fairy lights follows the sign's outline, tree tops included; those points are in `components/garland-header/logo-outline.ts`. To change the size, change the garland thickness (`--g` near the top of `GarlandHeader.tsx`); the sign is always twice that.
+**Logo.** The Noble Star Forest sign is `public/brand/noble-star-forest.webp` (your logo, cropped and resized to 1000px wide). It is centred on the page, twice as tall as the garland is thick, and centred on the garland so the garland runs behind it. The 8-point star in "STAR" glows and twinkles like a real star: a cut-out copy of the star (`public/brand/noble-star.webp`) is drawn over it, brightened, with a soft warm halo that slowly swells, fine rays along its points that lengthen and fade on their own rhythms, a hot white centre, and a faint irregular flicker between warm and icy white. Its position is in `components/garland-header/noble-star-logo.ts`; the effect is the `.gh-star` styles in `garland-header.css`. To change the size, change the garland thickness (`--g` near the top of `GarlandHeader.tsx`); the sign is always twice that.
 
 **Garland.** The noble fir and western red cedar garland is painted in code by `components/garland-header/garland-painter.ts`, from the reference photos (which are not used in the site):
 
@@ -285,7 +286,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 | `garlandFit` | `"cover"` | `"cover"` stretches one photo, `"repeat"` tiles it |
 | `logoSrc` | `/brand/noble-star-forest.webp` | Your logo file |
 | `logoRatio` | 1.8349 | The logo's width divided by its height |
-| `logoOutline` | the sign's outline | Points for the logo's lights; leave out for an oval |
+| `logoStar` | the sign's star | Where the logo's star is, so it glows; leave out for no star effect |
 | `logo` | none | Any element (like an inline `<svg>`) to use instead of `logoSrc` |
 | `logoAlt` | `"Noble Star Forest"` | Logo description for screen readers |
 | `homeHref` | `"/"` | Where the logo links to |
@@ -297,7 +298,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 - **Garland height, snowflake size, logo frame size:** the `[--g:…]`, `[--flake:…]` and `[--logo-w:…]`/`[--logo-h:…]` classes near the top of `GarlandHeader.tsx`, one value per screen width (`sm:` 640px+, `md:` 768px+, `lg:` 1024px+, `xl:` 1280px+).
 - **Ribbon lengths:** `NARROW` and `WIDE` in `placeTabs()` in `geometry.ts`.
 - **Light colour:** `--gh-light` (the bulb, `#FFF5EB`) and `--gh-warm` (the warm glow) at the top of `garland-header.css`.
-- **Garland and sign sparkle:** the `gh-sparkle` keyframes in `garland-header.css`; bulb size: `--gh-core` / `--gh-halo` in `parts.tsx`.
+- **Garland sparkle:** the `gh-sparkle` keyframes in `garland-header.css`; bulb size: `--gh-core` / `--gh-halo` in `parts.tsx`.
 - **Crystal brightness:** `.gh-crystal` rules in `garland-header.css` (inactive dimness, active shimmer).
 - **Glints:** how many and which colours in `crystalGlints()` in `geometry.ts`; how they flash in the `gh-glint` and `gh-fleck` keyframes.
 - **Swing:** the period (`1.7`) and damping (`0.16`) in `useSwing()` in `hooks.ts`.

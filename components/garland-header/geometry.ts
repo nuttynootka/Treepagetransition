@@ -70,14 +70,6 @@ export function garlandLights(seed = 7): LightPoint[] {
   return out;
 }
 
-/** Lights spaced evenly around the logo's oval frame. */
-export function ovalLights(count = 24, seed = 11): LightPoint[] {
-  const rand = seededRandom(seed);
-  return Array.from({ length: count }, (_, i) => {
-    const deg = (i / count) * 360 + (rand() - 0.5) * 4;
-    return { x: r2(50 + 50 * Math.cos(rad(deg))), y: r2(50 + 50 * Math.sin(rad(deg))), ...twinkle(rand) };
-  });
-}
 
 // ---------------------------------------------------------------------------
 // Crystal glints (percent of the snowflake box, centre 50,50)
