@@ -181,6 +181,45 @@ export function plateGlints(seed: number): PlateGlint[] {
 }
 
 // ---------------------------------------------------------------------------
+// Crystal star tabs (keep in step with scripts/make-crystal-stars.py)
+// ---------------------------------------------------------------------------
+
+/** Where the star's points meet, as a share of the box height. The glass centre sits here. */
+export const STAR_CENTRE_Y = 0.4;
+/** [angle in degrees (0 = right, 90 = down), length as a share of the box]. */
+export const STAR_ARMS: [number, number][] = [
+  [-135, 0.31], [-45, 0.31], [45, 0.29], [135, 0.29],
+  [180, 0.36], [0, 0.36], [-90, 0.39], [90, 0.58],
+];
+
+/** Glints along the star's points, past the glass centre, mostly toward the tips. */
+export function starGlints(seed: number, count = 12): Glint[] {
+  const rand = seededRandom(seed);
+  const out: Glint[] = [];
+  for (let i = 0; i < count; i++) {
+    const [deg, len] = STAR_ARMS[Math.floor(rand() * STAR_ARMS.length)];
+    const r = len * (0.45 + rand() * 0.5) * 100;
+    const x = 50 + r * Math.cos(rad(deg));
+    const y = STAR_CENTRE_Y * 100 + r * Math.sin(rad(deg));
+    const c = rand();
+    const color: GlintColor = c < 0.58 ? "white" : c < 0.72 ? "gold" : c < 0.86 ? "red" : "green";
+    const kind = rand() < 0.3 ? "star" : "fleck";
+    const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
+    out.push({
+      x: r2(x),
+      y: r2(y),
+      kind,
+      color,
+      size: r2(kind === "star" ? 0.16 + rand() * 0.1 : 0.05 + rand() * 0.035),
+      dur: r2(dur),
+      delay: r2(-rand() * dur),
+      rest: i % 2 === 0,
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Where each snowflake hangs
 // ---------------------------------------------------------------------------
 

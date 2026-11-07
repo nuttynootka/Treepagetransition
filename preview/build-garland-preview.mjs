@@ -25,10 +25,9 @@ const logoUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/
 const starUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/noble-star.webp")).toString("base64")}`;
 
 // The crystal pictures, embedded so the preview is one file.
-const plates = [0.3516, 0.3603, 0.3749, 0.3682];
-const crystals = plates.map((plate, i) => ({
-  src: `data:image/webp;base64,${readFileSync(join(root, `public/snowflakes/crystal-${i + 1}.webp`)).toString("base64")}`,
-  plate,
+const crystals = [1, 2, 3].map((i) => ({
+  src: `data:image/webp;base64,${readFileSync(join(root, `public/stars/crystal-star-${i}.webp`)).toString("base64")}`,
+  plate: 0.1,
 }));
 
 const js = await build({

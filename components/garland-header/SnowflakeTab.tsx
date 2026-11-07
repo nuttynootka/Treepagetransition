@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { crystalGlints, GLINT_COLORS, hashString, type Glint, type TabPlacement } from "./geometry";
+import { GLINT_COLORS, hashString, STAR_CENTRE_Y, starGlints, type Glint, type TabPlacement } from "./geometry";
 import { useSwing } from "./hooks";
 import { cn } from "./parts";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
@@ -71,7 +71,7 @@ export function SnowflakeTab({
   children,
 }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
-  const glints = useMemo(() => crystalGlints(seed, 0.44, 12), [seed]);
+  const glints = useMemo(() => starGlints(seed, 12), [seed]);
   // Each crystal turns on its ribbon at its own pace (3.6–5.2s each way).
   const turnStyle = useMemo(() => {
     const dur = 3.6 + (seed % 1000) / 625;
@@ -132,8 +132,8 @@ export function SnowflakeTab({
           {/* Everything that turns slowly on the ribbon, like the crystals in the reference video. */}
           <span
             ref={turnRef}
-            className="gh-turn pointer-events-none absolute inset-0"
-            style={{ ...turnStyle, "--plate-d": plateSize } as CSSProperties}
+            className="gh-turn pointer-events-none absolute inset-0 origin-[50%_40%]"
+            style={{ ...turnStyle, "--plate-d": plateSize, "--star-cy": `${STAR_CENTRE_Y * 100}%` } as CSSProperties}
           >
             {/* The leaded-glass crystal, with light sweeping across its facets and
                 coloured Christmas lights reflecting in them. */}
@@ -174,10 +174,10 @@ export function SnowflakeTab({
             {/* Silver rim around the glass centre */}
             <span
               aria-hidden
-              className="absolute left-1/2 top-1/2 size-[calc(var(--plate-d)+3px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
+              className="absolute left-1/2 top-[var(--star-cy)] size-[calc(var(--plate-d)+3px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_200deg,#f4f7fb,#9aa3ad,#ffffff,#7d8690,#e9eef4,#a7b0ba,#f4f7fb)] shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
             />
             {/* Solid, light frosted glass centre, just big enough for its word, etched dark. */}
-            <span className="absolute left-1/2 top-1/2 flex size-[var(--plate-d)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
+            <span className="absolute left-1/2 top-[var(--star-cy)] flex size-[var(--plate-d)] -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
               <span aria-hidden className={cn("gh-frost-glass absolute inset-0 rounded-full", active && "is-active")} />
               <span
                 ref={labelRef}

@@ -48,10 +48,11 @@ export interface GarlandHeaderProps {
 }
 
 export const DEFAULT_CRYSTALS: CrystalImage[] = [
-  { src: "/snowflakes/crystal-1.webp", plate: 0.3516 },
-  { src: "/snowflakes/crystal-2.webp", plate: 0.3603 },
-  { src: "/snowflakes/crystal-3.webp", plate: 0.3749 },
-  { src: "/snowflakes/crystal-4.webp", plate: 0.3682 },
+  // Faceted 8-point crystal stars (made by scripts/make-crystal-stars.py). They have no
+  // opening in the middle, so `plate` is only a small minimum size for the glass centre.
+  { src: "/stars/crystal-star-1.webp", plate: 0.1 },
+  { src: "/stars/crystal-star-2.webp", plate: 0.1 },
+  { src: "/stars/crystal-star-3.webp", plate: 0.1 },
 ];
 
 const PlainLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>(
@@ -141,7 +142,7 @@ export function GarlandHeader({
         // 4px from the top, and the garland runs behind its middle (--gt = garland top).
         "[--g:58px] sm:[--g:66px] md:[--g:76px] lg:[--g:84px] xl:[--g:92px]",
         "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
-        "[--flake:min(86px,24vw)] sm:[--flake:98px] md:[--flake:110px] lg:[--flake:117px] xl:[--flake:127px]",
+        "[--flake:min(108px,28vw)] sm:[--flake:124px] md:[--flake:144px] lg:[--flake:164px] xl:[--flake:180px]",
         // One text size for every menu word (snowflakes and hanging plates alike).
         "[--label-size:10.5px] md:[--label-size:11.5px] lg:[--label-size:12px]",
         // Hanging menu plates.
