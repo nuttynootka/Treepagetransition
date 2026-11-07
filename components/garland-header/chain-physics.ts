@@ -29,7 +29,7 @@ const PHYS = {
   substep: 1 / 180,
   iterations: 8,
   /** Chains stretch very slightly, which softens the catch when a plate drops. */
-  chainStiffness: 0.85,
+  chainStiffness: 0.66,
   /** Faint breeze, as a sideways acceleration (px/s²). */
   breeze: 55,
   /** Twist around the vertical axis: natural period ≈ 2.4s, lightly damped. */
@@ -38,17 +38,17 @@ const PHYS = {
   twistFromSwing: 0.0045,
   maxTwist: 0.21, // ≈ 12°
   /** Unfurl: each plate swings down from folded flat against the bottom of the plate
-   *  above, on a smooth, lightly damped hinge. */
+   *  above, on a hinge with a little flutter. */
   foldStiffness: (2 * Math.PI / 0.62) ** 2,
-  foldDamping: 2 * 0.62 * (2 * Math.PI / 0.62),
-  /** Opening: the garland chains lower the first plate over this long, easing in and out
-   *  (gentler than free fall, so the chains never go slack and catch with a jerk). */
-  leadTime: 0.85,
+  foldDamping: 2 * 0.4 * (2 * Math.PI / 0.62),
+  /** Opening: the garland chains lower the first plate over this long, easing in and out.
+   *  Mid-way they run a little faster than the plate falls, so it gets a soft, bouncy catch. */
+  leadTime: 0.5,
   /** Chains between plates lengthen over this long once a plate is let go. */
-  gapTime: 0.34,
+  gapTime: 0.2,
   /** A plate is let go this long after the one above, once that one is mostly unfolded. */
-  releaseGap: 0.13,
-  releaseFold: -28,
+  releaseGap: 0.11,
+  releaseFold: -45,
   /** Closing: seconds between reeling plates in, and how long each takes. */
   reelGap: 0.09,
   reelTime: 0.34,
@@ -59,7 +59,7 @@ const PHYS = {
   leadAttach: 0.2,
   innerAttach: 0.34,
   /** Small random sideways push and twist each plate gets as it drops, so no two drops look alike. */
-  dropKick: 36,
+  dropKick: 55,
   /** Faint random twisting from the breeze (rad/s²). */
   breezeTwist: 0.5,
 };
