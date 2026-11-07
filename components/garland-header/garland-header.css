@@ -48,16 +48,27 @@
   transition: opacity 0.4s ease-out;
 }
 
-/* Garland and logo lights stay softly lit at all times. */
-.gh-glow-soft .gh-light-twinkle { animation-name: gh-soft; }
+/* Garland and sign lights: small, crisp bulbs with a tight halo. Each one rests dim,
+ * then flares bright for a moment and drops back: a slow, random sparkle rather than
+ * a gentle fade. Cycles are 2.4–4.8s and every light is out of step with the others. */
+.gh-glow-soft .gh-light-twinkle {
+  background:
+    radial-gradient(circle, rgb(255 255 255) 0 calc(var(--core) / 2 - 0.3px), rgb(var(--gh-light)) calc(var(--core) / 2), transparent calc(var(--core) / 2 + 0.5px)),
+    radial-gradient(circle, rgb(var(--gh-light) / 0.6) 0%, rgb(var(--gh-warm) / 0.16) 22%, transparent 46%);
+  animation: gh-sparkle calc(var(--dur, 2.2s) * 1.6) ease-in-out var(--delay, 0s) infinite;
+}
 
 @keyframes gh-rest {
   from { opacity: 0.32; }
   to { opacity: 0.72; }
 }
-@keyframes gh-soft {
-  from { opacity: 0.55; }
-  to { opacity: 0.95; }
+@keyframes gh-sparkle {
+  0% { opacity: 0.4; scale: 0.9; }
+  32% { opacity: 0.46; scale: 0.92; }
+  46% { opacity: 1; scale: 1.3; }
+  56% { opacity: 0.85; scale: 1.08; }
+  70% { opacity: 0.5; scale: 0.95; }
+  100% { opacity: 0.4; scale: 0.9; }
 }
 
 /* ---------- Crystal snowflakes ----------

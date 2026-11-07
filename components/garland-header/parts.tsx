@@ -59,7 +59,7 @@ export function Garland({ src, fit }: GarlandProps) {
       ) : (
         <PaintedGarland />
       )}
-      <div className="gh-glow-soft absolute inset-0 [--gh-core:2.4px] [--gh-halo:12px] md:[--gh-core:3px] md:[--gh-halo:15px]">
+      <div className="gh-glow-soft absolute inset-0 [--gh-core:2.2px] [--gh-halo:9px] md:[--gh-core:2.7px] md:[--gh-halo:11px]">
         {lights.map((l, i) => (
           <FairyLight key={i} light={l} className={l.dense ? "hidden sm:block" : undefined} />
         ))}
@@ -158,7 +158,7 @@ export function LogoSign({ href, logo, logoSrc, logoAlt, ratio, outline, Link }:
             className="block h-full w-full object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.65)]"
           />
         )}
-        <span aria-hidden className="gh-glow-soft pointer-events-none absolute inset-0 [--gh-core:2.6px] [--gh-halo:13px] md:[--gh-core:3.2px] md:[--gh-halo:16px]">
+        <span aria-hidden className="gh-glow-soft pointer-events-none absolute inset-0 [--gh-core:2.2px] [--gh-halo:9px] md:[--gh-core:2.7px] md:[--gh-halo:11px]">
           {lights.map((l, i) => (
             <FairyLight key={i} light={l} />
           ))}
