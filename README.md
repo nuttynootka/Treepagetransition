@@ -168,7 +168,7 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 - Each star turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, a soft band of light sweeps across the bevels and the bead-blasted grain glitters in white and warm gold where the light passes; a few small white and gold glints sparkle at the points.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
-- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 13px on phones, 14px on tablets, 15px on computers), set in Yanone Kaffeesatz, on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
+- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 12px on phones, 13px on tablets, 14px on computers), set in Yanone Kaffeesatz, on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
 - When a page becomes active, its word sharpens into focus.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.

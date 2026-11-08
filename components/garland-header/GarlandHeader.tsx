@@ -132,7 +132,7 @@ export function GarlandHeader({
         "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
         "[--flake:min(80px,22vw)] sm:[--flake:96px] md:[--flake:124px] lg:[--flake:164px] xl:[--flake:180px]",
         // One text size for every menu word (snowflakes and hanging plates alike).
-        "[--label-size:13px] md:[--label-size:14px] lg:[--label-size:15px]",
+        "[--label-size:12px] md:[--label-size:13px] lg:[--label-size:14px]",
         // Hanging menu plates.
         "[--menu-h:26px] [--menu-font:var(--label-size)] md:[--menu-h:28px]",
         "h-[calc(var(--gt)+var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--gt)+var(--g)+var(--rib-w)+var(--flake)+36px)]",
