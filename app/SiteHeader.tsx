@@ -12,7 +12,6 @@ const pages: GarlandPage[] = [
       { href: "/wholesale-trees", label: "Wholesale Trees" },
       // Or "Wreaths & Boughs" if cut boughs are the only greenery you sell.
       { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
-      { href: "/firewood", label: "Firewood" },
       { href: "/make-payment", label: "Make Payment" },
     ],
   },

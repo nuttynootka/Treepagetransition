@@ -18,7 +18,6 @@ const pages: GarlandPage[] = [
       { href: "/statement-trees", label: "Statement Trees" },
       { href: "/wholesale-trees", label: "Wholesale Trees" },
       { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
-      { href: "/firewood", label: "Firewood" },
       { href: "/make-payment", label: "Make Payment" },
     ],
   },
