@@ -12,7 +12,6 @@ declare const LOGO_URI: string;
 declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
-  { href: "/", label: "Home" },
   {
     label: "Shop",
     items: [
@@ -23,6 +22,7 @@ const pages: GarlandPage[] = [
       { href: "/make-payment", label: "Make Payment" },
     ],
   },
+  { href: "/", label: "Home" },
   {
     label: "Us",
     items: [

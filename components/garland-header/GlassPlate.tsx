@@ -12,7 +12,21 @@ import { cn } from "./parts";
  * Put it inside an element with the `gh-menu-plate` class (the silver bevel) and a
  * `--gc` colour for the light it reflects.
  */
-export function GlassPlateFace({ label, current, glints }: { label: string; current: boolean; glints: PlateGlint[] }) {
+export function GlassPlateFace({
+  label,
+  current,
+  glints,
+  sizerLabels,
+  fading = false,
+}: {
+  label: string;
+  current: boolean;
+  glints: PlateGlint[];
+  /** Other labels this plate may show. The plate is as wide as the widest, so changing the label never resizes it. */
+  sizerLabels?: string[];
+  /** Fade the label out (it fades back in when this goes false). */
+  fading?: boolean;
+}) {
   return (
     <>
       <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
@@ -20,11 +34,18 @@ export function GlassPlateFace({ label, current, glints }: { label: string; curr
         <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
         <span
           className={cn(
-            "gh-etched relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",
+            "gh-etched relative grid px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",
             "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)]",
           )}
         >
-          {label}
+          {sizerLabels?.map((l) => (
+            <span key={l} aria-hidden className="invisible col-start-1 row-start-1">
+              {l}
+            </span>
+          ))}
+          <span className={cn("col-start-1 row-start-1 transition-opacity duration-150 ease-linear", fading && "opacity-0")}>
+            {label}
+          </span>
         </span>
       </span>
       <span aria-hidden className="pointer-events-none absolute inset-0">

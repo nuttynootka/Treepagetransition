@@ -5,7 +5,6 @@ import { GarlandHeader, type GarlandPage } from "@/components/garland-header";
 import { TransitionLink } from "@/components/tree-transition";
 
 const pages: GarlandPage[] = [
-  { href: "/", label: "Home" },
   {
     label: "Shop",
     items: [
@@ -17,6 +16,7 @@ const pages: GarlandPage[] = [
       { href: "/make-payment", label: "Make Payment" },
     ],
   },
+  { href: "/", label: "Home" },
   {
     label: "Us",
     items: [

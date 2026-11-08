@@ -7,6 +7,7 @@ import { NOBLE_STAR_LOGO, type LogoStar } from "./noble-star-logo";
 import { Bokeh, cn, Garland, LogoSign } from "./parts";
 import { HangingMenu } from "./HangingMenu";
 import { PlateTab } from "./PlateTab";
+import { useTabSwap } from "./tab-swap";
 import { SnowflakeTab } from "./SnowflakeTab";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 import "./garland-header.css";
@@ -101,11 +102,42 @@ export function GarlandHeader({
   const idBase = useId();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+  // Plate tabs: three fixed slots whose labels swap (see tab-swap.ts). Needs exactly three pages.
+  const swapEnabled = plates && pages.length === 3;
+  const viewed = pages.findIndex((p) => isActive(activeHref, p));
+  const swap = useTabSwap({
+    count: pages.length,
+    viewed: viewed >= 0 ? viewed : null,
+    hasMenu: pages.map((p) => !!p.items),
+    activate: (h) => rootRef.current?.querySelector<HTMLAnchorElement>(`[data-go="${h}"] a`)?.click(),
+    enabled: swapEnabled,
+  });
+  const swapOpenRef = useRef<number | null>(null);
+  swapOpenRef.current = swap.openIdx;
 
   useWarmPointer(rootRef, true);
 
   // A new page: roll every menu up.
   useEffect(() => setOpenMenu(null), [activeHref]);
+
+  // Plate tabs: tapping anywhere outside the tabs and the dropdown, or pressing Escape, closes
+  // the dropdown and fades the labels back to how they were.
+  useEffect(() => {
+    if (!swapEnabled || swap.openIdx === null) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!(e.target as Element | null)?.closest?.("[data-tab]")) swap.closeAll();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") swap.closeAll();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swapEnabled, swap.openIdx]);
 
   // Tapping anywhere else, or pressing Escape, rolls the open menu up.
   useEffect(() => {
@@ -167,40 +199,88 @@ export function GarlandHeader({
         Link={LinkComponent}
       />
 
+      {/* Pages with no dropdown (Home) are reached by pressing one of these out-of-sight links,
+          so the page change uses your link component (and so its page transition). */}
+      {swapEnabled &&
+        pages.map(
+          (p, h) =>
+            !p.items && (
+              <span key={p.label} data-go={h} inert className="sr-only">
+                <LinkComponent href={p.href ?? "/"}>{p.label}</LinkComponent>
+              </span>
+            ),
+        )}
+
       <nav aria-label="Main">
         <ul className="m-0 list-none p-0">
-          {pages.map((page, i) => {
-            const Tab = plates ? PlateTab : SnowflakeTab;
-            const menuId = `${idBase}-menu-${i}`;
-            const open = openMenu === menuId;
-            return (
-              <Tab
-                key={page.href ?? page.label}
-                page={page}
-                index={i}
-                active={isActive(activeHref, page)}
-                placement={layout.tabs[i]}
-                crystal={crystals[i % crystals.length]}
-                mirrored={Math.floor(i / crystals.length) % 2 === 1}
-                motion={!reducedMotion}
-                Link={LinkComponent}
-                menu={page.items ? { id: menuId, open, onToggle: () => setOpenMenu(open ? null : menuId) } : undefined}
-              >
-                {page.items && (
-                  <HangingMenu
-                    id={menuId}
+          {swapEnabled
+            ? [0, 1, 2].map((pos) => {
+                const h = swap.display[pos];
+                const page = pages[h];
+                return (
+                  <PlateTab
+                    key={pos}
+                    pos={pos}
                     label={page.label}
-                    items={page.items}
-                    open={open}
-                    activeHref={activeHref}
+                    sizerLabels={pages.map((p) => p.label)}
+                    fading={swap.fading[pos]}
+                    current={pos === 1}
+                    expanded={page.items ? swap.openIdx === h : undefined}
+                    controls={page.items ? `${idBase}-menu-${h}` : undefined}
+                    onPress={() => swap.tap(pos)}
+                    placement={layout.tabs[pos]}
+                    motion={!reducedMotion}
+                  >
+                    {/* Every dropdown unrolls from the centre tab, whichever page is in it. */}
+                    {pos === 1 &&
+                      pages.map(
+                        (p, hi) =>
+                          p.items && (
+                            <HangingMenu
+                              key={p.label}
+                              id={`${idBase}-menu-${hi}`}
+                              label={p.label}
+                              items={p.items}
+                              open={swap.openIdx === hi}
+                              activeHref={activeHref}
+                              Link={LinkComponent}
+                              onSelect={swap.select}
+                              fromTab
+                            />
+                          ),
+                      )}
+                  </PlateTab>
+                );
+              })
+            : pages.map((page, i) => {
+                const menuId = `${idBase}-menu-${i}`;
+                const open = openMenu === menuId;
+                return (
+                  <SnowflakeTab
+                    key={page.href ?? page.label}
+                    page={page}
+                    active={isActive(activeHref, page)}
+                    placement={layout.tabs[i]}
+                    crystal={crystals[i % crystals.length]}
+                    mirrored={Math.floor(i / crystals.length) % 2 === 1}
+                    motion={!reducedMotion}
                     Link={LinkComponent}
-                    onSelect={() => setOpenMenu(null)}
-                    fromTab={plates}
-                  />
-                )}
-              </Tab>
-            );
-          })}
+                    menu={page.items ? { id: menuId, open, onToggle: () => setOpenMenu(open ? null : menuId) } : undefined}
+                  >
+                    {page.items && (
+                      <HangingMenu
+                        id={menuId}
+                        label={page.label}
+                        items={page.items}
+                        open={open}
+                        activeHref={activeHref}
+                        Link={LinkComponent}
+                        onSelect={() => setOpenMenu(null)}
+                      />
+                    )}
+                  </SnowflakeTab>
+                );
+              })}
         </ul>
       </nav>
 

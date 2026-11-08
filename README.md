@@ -332,6 +332,17 @@ To rebuild the preview page after changing the component: `npm run build:garland
 
 The menu tabs are faceted 8-point crystal stars in the north-star shape of the star on the sign: a tall top point, a longer bottom point, and shorter side and diagonal points. The side and diagonal points are longer than on the sign so the star still reads clearly around its word. Each point is cut into three long facets (a centre face and two bevels), and the centre into 12 facets, like a cut-crystal star ornament, so one half catches the light and the other falls dark. The three pictures differ only in where the light comes from. They are drawn by `scripts/make-crystal-stars.py` (needs Python 3 with numpy and Pillow); if you change the point lengths there, change `STAR_ARMS` in `geometry.ts` to match.
 
-### Plate tabs (an alternative to the stars)
+### Plate tabs and how they swap (an alternative to the stars)
 
-Pass `tabStyle="plate"` to `<GarlandHeader>` (as `app/SiteHeader.tsx` does) and the tabs become frosted glass plates, exactly like the menu plates (same glass, etched word, bevel, and white or gold reflections), hanging from the garland on two short chains. They swing when brushed or tapped. A menu tab's hanging menu unrolls down from under its plate, centred under it and kept inside the screen, instead of from behind the logo, and rolls back up behind the plate. The plates are the height of the menu plates (26px on phones, 28px from 768px), which is smaller than the 44px most touch guidelines recommend for tap targets. Without `tabStyle` (or with `tabStyle="star"`) you get the crystal stars.
+Pass `tabStyle="plate"` to `<GarlandHeader>` (as `app/SiteHeader.tsx` does) and the tabs become frosted glass plates, exactly like the menu plates (same glass, etched word, bevel, white or gold reflections), hanging from the garland on two short chains. Without `tabStyle` you get the crystal stars. Plate tabs need exactly three pages, and the order of the `pages` list is the order they first appear left to right (Shop, Home, Us).
+
+**The three tabs sit in fixed left, centre and right slots. The slots never move or change size; only the word inside each changes.** Every plate is as wide as the widest word. The centre tab always shows the page being viewed.
+
+- **Tap a side tab:** the word in that tab and the word in the centre tab fade out (150ms), are swapped, and fade back in (150ms). Nothing slides. Then that page's dropdown unrolls from under the centre tab.
+- **Pick a subpage:** the page loads, the words stay swapped, and that page's word stays in the centre.
+- **Tap outside the dropdown (or press Escape) without picking:** the dropdown rolls up and the two words fade back to how they were.
+- **Tap the centre tab:** its dropdown opens, with no swap. Tap it again to close it (undoing any swap).
+- **Tap Home:** works the same way but Home has no dropdown, so it swaps and then goes to the home page.
+- **Swaps are always worked out from the arrangement that matches the page being viewed**, never from what is on screen. So tapping Shop and then Us without choosing undoes Shop's swap first (the labels that differ fade together in one go). The words on screen are always a rearrangement of the same three, so two tabs can never show the same word, however fast someone taps. A new tap cancels whatever is in progress.
+- The logic is in `components/garland-header/tab-swap.ts`. Home is reached by pressing an out-of-sight link, so the page change still plays your wand-tree transition.
+- The plates are the height of the menu plates (26px on phones, 28px from 768px), smaller than the 44px most touch guidelines recommend for tap targets.
