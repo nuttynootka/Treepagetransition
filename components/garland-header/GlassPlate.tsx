@@ -48,17 +48,22 @@ export function GlassPlateFace({
           </span>
         </span>
       </span>
+      {/* Tiny, faint glints of light along the edges: a pinpoint, a few pixels across, no halo. */}
       <span aria-hidden className="pointer-events-none absolute inset-0">
-        {glints.map((g, k) => (
+        {glints.slice(0, 4).map((g, k) => (
           <span
             key={k}
-            data-fairy-light=""
-            className={cn("gh-glint", g.kind === "star" ? "gh-glint-star" : "gh-glint-fleck")}
-            style={{ left: `${g.x}%`, top: `${g.y}%`, "--gs": `${g.size}px`, "--dur": `${g.dur}s`, "--delay": `${g.delay}s` } as CSSProperties}
-          >
-            <span className="gh-glint-spark" />
-            <span className="gh-light-warm" />
-          </span>
+            className="gh-tiny gh-tiny-soft"
+            style={
+              {
+                left: `${g.x}%`,
+                top: `${g.y}%`,
+                "--ts": g.kind === "star" ? "4px" : "2.5px",
+                "--dur": `${(g.dur * 1.6).toFixed(2)}s`,
+                "--delay": `${g.delay}s`,
+              } as CSSProperties
+            }
+          />
         ))}
       </span>
     </>
