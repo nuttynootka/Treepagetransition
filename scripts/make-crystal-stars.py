@@ -77,20 +77,20 @@ def render(light, seed):
             diff = max(0.0, N @ L)
             R = 2 * (N @ L) * N - L
             spec = max(0.0, R @ V) ** 18
-            base = 0.3 + 0.85 * diff ** 1.4 + 0.9 * spec
+            base = 0.52 + 0.6 * diff ** 1.4 + 0.9 * spec
             # Along the facet: a little brighter toward the tip, with one dark refraction streak.
             along = l2[m]
             s = rng.uniform(0.25, 0.75)
-            streak = 1 - 0.55 * np.exp(-(((along - s) / 0.06) ** 2))
+            streak = 1 - 0.25 * np.exp(-(((along - s) / 0.06) ** 2))
             # A bright flash of white near the base of some facets, as clear crystal throws back light.
             flash = 0.5 * np.exp(-(((along - rng.uniform(0.05, 0.3)) / 0.08) ** 2)) * (rng.random() < 0.5)
             tone = np.clip(base * (0.8 + 0.4 * along) * streak + flash, 0, 1.2)
             rgb[m] = tone
             alpha[m] = 0.94
             # Seams between facets (dark) and the ridge / outer edges (bright).
-            seam = np.minimum(l0[m], l1[m]) < 0.035
+            seam = np.minimum(l0[m], l1[m]) < 0.05
             e = edges[m]
-            e[seam] = 1 if k in (1, 2) else -0.6
+            e[seam] = 1
             edges[m] = e
 
     # A cleanly cut hub where the points meet (16 radial facets, no crossing seams), so the
@@ -110,7 +110,7 @@ def render(light, seed):
     edges[inside] = 0
 
     rgb = np.where(edges > 0, np.maximum(rgb, 1.05), rgb)
-    rgb = np.where(edges < 0, rgb * 0.55, rgb)
+    rgb = np.where(edges < 0, rgb * 0.8, rgb)
     # Slightly cool clear crystal.
     out = np.dstack([rgb * 236, rgb * 242, rgb * 250, alpha * 255]).clip(0, 255).astype(np.uint8)
     img = Image.fromarray(out, "RGBA").resize((OUT, OUT), Image.LANCZOS)
