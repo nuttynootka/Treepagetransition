@@ -248,8 +248,8 @@ export function placeTabs(count: number): TabLayout {
   const rows = Math.ceil(count / cols);
   // Three or fewer: the middle star hangs just under the sign (which reaches half a garland
   // thickness below the garland), and the side stars just under the garland.
-  const underSign = "calc(var(--g) / 2 + 5px)";
-  const underGarland = "calc(var(--g) * 0.4 + 6px)"; // the foliage hangs about 0.4 g below the garland band
+  const underSign = "calc(var(--sign-h) / 2 - var(--g) / 2 + 5px)";
+  const underGarland = "calc(var(--g) * 0.4 + 3px)"; // the foliage hangs about 0.4 g below the garland band
   const oneRowRibbon = (i: number) => (count === 3 && i === 1 ? underSign : underGarland);
   const narrowRibbon = (row: number, i = 0) =>
     count <= 3 ? oneRowRibbon(i) : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;

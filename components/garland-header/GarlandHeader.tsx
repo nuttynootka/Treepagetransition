@@ -126,10 +126,10 @@ export function GarlandHeader({
       className={cn(
         // overflow-x-clip (not hidden) so the hanging menus can drop below the header.
         "gh-root @container relative isolate z-30 w-full select-none overflow-x-clip text-[#FFF8F0]",
-        // Garland thickness per screen width. The sign is twice as tall (--sign-h), starts
-        // 4px from the top, and the garland runs behind its middle (--gt = garland top).
-        "[--g:58px] sm:[--g:66px] md:[--g:76px] lg:[--g:84px] xl:[--g:92px]",
-        "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
+        // The sign's height (--sign-h) per screen width. It starts 4px from the top. The garland
+        // is 25% thinner than half the sign (--g) and runs behind the sign's middle (--gt = top).
+        "[--sign-h:116px] sm:[--sign-h:132px] md:[--sign-h:152px] lg:[--sign-h:168px] xl:[--sign-h:184px]",
+        "[--g:calc(var(--sign-h)*0.375)] [--sign-top:4px] [--gt:calc(var(--sign-top)+var(--sign-h)/2-var(--g)/2)]",
         "[--flake:min(94px,26vw)] sm:[--flake:110px] md:[--flake:134px] lg:[--flake:164px] xl:[--flake:180px]",
         // One text size for every menu word (snowflakes and hanging plates alike).
         "[--label-size:12px] md:[--label-size:13px] lg:[--label-size:14px]",
