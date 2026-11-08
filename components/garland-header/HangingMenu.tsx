@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, type CSSProperties, type PointerEvent } from "react";
 import { ChainLadder, closeDuration } from "./chain-physics";
+import { GlassPlateFace } from "./GlassPlate";
 import { hashString, PLATE_LIGHT_COLORS, plateGlints } from "./geometry";
 import { useReducedMotion } from "./hooks";
 import { cn } from "./parts";
@@ -16,6 +17,8 @@ interface HangingMenuProps {
   activeHref: string;
   Link: LinkLike;
   onSelect: () => void;
+  /** Unroll from under a plate tab (instead of down the middle from behind the logo). */
+  fromTab?: boolean;
 }
 
 /**
@@ -24,7 +27,7 @@ interface HangingMenuProps {
  * physics in chain-physics.ts. Opening drops them one by one until their chains
  * catch; closing reels them back up behind the garland, bottom plate first.
  */
-export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect }: HangingMenuProps) {
+export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect, fromTab = false }: HangingMenuProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const plateRefs = useRef<(HTMLDivElement | null)[]>([]);
   const chainRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -39,11 +42,13 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
     const engine = engineRef.current;
     const first = plateRefs.current[0];
     if (!root || !engine || !first) return;
+    // Under a tab, the first plate hangs a short way below the tab's bottom edge (the menu's
+    // top is tucked 10px behind the tab). Otherwise just below the lowest star.
     const flakes = root.closest("nav")?.querySelectorAll(".gh-flake > a, .gh-flake > button") ?? [];
     const bottom = Math.max(0, ...Array.from(flakes, (f) => f.getBoundingClientRect().bottom));
     const top = root.getBoundingClientRect().top;
     const widths = plateRefs.current.slice(0, items.length).map((el) => el?.offsetWidth ?? 160);
-    engine.setGeometry(widths, first.offsetHeight, bottom ? bottom - top + 8 : 160);
+    engine.setGeometry(widths, first.offsetHeight, fromTab ? 22 : bottom ? bottom - top + 8 : 160);
   };
 
   useEffect(() => {
@@ -98,7 +103,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
       role="group"
       aria-label={`${label} menu`}
       data-open={open ? "true" : "false"}
-      className="gh-ladder absolute top-0 z-0"
+      className={cn("gh-ladder absolute top-0 z-0", fromTab && "gh-ladder-tab")}
       style={{ "--n": items.length, "--close-ms": `${Math.round(closeDuration(items.length) * 1000)}ms` } as CSSProperties}
     >
       {/* Chains first, so they pass behind the plates. */}
@@ -129,41 +134,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
                 current && "is-current",
               )}
             >
-              <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
-                {/* Same light frosted glass as the snowflake centres. */}
-                <span aria-hidden className={cn("gh-frost-glass absolute inset-0", current && "is-active")} />
-                {/* A reflection of that plate's light, sliding across the glass as the plate twists. */}
-                <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
-                <span
-                  className={cn(
-                    "gh-etched relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",
-                    "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)]",
-                  )}
-                >
-                  {item.label}
-                </span>
-              </span>
-              <span aria-hidden className="pointer-events-none absolute inset-0">
-                {glints[i].map((g, k) => (
-                  <span
-                    key={k}
-                    data-fairy-light=""
-                    className={cn("gh-glint", g.kind === "star" ? "gh-glint-star" : "gh-glint-fleck")}
-                    style={
-                      {
-                        left: `${g.x}%`,
-                        top: `${g.y}%`,
-                        "--gs": `${g.size}px`,
-                        "--dur": `${g.dur}s`,
-                        "--delay": `${g.delay}s`,
-                      } as CSSProperties
-                    }
-                  >
-                    <span className="gh-glint-spark" />
-                    <span className="gh-light-warm" />
-                  </span>
-                ))}
-              </span>
+              <GlassPlateFace label={item.label} current={current} glints={glints[i]} />
             </Link>
           </div>
         );

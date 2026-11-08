@@ -6,6 +6,7 @@ import { useReducedMotion, useWarmPointer } from "./hooks";
 import { NOBLE_STAR_LOGO, type LogoStar } from "./noble-star-logo";
 import { Bokeh, cn, Garland, LogoSign } from "./parts";
 import { HangingMenu } from "./HangingMenu";
+import { PlateTab } from "./PlateTab";
 import { SnowflakeTab } from "./SnowflakeTab";
 import type { CrystalImage, GarlandPage, LinkLike } from "./types";
 import "./garland-header.css";
@@ -42,6 +43,11 @@ export interface GarlandHeaderProps {
    * starting again after the last).
    */
   crystals?: CrystalImage[];
+  /**
+   * What the tabs look like: "star" (crystal stars) or "plate" (frosted glass plates, the
+   * same as the menu plates, hanging on chains, with the menu unrolling from under them).
+   */
+  tabStyle?: "star" | "plate";
   /** The link component to use, e.g. next/link or TransitionLink. Defaults to a plain <a>. */
   LinkComponent?: LinkLike;
   className?: string;
@@ -84,12 +90,14 @@ export function GarlandHeader({
   logo,
   homeHref = "/",
   crystals = DEFAULT_CRYSTALS,
+  tabStyle = "star",
   LinkComponent = PlainLink,
   className,
 }: GarlandHeaderProps) {
   const rootRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
-  const layout = useMemo(() => placeTabs(pages.length), [pages.length]);
+  const plates = tabStyle === "plate";
+  const layout = useMemo(() => placeTabs(pages.length, plates), [pages.length, plates]);
   const idBase = useId();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -135,7 +143,9 @@ export function GarlandHeader({
         "[--label-size:12px] md:[--label-size:13px] lg:[--label-size:14px]",
         // Hanging menu plates.
         "[--menu-h:26px] [--menu-font:var(--label-size)] md:[--menu-h:28px]",
-        "h-[calc(var(--gt)+var(--g)+var(--rib-n)+var(--flake)+30px)] lg:h-[calc(var(--gt)+var(--g)+var(--rib-w)+var(--flake)+36px)]",
+        // The tab's height: a star is --flake tall; a plate is --menu-h (less a little, as it needs less room below).
+        plates ? "[--tab-h:calc(var(--menu-h)-18px)]" : "[--tab-h:var(--flake)]",
+        "h-[calc(var(--gt)+var(--g)+var(--rib-n)+var(--tab-h)+30px)] lg:h-[calc(var(--gt)+var(--g)+var(--rib-w)+var(--tab-h)+36px)]",
         className,
       )}
       style={{ "--rib-n": layout.maxNarrow, "--rib-w": layout.maxWide } as React.CSSProperties}
@@ -160,12 +170,14 @@ export function GarlandHeader({
       <nav aria-label="Main">
         <ul className="m-0 list-none p-0">
           {pages.map((page, i) => {
+            const Tab = plates ? PlateTab : SnowflakeTab;
             const menuId = `${idBase}-menu-${i}`;
             const open = openMenu === menuId;
             return (
-              <SnowflakeTab
+              <Tab
                 key={page.href ?? page.label}
                 page={page}
+                index={i}
                 active={isActive(activeHref, page)}
                 placement={layout.tabs[i]}
                 crystal={crystals[i % crystals.length]}
@@ -183,9 +195,10 @@ export function GarlandHeader({
                     activeHref={activeHref}
                     Link={LinkComponent}
                     onSelect={() => setOpenMenu(null)}
+                    fromTab={plates}
                   />
                 )}
-              </SnowflakeTab>
+              </Tab>
             );
           })}
         </ul>

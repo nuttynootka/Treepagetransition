@@ -331,3 +331,7 @@ To rebuild the preview page after changing the component: `npm run build:garland
 ### The crystal stars
 
 The menu tabs are faceted 8-point crystal stars in the north-star shape of the star on the sign: a tall top point, a longer bottom point, and shorter side and diagonal points. The side and diagonal points are longer than on the sign so the star still reads clearly around its word. Each point is cut into three long facets (a centre face and two bevels), and the centre into 12 facets, like a cut-crystal star ornament, so one half catches the light and the other falls dark. The three pictures differ only in where the light comes from. They are drawn by `scripts/make-crystal-stars.py` (needs Python 3 with numpy and Pillow); if you change the point lengths there, change `STAR_ARMS` in `geometry.ts` to match.
+
+### Plate tabs (an alternative to the stars)
+
+Pass `tabStyle="plate"` to `<GarlandHeader>` (as `app/SiteHeader.tsx` does) and the tabs become frosted glass plates, exactly like the menu plates (same glass, etched word, bevel, and white or gold reflections), hanging from the garland on two short chains. They swing when brushed or tapped. A menu tab's hanging menu unrolls down from under its plate, centred under it and kept inside the screen, instead of from behind the logo, and rolls back up behind the plate. The plates are the height of the menu plates (26px on phones, 28px from 768px), which is smaller than the 44px most touch guidelines recommend for tap targets. Without `tabStyle` (or with `tabStyle="star"`) you get the crystal stars.

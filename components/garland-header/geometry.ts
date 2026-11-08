@@ -242,14 +242,14 @@ export interface TabLayout {
 
 const ROW_STEP = "(var(--flake) + 14px)";
 
-export function placeTabs(count: number): TabLayout {
+export function placeTabs(count: number, plates = false): TabLayout {
   // Narrow: up to 3 per row.
   const cols = count <= 3 ? count : Math.min(3, Math.ceil(count / 2));
   const rows = Math.ceil(count / cols);
   // Three or fewer: the middle star hangs just under the sign (which reaches half a garland
   // thickness below the garland), and the side stars just under the garland.
   const underSign = "calc(var(--sign-h) / 2 - var(--g) / 2 + 5px)";
-  const underGarland = "calc(var(--g) * 0.4 + 3px)"; // the foliage hangs about 0.4 g below the garland band
+  const underGarland = plates ? "calc(var(--g) * 0.4 + 9px)" : "calc(var(--g) * 0.4 + 3px)"; // the foliage hangs about 0.4 g below the garland band
   const oneRowRibbon = (i: number) => (count === 3 && i === 1 ? underSign : underGarland);
   const narrowRibbon = (row: number, i = 0) =>
     count <= 3 ? oneRowRibbon(i) : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;

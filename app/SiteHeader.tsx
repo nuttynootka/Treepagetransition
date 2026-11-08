@@ -33,6 +33,7 @@ export function SiteHeader() {
     <GarlandHeader
       pages={pages}
       activeHref={pathname}
+      tabStyle="plate"
       LinkComponent={TransitionLink}
       logoAlt="Noble Star Forest"
     />

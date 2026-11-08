@@ -1,0 +1,45 @@
+"use client";
+
+import type { CSSProperties } from "react";
+import type { PlateGlint } from "./geometry";
+import { cn } from "./parts";
+
+/**
+ * The inside of a frosted glass plate: light frosted glass, a reflection that slides
+ * across it as the plate twists, the word etched in dark, and tiny glints of light.
+ * Shared by the tabs and the hanging menu plates so they look identical.
+ *
+ * Put it inside an element with the `gh-menu-plate` class (the silver bevel) and a
+ * `--gc` colour for the light it reflects.
+ */
+export function GlassPlateFace({ label, current, glints }: { label: string; current: boolean; glints: PlateGlint[] }) {
+  return (
+    <>
+      <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
+        <span aria-hidden className={cn("gh-frost-glass absolute inset-0", current && "is-active")} />
+        <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
+        <span
+          className={cn(
+            "gh-etched relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",
+            "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)]",
+          )}
+        >
+          {label}
+        </span>
+      </span>
+      <span aria-hidden className="pointer-events-none absolute inset-0">
+        {glints.map((g, k) => (
+          <span
+            key={k}
+            data-fairy-light=""
+            className={cn("gh-glint", g.kind === "star" ? "gh-glint-star" : "gh-glint-fleck")}
+            style={{ left: `${g.x}%`, top: `${g.y}%`, "--gs": `${g.size}px`, "--dur": `${g.dur}s`, "--delay": `${g.delay}s` } as CSSProperties}
+          >
+            <span className="gh-glint-spark" />
+            <span className="gh-light-warm" />
+          </span>
+        ))}
+      </span>
+    </>
+  );
+}

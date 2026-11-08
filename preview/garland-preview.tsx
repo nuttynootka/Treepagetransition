@@ -94,6 +94,7 @@ function App() {
       <GarlandHeader
         pages={pages}
         activeHref={current}
+        tabStyle="plate"
         LinkComponent={PreviewLink}
         crystals={CRYSTALS}
         logoSrc={LOGO_URI}
