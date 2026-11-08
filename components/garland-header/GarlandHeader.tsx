@@ -130,7 +130,7 @@ export function GarlandHeader({
         // 4px from the top, and the garland runs behind its middle (--gt = garland top).
         "[--g:58px] sm:[--g:66px] md:[--g:76px] lg:[--g:84px] xl:[--g:92px]",
         "[--sign-top:4px] [--sign-h:calc(var(--g)*2)] [--gt:calc(var(--sign-top)+var(--g)/2)]",
-        "[--flake:min(80px,22vw)] sm:[--flake:96px] md:[--flake:124px] lg:[--flake:164px] xl:[--flake:180px]",
+        "[--flake:min(94px,26vw)] sm:[--flake:110px] md:[--flake:134px] lg:[--flake:164px] xl:[--flake:180px]",
         // One text size for every menu word (snowflakes and hanging plates alike).
         "[--label-size:12px] md:[--label-size:13px] lg:[--label-size:14px]",
         // Hanging menu plates.

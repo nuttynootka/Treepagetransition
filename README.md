@@ -307,7 +307,7 @@ It needs React 18 or newer and Tailwind CSS v4.
 ### Notes
 
 - The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 240px tall on phones (stars about 80px wide), 255–285px on tablets and 385–400px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
+- The header is about 255px tall on phones (stars about 94px wide), 265–295px on tablets and 385–400px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
 - There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
 
 ### Using different crystal pictures
