@@ -56,7 +56,7 @@ export function GlassPlateFace({
               {
                 left: `${g.x}%`,
                 top: `${g.y}%`,
-                "--ts": g.kind === "star" ? "4px" : "2.5px",
+                "--ts": g.kind === "star" ? "7px" : "4.5px",
                 "--dur": `${(g.dur * 1.6).toFixed(2)}s`,
                 "--delay": `${g.delay}s`,
               } as CSSProperties

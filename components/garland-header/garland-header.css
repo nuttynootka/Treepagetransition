@@ -153,8 +153,11 @@
 }
 /* On the menu plates and tabs: fainter still, and no crossed hairlines. */
 .gh-tiny-soft {
-  --peak: 0.6;
-  background: radial-gradient(circle, rgb(255 255 255) 0 22%, rgb(var(--gc) / 0.5) 38%, transparent 62%);
+  --peak: 0.95;
+  background:
+    radial-gradient(circle, rgb(255 255 255) 0 16%, rgb(var(--gc) / 0.75) 30%, transparent 55%),
+    linear-gradient(90deg, transparent 10%, rgb(var(--gc) / 0.7) 50%, transparent 90%) center / 100% 1px no-repeat,
+    linear-gradient(0deg, transparent 10%, rgb(var(--gc) / 0.7) 50%, transparent 90%) center / 1px 100% no-repeat;
 }
 .gh-flake[data-active="false"] .gh-tiny[data-rest="false"] { display: none; }
 .gh-glints { transition: opacity 0.7s ease; }

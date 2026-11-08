@@ -154,11 +154,13 @@ export interface PlateGlint {
 export function plateGlints(seed: number): PlateGlint[] {
   const rand = seededRandom(seed);
   const out: PlateGlint[] = [];
+  // On the silver rim and the darker lower edge of the plate, where a pinpoint of light shows.
+  // On the pale glass itself it would disappear.
   const edgePoint = () => {
     const side = rand();
-    if (side < 0.38) return { x: 6 + rand() * 88, y: 6 + rand() * 6 }; // top edge
-    if (side < 0.76) return { x: 6 + rand() * 88, y: 88 + rand() * 6 }; // bottom bevel
-    return { x: side < 0.88 ? 3 + rand() * 3 : 94 + rand() * 3, y: 20 + rand() * 60 }; // ends
+    if (side < 0.3) return { x: 6 + rand() * 88, y: 1 + rand() * 3 }; // top rim
+    if (side < 0.85) return { x: 6 + rand() * 88, y: 100 + rand() * 7 }; // dark lower edge
+    return { x: side < 0.92 ? 0.5 + rand() * 1.5 : 98 + rand() * 1.5, y: 25 + rand() * 50 }; // end rims
   };
   for (let i = 0; i < 6; i++) {
     const kind = i < 2 ? "star" : "fleck";
