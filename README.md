@@ -163,9 +163,9 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 # Garland header with snowflake page tabs
 
-A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging 8-point star per menu item in 14K unplated palladium white gold with a glass-bead blasted satin finish, the same north-star shape as the star on the sign, catching the white and gold Christmas lights. Each word is etched in dark straight onto its star, with the facets fading to soft frosted crystal behind it so it stays readable.
+A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging faceted 8-point crystal star per menu item, the same north-star shape as the star on the sign, catching the light of Christmas lights. Each word is etched in dark straight onto its star, with the facets fading to soft frosted crystal behind it so it stays readable.
 
-- Each star turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, a soft band of light sweeps across the bevels and the bead-blasted grain glitters in white and warm gold where the light passes; a few small white and gold glints sparkle at the points.
+- Light plays on the crystals the way it does on the cut-crystal ornaments in the reference videos. Each snowflake turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and fall back to dark; an iridescent sheen in Christmas-light colours (red, gold, green, blue) changes from facet to facet and shifts with the turn; brighter patches of colour flash on single facets; and a few small glints sparkle at the edges. The layers are all copies of the crystal picture, so the colour never spills outside the glass. Settings: `.gh-turn`, `.gh-shine`, `.gh-iris` and `.gh-fire` in `garland-header.css`.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
 - All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 12px on phones, 13px on tablets, 14px on computers), set in Yanone Kaffeesatz, on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
@@ -189,8 +189,8 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 | `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
 | `components/garland-header/geometry.ts` | Where every light and glint goes, and where each snowflake hangs. |
 | `components/garland-header/garland-header.css` | The twinkle, crystal light, glass and aura styles. |
-| `public/stars/` | The 3 white gold star pictures. |
-| `scripts/make-gold-stars.py` | Draws those star pictures (shape, bevels, metal colour, satin grain, lighting). Run `python3 scripts/make-gold-stars.py` after changing it. |
+| `public/stars/` | The 3 faceted crystal star pictures. |
+| `scripts/make-crystal-stars.py` | Draws those star pictures (shape, facets, lighting). Run `python3 scripts/make-crystal-stars.py` after changing it. |
 | `public/brand/noble-star-forest.webp` | Your logo (the wood sign). |
 | `components/garland-header/garland-painter.ts` | Paints the noble fir and western red cedar garland. |
 | `components/garland-header/noble-star-logo.ts` | The sign's image, shape ratio, and where its star is. |
@@ -247,7 +247,7 @@ const pages: GarlandPage[] = [
 ### How the hanging menu works
 
 - Tapping SHOP or US drops a series of light frosted glass plates (the same glass as the snowflake centres, words etched in dark) on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
-- The plates catch white and warm gold light, alternating. It shows as small glints along the plate's edges and a faint tinted reflection that slides across the glass as the plate twists. The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
+- Each plate catches one Christmas-light colour, in order: red, green, gold, blue, orange, violet. It shows as small glints along the plate's edges and a faint tinted reflection that slides across the glass as the plate twists. The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
 - The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
 - Opening: the garland chains lower the first plate with an ease in and out, quick enough that it briefly runs ahead of the chains and gets a soft, bouncy catch. Each plate below starts folded up against the bottom of the plate above and swings down on that edge with a little flutter, its chains paying out quickly so it drops a short way, once the plate above is about half unfolded. Each gets a small random nudge so no two openings look alike. Then they sway and settle.
 - A faint, random breeze keeps each plate drifting slightly on its own. Moving the mouse across a plate, or tapping it, pushes it, and the motion travels up and down the chain.
@@ -328,6 +328,6 @@ The word and its frosted fade are drawn over the star's centre. The `plate` numb
 
 To rebuild the preview page after changing the component: `npm run build:garland-preview`.
 
-### The white gold stars
+### The crystal stars
 
-The menu tabs are 8-point stars in the north-star shape of the star on the sign: a tall top point, a longer bottom point, and shorter side and diagonal points (lengthened a little so the star reads clearly around its word). They are drawn as 14K unplated palladium white gold, a soft, slightly warm grey-white, with each point bevelled into four faces meeting at a ridge and a low eight-sided pyramid where the points meet. The finish is glass-bead blasted: a fine matte satin grain with soft, broad highlights rather than mirror shine. As each star turns on its ribbon, a soft band of light sweeps across it and the grain glitters in white and warm gold where the light passes (`.gh-glitter` in `garland-header.css`). Only white and gold light is used on the stars and the menu plates. The three pictures differ only in where the light comes from. They are drawn by `scripts/make-gold-stars.py` (needs Python 3 with numpy and Pillow); if you change the point lengths there, change `STAR_ARMS` in `geometry.ts` to match.
+The menu tabs are faceted 8-point crystal stars in the north-star shape of the star on the sign: a tall top point, a longer bottom point, and shorter side and diagonal points. The side and diagonal points are longer than on the sign so the star still reads clearly around its word. Each point is cut into four long facets meeting at a ridge, like a cut-crystal star ornament, so one half catches the light and the other falls dark. The three pictures differ only in where the light comes from. They are drawn by `scripts/make-crystal-stars.py` (needs Python 3 with numpy and Pillow); if you change the point lengths there, change `STAR_ARMS` in `geometry.ts` to match.
