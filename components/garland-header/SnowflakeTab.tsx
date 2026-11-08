@@ -15,26 +15,27 @@ export function estimatePlate(label: string): string {
   return `calc(var(--label-size) * ${(label.length * 0.36 + 0.8).toFixed(2)})`;
 }
 
+/**
+ * A tiny, sharp glint of reflected light on a facet edge. Much smaller than the garland
+ * bulbs and with no round glow: just a pinpoint and a hairline cross that flash briefly.
+ */
 function GlintSpark({ glint }: { glint: Glint }) {
   return (
     <span
       data-fairy-light=""
       data-rest={glint.rest ? "true" : "false"}
-      className={cn("gh-glint", glint.kind === "star" ? "gh-glint-star" : "gh-glint-fleck")}
+      className="gh-tiny"
       style={
         {
           left: `${glint.x}%`,
           top: `${glint.y}%`,
-          "--gs": `calc(var(--flake) * ${glint.size})`,
           "--gc": GLINT_COLORS[glint.color],
-          "--dur": `${glint.dur}s`,
+          "--dur": `${(glint.dur * 1.5).toFixed(2)}s`,
           "--delay": `${glint.delay}s`,
+          "--ts": `calc(var(--flake) * ${glint.kind === "star" ? 0.075 : 0.05})`,
         } as CSSProperties
       }
-    >
-      <span className="gh-glint-spark" />
-      <span className="gh-light-warm" />
-    </span>
+    />
   );
 }
 
@@ -65,7 +66,7 @@ export function SnowflakeTab({
   children,
 }: SnowflakeTabProps) {
   const seed = useMemo(() => hashString((page.href ?? "") + page.label), [page.href, page.label]);
-  const glints = useMemo(() => starGlints(seed, 12), [seed]);
+  const glints = useMemo(() => starGlints(seed, 7), [seed]);
   // Each crystal turns on its ribbon at its own pace (3.6–5.2s each way).
   const turnStyle = useMemo(() => {
     const dur = 3.6 + (seed % 1000) / 625;

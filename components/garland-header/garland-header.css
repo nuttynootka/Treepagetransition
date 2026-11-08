@@ -129,7 +129,33 @@
   from { -webkit-mask-position: 100% 0%; mask-position: 100% 0%; }
   to { -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
 }
-/* ---------- Glints ----------
+/* ---------- Tiny glints on the stars ----------
+ * A pinpoint plus a hairline cross, a few pixels across, that flashes briefly on a facet
+ * edge and then rests. No halo, so it can't be mistaken for a garland bulb. */
+.gh-tiny {
+  position: absolute;
+  width: var(--ts, 5px);
+  height: var(--ts, 5px);
+  translate: -50% -50%;
+  opacity: 0;
+  background:
+    radial-gradient(circle, rgb(255 255 255) 0 14%, rgb(var(--gc) / 0.55) 22%, transparent 36%),
+    linear-gradient(90deg, transparent 5%, rgb(var(--gc) / 0.85) 50%, transparent 95%) center / 100% 1px no-repeat,
+    linear-gradient(0deg, transparent 5%, rgb(var(--gc) / 0.85) 50%, transparent 95%) center / 1px 100% no-repeat;
+  animation: gh-tiny var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+  pointer-events: none;
+}
+@keyframes gh-tiny {
+  0%, 70% { opacity: 0; scale: 0.4; }
+  78% { opacity: 1; scale: 1; }
+  88% { opacity: 0.35; scale: 0.7; }
+  100% { opacity: 0; scale: 0.4; }
+}
+.gh-flake[data-active="false"] .gh-tiny[data-rest="false"] { display: none; }
+.gh-glints { transition: opacity 0.7s ease; }
+.gh-flake[data-active="false"] .gh-glints { opacity: 0.7; }
+
+/* ---------- Glints (menu plates) ----------
  * .gh-glint            zero-size anchor (also a "fairy light" for pointer warmth)
  *   .gh-glint-spark    the sparkle: a star with crossed rays, or a small coloured fleck
  *   .gh-light-warm     extra glow when the pointer is near
@@ -424,6 +450,7 @@
 @media (prefers-reduced-motion: reduce) {
   .gh-light-twinkle,
   .gh-glint-spark,
+  .gh-tiny,
   .gh-flake[data-active="true"] .gh-crystal,
   .gh-turn,
   .gh-flake[data-active="true"] .gh-aura { animation: none !important; }

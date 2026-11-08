@@ -56,9 +56,9 @@ def render(light, seed):
         w = half * S
         root = np.array([cx, cy]) - u * w * 0.4
         # Four facets across the point: outer-left, inner-left, inner-right, outer-right.
-        offs = [-1.0, -0.45, 0.0, 0.45, 1.0]
-        tilts = [-1.05, -0.5, 0.5, 1.05]  # how far each facet leans away from flat
-        for k in range(4):
+        offs = [-1.0, -0.34, 0.34, 1.0]
+        tilts = [-1.0, 0.0, 1.0]  # how far each facet leans away from flat
+        for k in range(3):
             p0 = root + n * w * offs[k]
             p1 = root + n * w * offs[k + 1]
             # barycentric mask for triangle p0, p1, tip
@@ -93,7 +93,7 @@ def render(light, seed):
             e[seam] = 1
             edges[m] = e
 
-    # A cleanly cut hub where the points meet (16 radial facets, no crossing seams), so the
+    # A cleanly cut hub where the points meet (12 radial facets, no crossing seams), so the
     # word placed here sits on calm, bright crystal.
     hub = 0.115 * S
     ang = np.arctan2(yy - cy, xx - cx)
@@ -103,8 +103,8 @@ def render(light, seed):
     a_mod = np.mod(ang + sector / 2, np.pi / 4) - np.pi / 8
     oct_r = hub * np.cos(np.pi / 8) / np.cos(a_mod)
     inside = rad <= oct_r
-    facet = np.floor((ang + np.pi) / (np.pi / 8)).astype(int) % 16
-    shades = 0.72 + 0.28 * np.cos(facet * np.pi / 8 - np.arctan2(L[1], L[0]))
+    facet = np.floor((ang + np.pi) / (np.pi / 6)).astype(int) % 12
+    shades = 0.72 + 0.28 * np.cos(facet * np.pi / 6 - np.arctan2(L[1], L[0]))
     rgb[inside] = (shades * (0.92 + 0.12 * (rad / hub)))[inside]
     alpha[inside] = 0.96
     edges[inside] = 0
