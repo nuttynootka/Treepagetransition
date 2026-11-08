@@ -136,7 +136,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
                 <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
                 <span
                   className={cn(
-                    "gh-etched relative px-[7px] text-center font-bold uppercase leading-none tracking-[0.04em] whitespace-nowrap",
+                    "gh-etched relative px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",
                     "font-[family-name:var(--gh-font)] text-[length:var(--menu-font)]",
                   )}
                 >

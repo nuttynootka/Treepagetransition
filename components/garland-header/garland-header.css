@@ -7,7 +7,7 @@
 .gh-root {
   --gh-light: 255 245 235; /* #FFF5EB */
   --gh-warm: 255 222 186;
-  --gh-font: var(--font-cormorant, "Cormorant Garamond"), "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --gh-font: var(--font-yanone, "Yanone Kaffeesatz"), "Arial Narrow", "Roboto Condensed", sans-serif;
 }
 
 /* ---------- Fairy light ----------

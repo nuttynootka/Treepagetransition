@@ -167,7 +167,7 @@ export function SnowflakeTab({
             <span
               ref={labelRef}
               className={cn(
-                "gh-title gh-etched absolute left-1/2 top-[var(--star-cy)] -mr-[0.04em] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center font-bold uppercase leading-none tracking-[0.04em]",
+                "gh-title gh-etched absolute left-1/2 top-[var(--star-cy)] -mr-[0.04em] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center font-semibold uppercase leading-none tracking-[0.06em]",
                 "font-[family-name:var(--gh-font)] text-[length:var(--label-size)]",
                 active && "is-blooming",
               )}

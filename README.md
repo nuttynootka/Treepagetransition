@@ -168,7 +168,7 @@ A header for the top of the site: a painted noble fir and western red cedar garl
 - Each star turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, a soft band of light sweeps across the bevels and the bead-blasted grain glitters in white and warm gold where the light passes; a few small white and gold glints sparkle at the points.
 - The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
 - The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
-- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 10.5px on phones, 11.5px on tablets, 12px on computers), on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
+- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 13px on phones, 14px on tablets, 15px on computers), set in Yanone Kaffeesatz, on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
 - When a page becomes active, its word sharpens into focus.
 - Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
 - Lights near the mouse or finger glow a little warmer.
@@ -272,7 +272,7 @@ It needs React 18 or newer and Tailwind CSS v4.
    Then create a file called `postcss.config.mjs` next to `package.json` containing exactly what is in this repo's `postcss.config.mjs`, and add `@import "tailwindcss";` as the first line of your global CSS file (usually `app/globals.css`).
 2. **Copy** the folder `components/garland-header/` (all 7 files) into your project's `components/` folder.
 3. **Copy** `public/brand/noble-star-forest.webp` and the `public/snowflakes/` folder into the same places in your project's `public/` folder.
-4. **Font (optional):** the snowflake labels use Cormorant Garamond if it is loaded, through a CSS variable called `--font-cormorant`. Copy the `Cormorant_Garamond` lines from this repo's `app/layout.tsx` into your layout. Without it, labels fall back to Palatino or Georgia.
+4. **Font:** the menu words use Yanone Kaffeesatz (from Google Fonts), through a CSS variable called `--font-yanone`. Copy the `Yanone_Kaffeesatz` lines from this repo's `app/layout.tsx` into your layout. Without it, words fall back to Arial Narrow or another narrow sans-serif.
 5. **Create** `app/SiteHeader.tsx` like the one in this repo, and put `<SiteHeader />` at the top of `<body>` in `app/layout.tsx`.
    - Using the tree transition too? Keep `LinkComponent={TransitionLink}`.
    - Not using it? Use `import Link from "next/link"` and `LinkComponent={Link}`.
