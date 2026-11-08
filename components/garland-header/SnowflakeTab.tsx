@@ -138,17 +138,16 @@ export function SnowflakeTab({
               <img src={crystal.src} alt="" draggable={false} className="gh-shine gh-shine-a absolute inset-0 h-full w-full" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={crystal.src} alt="" draggable={false} className="gh-shine gh-shine-b absolute inset-0 h-full w-full" />
-              {/* Iridescent sheen in Christmas-light colours across whole facets, like the
-                  coated crystal in the reference videos; it shifts as the crystal turns. */}
+              {/* Glass-bead blasted satin: the fine grain glitters in white and warm gold
+                  where the moving light passes over it. */}
               <span
-                className="gh-iris absolute inset-0"
-                style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
+                className="gh-glitter absolute inset-0"
+                style={{
+                  maskImage: `url("${crystal.src}"), linear-gradient(115deg, transparent 38%, #000 47%, #000 53%, transparent 62%)`,
+                  WebkitMaskImage: `url("${crystal.src}"), linear-gradient(115deg, transparent 38%, #000 47%, #000 53%, transparent 62%)`,
+                }}
               />
-              <span
-                className="gh-fire absolute inset-0"
-                style={{ maskImage: `url("${crystal.src}")`, WebkitMaskImage: `url("${crystal.src}")` }}
-              />
-              {/* Behind the word, the facets fade to soft frosted crystal so the word stays
+              {/* Behind the word, the bevels fade to smooth satin metal so the word stays
                   legible. Masked to the star, so a long word runs on into the points. */}
               <span
                 aria-hidden
