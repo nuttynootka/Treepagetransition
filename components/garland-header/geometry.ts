@@ -246,8 +246,13 @@ export function placeTabs(count: number): TabLayout {
   // Narrow: up to 3 per row.
   const cols = count <= 3 ? count : Math.min(3, Math.ceil(count / 2));
   const rows = Math.ceil(count / cols);
-  const narrowRibbon = (row: number) =>
-    count <= 3 ? "calc(var(--g) / 2 + 10px)" : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;
+  // Three or fewer: the middle star hangs just under the sign (which reaches half a garland
+  // thickness below the garland), and the side stars just under the garland.
+  const underSign = "calc(var(--g) / 2 + 5px)";
+  const underGarland = "calc(var(--g) * 0.4 + 6px)"; // the foliage hangs about 0.4 g below the garland band
+  const oneRowRibbon = (i: number) => (count === 3 && i === 1 ? underSign : underGarland);
+  const narrowRibbon = (row: number, i = 0) =>
+    count <= 3 ? oneRowRibbon(i) : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;
 
   // Wide: left side gets the extra one when the count is odd.
   const left = Math.ceil(count / 2);
@@ -265,8 +270,6 @@ export function placeTabs(count: number): TabLayout {
   // snowflake hangs clear of it, and on computers the middle one does.
   const oneRow = count <= 3;
   const rowX = spread(count, 20, 80);
-  const clearSign = "calc(var(--g) / 2 + 10px)";
-  const rowRibbon = (i: number) => (count === 3 && i === 1 ? clearSign : "24px");
 
   const tabs = Array.from({ length: count }, (_, i) => {
     const row = Math.floor(i / cols);
@@ -276,16 +279,17 @@ export function placeTabs(count: number): TabLayout {
     const j = isLeft ? i : i - left;
     return {
       xNarrow: r2(((col + 0.5) / inRow) * 100),
-      ribbonNarrow: narrowRibbon(row),
+      ribbonNarrow: narrowRibbon(row, i),
       xWide: oneRow ? r2(rowX[i]) : isLeft ? r2(leftX[j]) : r2(rightX[j]),
-      ribbonWide: oneRow ? rowRibbon(i) : isLeft ? waveFor(j) : waveFor(right - 1 - j),
+      ribbonWide: oneRow ? oneRowRibbon(i) : isLeft ? waveFor(j) : waveFor(right - 1 - j),
       layer: Math.max(1, 5 - row),
     };
   });
   const maxWide = oneRow
     ? count === 3
-      ? clearSign
-      : "24px"
+      ? underSign
+      : underGarland
     : `${Math.max(0, ...tabs.map((t) => parseInt(t.ribbonWide, 10)))}px`;
-  return { tabs, maxNarrow: narrowRibbon(rows - 1), maxWide };
+  const maxNarrow = count === 3 ? underSign : narrowRibbon(rows - 1, Math.min(1, count - 1));
+  return { tabs, maxNarrow, maxWide };
 }
