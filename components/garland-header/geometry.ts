@@ -113,7 +113,7 @@ export function crystalGlints(seed: number, plate: number, count = 18): Glint[] 
     const r = innerR + rand() * (46 - innerR);
     const [x, y] = polar(r, deg);
     const c = rand();
-    const color: GlintColor = c < 0.65 ? "white" : "gold";
+    const color: GlintColor = c < 0.58 ? "white" : c < 0.72 ? "gold" : c < 0.86 ? "red" : "green";
     const kind = rand() < 0.25 ? "star" : "fleck";
     const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
     out.push({
@@ -131,12 +131,16 @@ export function crystalGlints(seed: number, plate: number, count = 18): Glint[] 
 }
 
 /**
- * Light caught by the menu's glass plates: white and warm gold, alternating.
+ * Christmas-light colours caught by the menu's glass plates, one per plate, in order.
  * Plain RGB numbers, used as rgb(var(--gc)).
  */
 export const PLATE_LIGHT_COLORS = [
-  "255 250 240", // white
-  "255 206 120", // warm gold
+  "255 70 70", // red
+  "70 225 120", // green
+  "255 196 80", // gold
+  "90 150 255", // blue
+  "255 132 56", // orange
+  "205 110 255", // violet
 ];
 
 export interface PlateGlint {
@@ -177,7 +181,7 @@ export function plateGlints(seed: number): PlateGlint[] {
 }
 
 // ---------------------------------------------------------------------------
-// Star tabs (keep in step with scripts/make-gold-stars.py)
+// Crystal star tabs (keep in step with scripts/make-crystal-stars.py)
 // ---------------------------------------------------------------------------
 
 /** Where the star's points meet, as a share of the box height. The glass centre sits here. */
@@ -198,7 +202,7 @@ export function starGlints(seed: number, count = 12): Glint[] {
     const x = 50 + r * Math.cos(rad(deg));
     const y = STAR_CENTRE_Y * 100 + r * Math.sin(rad(deg));
     const c = rand();
-    const color: GlintColor = c < 0.65 ? "white" : "gold";
+    const color: GlintColor = c < 0.58 ? "white" : c < 0.72 ? "gold" : c < 0.86 ? "red" : "green";
     const kind = rand() < 0.3 ? "star" : "fleck";
     const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
     out.push({

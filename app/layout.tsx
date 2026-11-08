@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Yanone_Kaffeesatz } from "next/font/google";
+import { Cormorant_Garamond, Cuprum } from "next/font/google";
 import { TreeTransitionProvider } from "@/components/tree-transition";
 import { SiteHeader } from "./SiteHeader";
 import "./globals.css";
@@ -12,11 +12,11 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-// The menu words on the stars and hanging plates (via --font-yanone).
-const yanone = Yanone_Kaffeesatz({
+// The menu words on the stars and hanging plates (via --font-cuprum).
+const cuprum = Cuprum({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-yanone",
+  variable: "--font-cuprum",
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${yanone.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${cuprum.variable}`}>
       <body>
         <TreeTransitionProvider>
           <SiteHeader />

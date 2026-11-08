@@ -26,7 +26,7 @@ const starUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/
 
 // The crystal pictures, embedded so the preview is one file.
 const crystals = [1, 2, 3].map((i) => ({
-  src: `data:image/webp;base64,${readFileSync(join(root, `public/stars/white-gold-star-${i}.webp`)).toString("base64")}`,
+  src: `data:image/webp;base64,${readFileSync(join(root, `public/stars/crystal-star-${i}.webp`)).toString("base64")}`,
   plate: 0.1,
 }));
 

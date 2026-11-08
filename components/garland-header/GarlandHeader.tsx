@@ -48,11 +48,11 @@ export interface GarlandHeaderProps {
 }
 
 export const DEFAULT_CRYSTALS: CrystalImage[] = [
-  // 8-point stars in 14K unplated palladium white gold with a glass-bead blasted (satin)
-  // finish, made by scripts/make-gold-stars.py. `plate` is unused for sizing.
-  { src: "/stars/white-gold-star-1.webp", plate: 0.1 },
-  { src: "/stars/white-gold-star-2.webp", plate: 0.1 },
-  { src: "/stars/white-gold-star-3.webp", plate: 0.1 },
+  // Faceted 8-point crystal stars (made by scripts/make-crystal-stars.py). They have no
+  // opening in the middle, so `plate` is only a small minimum size for the glass centre.
+  { src: "/stars/crystal-star-1.webp", plate: 0.1 },
+  { src: "/stars/crystal-star-2.webp", plate: 0.1 },
+  { src: "/stars/crystal-star-3.webp", plate: 0.1 },
 ];
 
 const PlainLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }>(
