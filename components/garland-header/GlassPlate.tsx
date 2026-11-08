@@ -5,8 +5,7 @@ import type { PlateGlint } from "./geometry";
 import { cn } from "./parts";
 
 /**
- * The inside of a frosted glass plate: light frosted glass, a reflection that slides
- * across it as the plate twists, the word etched in dark, and tiny glints of light.
+ * The inside of a frosted glass plate: light frosted glass, the word etched in dark, and tiny glints of light.
  * Shared by the tabs and the hanging menu plates so they look identical.
  *
  * Put it inside an element with the `gh-menu-plate` class (the silver bevel) and a
@@ -31,7 +30,6 @@ export function GlassPlateFace({
     <>
       <span className="relative flex h-full items-center justify-center overflow-hidden rounded-[6.5px] border border-white/20 bg-white/10 shadow-lg backdrop-blur-md">
         <span aria-hidden className={cn("gh-frost-glass absolute inset-0", current && "is-active")} />
-        <span aria-hidden className="gh-plate-sheen pointer-events-none absolute inset-y-0 left-[20%] w-[60%]" />
         <span
           className={cn(
             "gh-etched relative grid px-[7px] text-center font-semibold uppercase leading-none tracking-[0.06em] whitespace-nowrap",

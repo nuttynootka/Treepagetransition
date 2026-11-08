@@ -344,19 +344,7 @@
     repeat-y center top / 8px 16px;
 }
 
-/* Each plate reflects one Christmas-light colour (--gc): a faint tinted streak
- * and a tinted top edge. No coloured glow outside the plate. */
-.gh-plate-sheen {
-  background: linear-gradient(
-    112deg,
-    transparent 18%,
-    rgb(var(--gc) / 0.1) 40%,
-    rgb(255 255 255 / 0.16) 50%,
-    rgb(var(--gc) / 0.08) 60%,
-    transparent 82%
-  );
-  transform: translateX(calc(var(--tw, 0) * 520%));
-}
+/* Each plate's light (--gc, white or warm gold) tints its top edge. */
 .gh-menu-plate > span:first-child {
   /* Tinted top edge from that plate's light, plus Tailwind's shadow-lg values. */
   box-shadow:
