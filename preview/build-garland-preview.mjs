@@ -25,11 +25,6 @@ const logoUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/
 const starUri = `data:image/webp;base64,${readFileSync(join(root, "public/brand/noble-star.webp")).toString("base64")}`;
 
 // The crystal pictures, embedded so the preview is one file.
-const crystals = [1, 2, 3].map((i) => ({
-  src: `data:image/webp;base64,${readFileSync(join(root, `public/stars/crystal-star-${i}.webp`)).toString("base64")}`,
-  plate: 0.1,
-}));
-
 const js = await build({
   entryPoints: [join(here, "garland-preview.tsx")],
   bundle: true,
@@ -44,7 +39,7 @@ const js = await build({
   inject: [join(here, "react-shim.js")],
   loader: { ".css": "empty" },
   plugins: [reactGlobals],
-  define: { "process.env.NODE_ENV": '"production"', LOGO_URI: JSON.stringify(logoUri), STAR_URI: JSON.stringify(starUri), CRYSTALS: JSON.stringify(crystals) },
+  define: { "process.env.NODE_ENV": '"production"', LOGO_URI: JSON.stringify(logoUri), STAR_URI: JSON.stringify(starUri) },
 });
 
 const cssPath = join(here, "garland-preview.css");

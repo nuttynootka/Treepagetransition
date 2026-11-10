@@ -2,14 +2,13 @@
 // wand-tree engine, with a tiny fake router so it runs as one HTML page.
 import { forwardRef, useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { createRoot } from "react-dom/client";
-import { GarlandHeader, type CrystalImage, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
+import { GarlandHeader, type GarlandPage, type LinkLikeProps } from "../components/garland-header";
 import { NOBLE_STAR_LOGO } from "../components/garland-header/noble-star-logo";
 
 declare const STAR_URI: string;
 import { TreeTransitionEngine } from "../components/tree-transition/engine";
 
 declare const LOGO_URI: string;
-declare const CRYSTALS: CrystalImage[];
 
 const pages: GarlandPage[] = [
   {
@@ -95,7 +94,6 @@ function App() {
         activeHref={current}
         tabStyle="plate"
         LinkComponent={PreviewLink}
-        crystals={CRYSTALS}
         logoSrc={LOGO_URI}
         logoStar={{ ...NOBLE_STAR_LOGO.star, src: STAR_URI }}
         logoAlt="Noble Star Forest"
