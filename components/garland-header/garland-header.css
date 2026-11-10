@@ -71,66 +71,8 @@
   100% { opacity: 0.4; scale: 0.9; }
 }
 
-/* ---------- Crystal snowflakes ----------
- * Inactive: dimmed and softly shadowed, a few slow glints.
- * Active: fully lit, gently brightening and dimming as if lit by nearby lights.
- */
-.gh-crystal {
-  filter: brightness(0.9) contrast(1.05) saturate(0.7) drop-shadow(0 8px 10px rgb(0 0 0 / 0.65));
-  transition: filter 0.7s ease;
-}
-.gh-flake:hover .gh-crystal { filter: brightness(0.96) contrast(1.05) saturate(0.7) drop-shadow(0 8px 10px rgb(0 0 0 / 0.6)); }
-.gh-flake[data-active="true"] .gh-crystal {
-  filter: brightness(1) contrast(1.08) saturate(0.7) drop-shadow(0 0 8px rgb(var(--gh-light) / 0.4));
-  animation: gh-crystal 3s ease-in-out infinite alternate;
-}
-@keyframes gh-crystal {
-  from { filter: brightness(0.96) contrast(1.08) saturate(0.7) drop-shadow(0 0 6px rgb(var(--gh-light) / 0.3)); }
-  to { filter: brightness(1.06) contrast(1.1) saturate(0.7) drop-shadow(0 0 11px rgb(255 232 190 / 0.5)); }
-}
-
-/* ---------- How light plays on the crystals ----------
- * Modelled on the reference videos: each crystal turns back and forth on its ribbon
- * (.gh-turn); as it turns, two soft bands of light sweep across it in step
- * (.gh-shine), so facets flash bright and settle back. The shine layers are copies
- * of the star picture, so they only ever touch the star itself.
- */
-.gh-turn {
-  animation: gh-turn var(--turn-dur, 8s) ease-in-out var(--turn-delay, 0s) infinite alternate;
-}
-@keyframes gh-turn {
-  from { transform: perspective(520px) rotateY(-18deg) rotateZ(-1.5deg); }
-  to { transform: perspective(520px) rotateY(18deg) rotateZ(1.5deg); }
-}
-.gh-shine {
-  mix-blend-mode: screen;
-  filter: brightness(1.3) contrast(1.6) saturate(0.3);
-  -webkit-mask-size: 320% 320%;
-  mask-size: 320% 320%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-.gh-shine-a {
-  -webkit-mask-image: linear-gradient(115deg, transparent 40%, #000 48%, #000 52%, transparent 60%);
-  mask-image: linear-gradient(115deg, transparent 40%, #000 48%, #000 52%, transparent 60%);
-  animation: gh-shine-a var(--turn-dur, 8s) ease-in-out var(--turn-delay, 0s) infinite alternate;
-}
-.gh-shine-b {
-  opacity: 0.5;
-  -webkit-mask-image: linear-gradient(35deg, transparent 42%, #000 49%, #000 51%, transparent 58%);
-  mask-image: linear-gradient(35deg, transparent 42%, #000 49%, #000 51%, transparent 58%);
-  animation: gh-shine-b calc(var(--turn-dur, 8s) * 1.37) ease-in-out var(--turn-delay, 0s) infinite alternate;
-}
-@keyframes gh-shine-a {
-  from { -webkit-mask-position: 0% 0%; mask-position: 0% 0%; }
-  to { -webkit-mask-position: 100% 100%; mask-position: 100% 100%; }
-}
-@keyframes gh-shine-b {
-  from { -webkit-mask-position: 100% 0%; mask-position: 100% 0%; }
-  to { -webkit-mask-position: 0% 100%; mask-position: 0% 100%; }
-}
-/* ---------- Tiny glints on the stars ----------
- * A pinpoint plus a hairline cross, a few pixels across, that flashes briefly on a facet
+/* ---------- Tiny glints on the plates ----------
+ * A pinpoint plus a hairline cross, a few pixels across, that flashes briefly on the plate's
  * edge and then rests. No halo, so it can't be mistaken for a garland bulb. */
 .gh-tiny {
   position: absolute;
@@ -151,7 +93,7 @@
   88% { opacity: calc(var(--peak, 1) * 0.35); scale: 0.7; }
   100% { opacity: 0; scale: 0.4; }
 }
-/* On the menu plates and tabs: fainter still, and no crossed hairlines. */
+/* The glints on the plates and tabs. */
 .gh-tiny-soft {
   --peak: 0.95;
   background:
@@ -159,62 +101,6 @@
     linear-gradient(90deg, transparent 10%, rgb(var(--gc) / 0.7) 50%, transparent 90%) center / 100% 1px no-repeat,
     linear-gradient(0deg, transparent 10%, rgb(var(--gc) / 0.7) 50%, transparent 90%) center / 1px 100% no-repeat;
 }
-.gh-flake[data-active="false"] .gh-tiny[data-rest="false"] { display: none; }
-.gh-glints { transition: opacity 0.7s ease; }
-.gh-flake[data-active="false"] .gh-glints { opacity: 0.7; }
-
-/* ---------- Glints (menu plates) ----------
- * .gh-glint            zero-size anchor (also a "fairy light" for pointer warmth)
- *   .gh-glint-spark    the sparkle: a star with crossed rays, or a small coloured fleck
- *   .gh-light-warm     extra glow when the pointer is near
- */
-.gh-glint {
-  position: absolute;
-  width: 0;
-  height: 0;
-  --warm: 0;
-  --halo: calc(var(--gs) * 1.4);
-}
-.gh-glint > span {
-  position: absolute;
-  left: 0;
-  top: 0;
-  translate: -50% -50%;
-  border-radius: 9999px;
-}
-.gh-glint-spark {
-  width: var(--gs);
-  height: var(--gs);
-  opacity: 0;
-}
-.gh-glint-star .gh-glint-spark {
-  border-radius: 0;
-  rotate: 12deg;
-  background:
-    radial-gradient(circle, rgb(255 255 255) 0 6%, rgb(var(--gc) / 0.85) 11%, rgb(var(--gc) / 0.25) 24%, transparent 46%),
-    linear-gradient(90deg, transparent 0%, rgb(var(--gc) / 0.9) 50%, transparent 100%) center / 100% 1.5px no-repeat,
-    linear-gradient(0deg, transparent 0%, rgb(var(--gc) / 0.9) 50%, transparent 100%) center / 1.5px 100% no-repeat;
-  animation: gh-glint var(--dur) ease-in-out var(--delay) infinite;
-}
-.gh-glint-fleck .gh-glint-spark {
-  background: radial-gradient(circle, rgb(255 255 255 / 0.95) 0 18%, rgb(var(--gc) / 0.9) 32%, rgb(var(--gc) / 0.3) 55%, transparent 72%);
-  animation: gh-fleck var(--dur) ease-in-out var(--delay) infinite alternate;
-}
-/* A star flashes briefly, then rests: a soft glint, never a strobe. */
-@keyframes gh-glint {
-  0%, 58% { opacity: 0; scale: 0.2; }
-  72% { opacity: 1; scale: 1; }
-  86% { opacity: 0.25; scale: 0.65; }
-  100% { opacity: 0; scale: 0.2; }
-}
-@keyframes gh-fleck {
-  from { opacity: 0.1; }
-  to { opacity: 0.9; }
-}
-/* Inactive snowflakes: only half the glints, at lower brightness. */
-.gh-flake[data-active="false"] .gh-glints { opacity: 0.55; }
-.gh-flake[data-active="false"] .gh-glint[data-rest="false"] .gh-glint-spark { display: none; }
-.gh-glints { transition: opacity 0.7s ease; }
 
 /* ---------- Active aura ---------- */
 .gh-aura {
@@ -222,7 +108,7 @@
   opacity: 0;
   transition: opacity 0.8s ease;
 }
-.gh-flake[data-active="true"] .gh-aura {
+.gh-tab[data-active="true"] .gh-aura {
   opacity: 1;
   animation: gh-aura 3s ease-in-out infinite alternate;
 }
@@ -231,7 +117,7 @@
   to { opacity: 1; scale: 1.04; }
 }
 
-/* ---------- Glass centres and menu plates ----------
+/* ---------- Glass plates (tabs and menu) ----------
  * Solid, light frosted glass with a fine frosted grain, a bright top edge and a soft
  * inner shadow at the bottom for thickness. Words are etched in dark with a thin
  * light edge below, so they read like letters cut into glass.
@@ -245,64 +131,32 @@
     inset 0 -3px 6px rgb(110 125 140 / 0.35);
   transition: background-color 0.6s ease, filter 0.6s ease;
 }
-.gh-flake[data-active="false"] .gh-frost-glass { filter: brightness(0.86); }
-.gh-flake:hover .gh-frost-glass { filter: none; }
 .gh-frost-glass.is-active {
   box-shadow:
     inset 0 1px 1px rgb(255 255 255 / 0.95),
     inset 0 -3px 6px rgb(110 125 140 / 0.3),
     inset 0 0 10px rgb(255 236 210 / 0.6);
 }
-/* Soft frosted crystal behind a star's word: an oval sized to the word (--fade-w,
- * --fade-h, set from the word's measured size) that fades out smoothly into the facets. */
-.gh-text-fade {
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  background: radial-gradient(
-    var(--fade-w) var(--fade-h) at 50% var(--star-cy),
-    rgb(238 243 247) 0%,
-    rgb(238 243 247 / 0.97) 58%,
-    rgb(238 243 247 / 0.6) 80%,
-    transparent 100%
-  );
-  transition: filter 0.6s ease;
-}
-.gh-flake[data-active="false"] .gh-text-fade { filter: brightness(0.88); }
-.gh-flake:hover .gh-text-fade { filter: none; }
-.gh-text-fade.is-active { filter: drop-shadow(0 0 4px rgb(255 240 215 / 0.6)); }
 .gh-etched {
   color: rgb(40 48 54);
   text-shadow:
     0 1px 0 rgb(255 255 255 / 0.8),
     0 -0.5px 0 rgb(0 0 0 / 0.25);
 }
-.gh-title.is-blooming {
-  animation: gh-sharpen 0.7s ease-out 0.4s both;
-}
-@keyframes gh-sharpen {
-  from { filter: blur(2px); opacity: 0.4; }
-  to { filter: blur(0); opacity: 1; }
-}
-
 /* ---------- Hanging menu ----------
- * Positioned from the snowflake's li, but kept inside the header's width
+ * Positioned from the centre tab's li, kept inside the header's width
  * (100cqw = header width, since the header is a size container).
  */
 .gh-ladder {
-  /* Centred on the header (100cqw = header width), whichever snowflake opened it,
-   * so it drops from behind the logo. The ladder sits inside that snowflake's li,
-   * so subtract the li's own left edge. */
-  --xf: var(--xfn);
-  /* Zero width at the centre line: plates (each as wide as its label) are placed around it. */
+  /* Zero width at the centre line: plates (each as wide as its label) hang around it.
+   * Tucked 10px behind the centre tab, and centred under it. */
   width: 0;
-  left: calc(50cqw - var(--xf) * 100cqw + var(--flake) / 2);
+  top: calc(100% - 10px);
+  left: 50%;
   pointer-events: none;
   visibility: hidden;
   /* Stay visible until the plates have been reeled back up (see closeDuration). */
   transition: visibility 0s linear calc(var(--close-ms, 700ms) + 60ms);
-}
-@media (min-width: 1024px) {
-  .gh-ladder { --xf: var(--xfw); }
 }
 .gh-ladder[data-open="true"] {
   visibility: visible;
@@ -326,12 +180,6 @@
   translate: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='16' viewBox='0 0 8 16'%3E%3Cellipse cx='4' cy='4.6' rx='2.5' ry='3.9' fill='none' stroke='%23000' stroke-opacity='.45' stroke-width='1.6' transform='translate(.4 .5)'/%3E%3Cellipse cx='4' cy='4.6' rx='2.5' ry='3.9' fill='none' stroke='%23e3e8ee' stroke-width='1.3'/%3E%3Crect x='3.3' y='8.2' width='1.4' height='7.6' rx='.7' fill='%23aeb6bf'/%3E%3Crect x='3.5' y='8.6' width='.5' height='6.6' rx='.25' fill='%23fff' fill-opacity='.8'/%3E%3C/svg%3E") repeat-y center top / 8px 16px;
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.5));
-}
-
-/* A hanging menu under a plate tab: centred under the tab, kept inside the header. */
-.gh-ladder-tab {
-  top: calc(100% - 10px);
-  left: calc(50% + clamp(96px, calc(var(--xf) * 100cqw), calc(100cqw - 96px)) - var(--xf) * 100cqw);
 }
 
 .gh-chain {
@@ -459,21 +307,15 @@
   to { opacity: 0.85; scale: 1 1; }
 }
 
-/* ---------- Reduced motion: still lights, no frost growth ---------- */
+/* ---------- Reduced motion: still lights and glints ---------- */
 @media (prefers-reduced-motion: reduce) {
   .gh-light-twinkle,
-  .gh-glint-spark,
   .gh-tiny,
-  .gh-flake[data-active="true"] .gh-crystal,
-  .gh-turn,
-  .gh-flake[data-active="true"] .gh-aura { animation: none !important; }
-  .gh-glint-fleck .gh-glint-spark { opacity: 0.6; }
-  .gh-shine { display: none; }
+  .gh-tab[data-active="true"] .gh-aura { animation: none !important; }
   .gh-star-img,
   .gh-star-halo,
   .gh-star-ray,
   .gh-star-core { animation: none !important; }
-  .gh-title.is-blooming { animation: none; }
   .gh-light-warm { transition: none; }
   .gh-ladder { opacity: 0; transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
   .gh-ladder[data-open="true"] { opacity: 1; transition: opacity 0.2s ease; }

@@ -1,4 +1,4 @@
-// Positions for every fairy light, snowflake line and frost crystal.
+// Positions for the fairy lights and the glints on the plates.
 // Everything is seeded (no Math.random), so the server and the browser
 // draw exactly the same thing and React hydration never mismatches.
 
@@ -71,65 +71,6 @@ export function garlandLights(seed = 7): LightPoint[] {
 }
 
 
-// ---------------------------------------------------------------------------
-// Crystal glints (percent of the snowflake box, centre 50,50)
-// ---------------------------------------------------------------------------
-
-/** The six arm directions of the crystal pictures (one arm points straight up). */
-const ARMS = [-90, -30, 30, 90, 150, 210];
-
-/** Colours of light caught in the crystal: mostly white, some from coloured Christmas lights. */
-export const GLINT_COLORS = {
-  white: "255 248 240",
-  gold: "255 214 140",
-  red: "255 92 92",
-  green: "92 255 150",
-} as const;
-export type GlintColor = keyof typeof GLINT_COLORS;
-
-export interface Glint {
-  x: number;
-  y: number;
-  /** "star" has crossed rays; "fleck" is a small coloured point of refracted light. */
-  kind: "star" | "fleck";
-  color: GlintColor;
-  /** Size as a share of the snowflake box. */
-  size: number;
-  dur: number;
-  delay: number;
-  /** Shown while the snowflake is inactive too (the rest only sparkle when active). */
-  rest: boolean;
-}
-
-/** Glints scattered over the crystal arms and branches, never on the glass plate. */
-export function crystalGlints(seed: number, plate: number, count = 18): Glint[] {
-  const rand = seededRandom(seed);
-  const innerR = plate * 50 + 3;
-  const out: Glint[] = [];
-  for (let i = 0; i < count; i++) {
-    const onArm = rand() < 0.7;
-    const arm = ARMS[Math.floor(rand() * ARMS.length)];
-    const deg = onArm ? arm + (rand() - 0.5) * 16 : arm + 30 + (rand() - 0.5) * 24;
-    const r = innerR + rand() * (46 - innerR);
-    const [x, y] = polar(r, deg);
-    const c = rand();
-    const color: GlintColor = c < 0.65 ? "white" : "gold";
-    const kind = rand() < 0.25 ? "star" : "fleck";
-    const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
-    out.push({
-      x: r2(x),
-      y: r2(y),
-      kind,
-      color,
-      size: r2(kind === "star" ? 0.16 + rand() * 0.1 : 0.05 + rand() * 0.035),
-      dur: r2(dur),
-      delay: r2(-rand() * dur),
-      rest: i % 2 === 0,
-    });
-  }
-  return out;
-}
-
 /**
  * Light caught by the menu's glass plates: white and warm gold, alternating.
  * Plain RGB numbers, used as rgb(var(--gc)).
@@ -179,119 +120,46 @@ export function plateGlints(seed: number): PlateGlint[] {
 }
 
 // ---------------------------------------------------------------------------
-// Crystal star tabs (keep in step with scripts/make-crystal-stars.py)
-// ---------------------------------------------------------------------------
-
-/** Where the star's points meet, as a share of the box height. The glass centre sits here. */
-export const STAR_CENTRE_Y = 0.4;
-/** [angle in degrees (0 = right, 90 = down), length as a share of the box]. */
-export const STAR_ARMS: [number, number][] = [
-  [-135, 0.31], [-45, 0.31], [45, 0.29], [135, 0.29],
-  [180, 0.36], [0, 0.36], [-90, 0.39], [90, 0.58],
-];
-
-/** Glints along the star's points, past the glass centre, mostly toward the tips. */
-export function starGlints(seed: number, count = 12): Glint[] {
-  const rand = seededRandom(seed);
-  const out: Glint[] = [];
-  for (let i = 0; i < count; i++) {
-    const [deg, len] = STAR_ARMS[Math.floor(rand() * STAR_ARMS.length)];
-    const r = len * (0.45 + rand() * 0.5) * 100;
-    const x = 50 + r * Math.cos(rad(deg));
-    const y = STAR_CENTRE_Y * 100 + r * Math.sin(rad(deg));
-    const c = rand();
-    const color: GlintColor = c < 0.65 ? "white" : "gold";
-    const kind = rand() < 0.3 ? "star" : "fleck";
-    const dur = kind === "star" ? 2.6 + rand() * 2.2 : 1.6 + rand() * 1.4;
-    out.push({
-      x: r2(x),
-      y: r2(y),
-      kind,
-      color,
-      size: r2(kind === "star" ? 0.16 + rand() * 0.1 : 0.05 + rand() * 0.035),
-      dur: r2(dur),
-      delay: r2(-rand() * dur),
-      rest: i % 2 === 0,
-    });
-  }
-  return out;
-}
-
-// ---------------------------------------------------------------------------
-// Where each snowflake hangs
+// Where the three tabs hang
 // ---------------------------------------------------------------------------
 
 export interface TabPlacement {
-  /**
-   * Phones and tablets (below 1024px): a grid of rows, up to 3 across. Each row hangs
-   * one snowflake-height lower, so the ribbon is a CSS length that depends on --flake.
-   */
+  /** Horizontal position as a percent of the header width: phones and tablets (below 1024px). */
   xNarrow: number;
-  ribbonNarrow: string;
-  /** Computers (1024px and up): half the flakes on each side of the logo, in a gentle wave. */
+  /** Horizontal position as a percent of the header width: computers (1024px and up). */
   xWide: number;
+  /** How far the chains reach below the garland band, as a CSS length (narrow, then wide). */
+  ribbonNarrow: string;
   ribbonWide: string;
-  /** Upper rows sit in front, so lower rows' ribbons pass behind them. */
+  /** Stacking order. */
   layer: number;
 }
 
 export interface TabLayout {
   tabs: TabPlacement[];
-  /** The longest ribbon in each layout, used to size the header. */
+  /** The longest chain, used to size the header. */
   maxNarrow: string;
   maxWide: string;
 }
 
-const ROW_STEP = "(var(--flake) + 14px)";
-
-export function placeTabs(count: number, plates = false): TabLayout {
-  // Narrow: up to 3 per row.
-  const cols = count <= 3 ? count : Math.min(3, Math.ceil(count / 2));
-  const rows = Math.ceil(count / cols);
-  // Three or fewer: the middle star hangs just under the sign (which reaches half a garland
-  // thickness below the garland), and the side stars just under the garland.
+/**
+ * Left, centre and right slots. The centre plate hangs just under the sign (which reaches below
+ * the garland); the side plates hang just under the garland's foliage, which droops about
+ * 0.4 of the garland's thickness below its edge.
+ */
+export function placeTabs(): TabLayout {
   const underSign = "calc(var(--sign-h) / 2 - var(--g) / 2 + 5px)";
-  const underGarland = plates ? "calc(var(--g) * 0.4 + 9px)" : "calc(var(--g) * 0.4 + 3px)"; // the foliage hangs about 0.4 g below the garland band
-  const oneRowRibbon = (i: number) => (count === 3 && i === 1 ? underSign : underGarland);
-  const narrowRibbon = (row: number, i = 0) =>
-    count <= 3 ? oneRowRibbon(i) : row === 0 ? "8px" : `calc(8px + ${ROW_STEP} * ${row})`;
-
-  // Wide: left side gets the extra one when the count is odd.
-  const left = Math.ceil(count / 2);
-  const right = count - left;
-  const spread = (n: number, from: number, to: number) =>
-    n === 1 ? [(from + to) / 2] : Array.from({ length: n }, (_, i) => from + ((to - from) * i) / (n - 1));
-  const leftX = spread(left, 7, 37);
-  const rightX = spread(right, 63, 93);
-  // Outer to inner: a soft wave, mirrored on the right.
-  const WAVE = [20, 70, 36, 60];
-  const waveFor = (fromOuter: number) => `${WAVE[fromOuter % WAVE.length]}px`;
-
-  // Three or fewer: one row, spread evenly, the middle one hanging under the logo.
-  // The sign reaches half a garland-thickness below the garland, so on phones every
-  // snowflake hangs clear of it, and on computers the middle one does.
-  const oneRow = count <= 3;
-  const rowX = spread(count, 20, 80);
-
-  const tabs = Array.from({ length: count }, (_, i) => {
-    const row = Math.floor(i / cols);
-    const inRow = Math.min(cols, count - row * cols);
-    const col = i - row * cols;
-    const isLeft = i < left;
-    const j = isLeft ? i : i - left;
-    return {
-      xNarrow: r2(((col + 0.5) / inRow) * 100),
-      ribbonNarrow: narrowRibbon(row, i),
-      xWide: oneRow ? r2(rowX[i]) : isLeft ? r2(leftX[j]) : r2(rightX[j]),
-      ribbonWide: oneRow ? oneRowRibbon(i) : isLeft ? waveFor(j) : waveFor(right - 1 - j),
-      layer: Math.max(1, 5 - row),
-    };
+  const underGarland = "calc(var(--g) * 0.4 + 9px)";
+  const slot = (xNarrow: number, xWide: number, ribbon: string): TabPlacement => ({
+    xNarrow,
+    xWide,
+    ribbonNarrow: ribbon,
+    ribbonWide: ribbon,
+    layer: 1,
   });
-  const maxWide = oneRow
-    ? count === 3
-      ? underSign
-      : underGarland
-    : `${Math.max(0, ...tabs.map((t) => parseInt(t.ribbonWide, 10)))}px`;
-  const maxNarrow = count === 3 ? underSign : narrowRibbon(rows - 1, Math.min(1, count - 1));
-  return { tabs, maxNarrow, maxWide };
+  return {
+    tabs: [slot(16.67, 20, underGarland), slot(50, 50, underSign), slot(83.33, 80, underGarland)],
+    maxNarrow: underSign,
+    maxWide: underSign,
+  };
 }

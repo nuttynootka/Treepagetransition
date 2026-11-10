@@ -10,24 +10,22 @@ import type { GarlandLink, LinkLike } from "./types";
 
 interface HangingMenuProps {
   id: string;
-  /** The snowflake's label, for screen readers ("Shop menu"). */
+  /** The tab's label, for screen readers ("Shop menu"). */
   label: string;
   items: GarlandLink[];
   open: boolean;
   activeHref: string;
   Link: LinkLike;
   onSelect: () => void;
-  /** Unroll from under a plate tab (instead of down the middle from behind the logo). */
-  fromTab?: boolean;
 }
 
 /**
- * Frosted glass plates on silver chains, hanging from the garland behind the
- * snowflake. Each plate swings, tilts and twists on its own, driven by the
+ * Frosted glass plates on silver chains, unrolling from under the
+ * centre tab. Each plate swings, tilts and twists on its own, driven by the
  * physics in chain-physics.ts. Opening drops them one by one until their chains
  * catch; closing reels them back up behind the garland, bottom plate first.
  */
-export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect, fromTab = false }: HangingMenuProps) {
+export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect }: HangingMenuProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const plateRefs = useRef<(HTMLDivElement | null)[]>([]);
   const chainRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -35,20 +33,14 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
   const reducedMotion = useReducedMotion();
   const glints = useMemo(() => items.map((item) => plateGlints(hashString(item.href))), [items]);
 
-  // Measure plate size, and how far the first plate hangs: just below the lowest
-  // snowflake, since the menu drops down the middle, behind the logo and snowflakes.
+  // Measure each plate's width and the height of the plates. The first plate hangs a short way
+  // below the centre tab's bottom edge (the menu's top is tucked behind the tab).
   const measure = () => {
-    const root = rootRef.current;
     const engine = engineRef.current;
     const first = plateRefs.current[0];
-    if (!root || !engine || !first) return;
-    // Under a tab, the first plate hangs a short way below the tab's bottom edge (the menu's
-    // top is tucked 10px behind the tab). Otherwise just below the lowest star.
-    const flakes = root.closest("nav")?.querySelectorAll(".gh-flake > a, .gh-flake > button") ?? [];
-    const bottom = Math.max(0, ...Array.from(flakes, (f) => f.getBoundingClientRect().bottom));
-    const top = root.getBoundingClientRect().top;
+    if (!engine || !first) return;
     const widths = plateRefs.current.slice(0, items.length).map((el) => el?.offsetWidth ?? 160);
-    engine.setGeometry(widths, first.offsetHeight, fromTab ? 22 : bottom ? bottom - top + 8 : 160);
+    engine.setGeometry(widths, first.offsetHeight, 22);
   };
 
   useEffect(() => {
@@ -103,7 +95,7 @@ export function HangingMenu({ id, label, items, open, activeHref, Link, onSelect
       role="group"
       aria-label={`${label} menu`}
       data-open={open ? "true" : "false"}
-      className={cn("gh-ladder absolute top-0 z-0", fromTab && "gh-ladder-tab")}
+      className="gh-ladder absolute top-0 z-0"
       style={{ "--n": items.length, "--close-ms": `${Math.round(closeDuration(items.length) * 1000)}ms` } as CSSProperties}
     >
       {/* Chains first, so they pass behind the plates. */}

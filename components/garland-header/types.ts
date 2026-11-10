@@ -7,11 +7,11 @@ export interface GarlandLink {
 }
 
 export interface GarlandPage {
-  /** Shown on the snowflake's glass plate (in capitals). Keep it short: the longest label sets the size for all. */
+  /** Shown on the tab's glass plate (in capitals). Every plate is as wide as the widest label. */
   label: string;
-  /** Where the snowflake links to. Leave out when the snowflake opens a menu instead. */
+  /** Where the tab goes. Leave out when the tab opens a menu instead. */
   href?: string;
-  /** Tapping the snowflake drops down these plates instead of going to a page. */
+  /** Tapping the tab drops down these plates instead of going to a page. */
   items?: GarlandLink[];
 }
 
@@ -28,10 +28,3 @@ export interface LinkLikeProps {
 }
 
 export type LinkLike = ComponentType<LinkLikeProps>;
-
-/** A crystal snowflake picture: a square image with a transparent background, centred on its glass plate. */
-export interface CrystalImage {
-  src: string;
-  /** Width of the glass plate (inside its silver rim) as a share of the image width, 0–1. */
-  plate: number;
-}

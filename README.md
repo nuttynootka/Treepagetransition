@@ -161,187 +161,104 @@ To rebuild the preview HTML after changing `engine.ts`: `npm run build:preview`.
 
 ---
 
-# Garland header with snowflake page tabs
+# Noble Star Forest header
 
-A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest sign centred over it, its 8-point star glowing and twinkling; and one hanging faceted 8-point crystal star per menu item, the same north-star shape as the star on the sign, catching the light of Christmas lights. Each word is etched in dark straight onto its star, with the facets fading to soft frosted crystal behind it so it stays readable.
+A header for the top of the site: a painted noble fir and western red cedar garland across the top, strung with fairy lights; the Noble Star Forest wood sign centred over it with its 8-point star glowing and twinkling; and three frosted glass plate tabs hanging from the garland on silver chains. Tapping a tab drops a hanging menu of more glass plates from under the centre tab. Everything is built in React, TypeScript and Tailwind CSS v4.
 
-- Each star turns slowly back and forth on its ribbon (3.6–5.2 seconds each way, each at its own pace). As it turns, two soft bands of light sweep across it so facets flash bright and settle back, and a few tiny, sharp white and gold glints (a few pixels across, no glow, unlike the garland bulbs) flash briefly on the facet edges. These are the `.gh-tiny` styles. Only white and gold light is used on the stars and the menu plates. The dark side of each facet is kept light enough, and every point has a thin bright edge, so a whole point is always visible as the star turns. The layers are all copies of the star picture, so light never spills outside it. Settings: `.gh-turn` and `.gh-shine` in `garland-header.css`.
-- The snowflake for the current page is fully lit with deeper contrast and a soft aura behind it.
-- The other snowflakes stay readable and clickable but rest in shadow, with only a few slow glints.
-- All menu words are the same size (`--label-size` in `GarlandHeader.tsx`: 12px on phones, 13px on tablets, 14px on computers), set in Cuprum, on the stars and the hanging plates alike. Each word sits directly on its star where the points meet. Behind it, the facets fade into an oval of soft frosted crystal sized to the word (`.gh-text-fade` in `garland-header.css`), kept within the star's shape, so a longer word runs on into the side points.
-- When a page becomes active, its word sharpens into focus.
-- Snowflakes swing gently when the mouse brushes past or a finger taps them, then settle.
-- Lights near the mouse or finger glow a little warmer.
-- Garland lights are small, crisp bulbs that rest at about 40% and flare to full brightness for a moment, each on its own slow cycle (4.5–9 seconds), so they sparkle at random. Tune it in the `gh-sparkle` keyframes in `garland-header.css`. Crystal glints flare briefly every few seconds. Nothing strobes.
-- With "reduce motion" turned on, lights and glints stay steady, and nothing swings or turns.
+**Preview it:** open `preview/garland-header-preview.html` in a browser. **Building a site around it?** Read `DESIGN-BRIEF.md`: it has the sizes, colours, fonts and behaviour.
 
-**Preview it:** open `preview/garland-header-preview.html` in a browser, or use the private preview link from the chat.
+## What it does
 
-## What's in it
+- **Three fixed tabs** (left, centre, right) whose positions never change. Only the word on each changes. The centre tab always shows the page being viewed. At first open: Shop, Home, Us. Tapping a side tab swaps its word with the centre's (150ms fade out, 150ms fade in), then that page's dropdown unrolls from under the centre tab. Full rules are below.
+- **Hanging menus** are frosted glass plates on silver chains that unroll with real physics (`chain-physics.ts`): each plate swings, tilts and twists on its own, with a faint breeze, and responds to a brush or tap.
+- **The garland** is painted in code (`garland-painter.ts`) and repainted to fit the screen. About one fairy light per 8px sits on the foliage, each on its own slow 4.5–9 second sparkle.
+- **The sign's star** glows and twinkles like a real star (`.gh-star` in `garland-header.css`).
+- **Reduced motion:** lights and glints hold still, nothing swings, and the menu fades in and out instead of unrolling.
+
+## Files
 
 | Path | What it is |
 | --- | --- |
 | `components/garland-header/GarlandHeader.tsx` | The header. This is what you use. |
-| `components/garland-header/SnowflakeTab.tsx` | One hanging snowflake tab. |
-| `components/garland-header/HangingMenu.tsx` | The drop-down menu of glass plates on chains. |
-| `components/garland-header/chain-physics.ts` | The physics that makes each plate swing, twist and settle on its own. |
-| `components/garland-header/parts.tsx` | Fairy light, garland, logo sign, background lights. |
-| `components/garland-header/hooks.ts` | Swinging, pointer warmth, reduced motion, image check. |
-| `components/garland-header/geometry.ts` | Where every light and glint goes, and where each snowflake hangs. |
-| `components/garland-header/garland-header.css` | The twinkle, crystal light, glass and aura styles. |
-| `public/stars/` | The 3 faceted crystal star pictures. |
-| `scripts/make-crystal-stars.py` | Draws those star pictures (shape, facets, lighting). Run `python3 scripts/make-crystal-stars.py` after changing it. |
+| `components/garland-header/PlateTab.tsx` | One tab plate. |
+| `components/garland-header/GlassPlate.tsx` | The look of a glass plate, shared by tabs and menu plates. |
+| `components/garland-header/HangingMenu.tsx` | The dropdown of plates on chains. |
+| `components/garland-header/tab-swap.ts` | The swap logic (which word is in which slot). |
+| `components/garland-header/chain-physics.ts` | The plate and chain physics. |
+| `components/garland-header/garland-painter.ts` | Paints the garland. |
+| `components/garland-header/parts.tsx` | The garland strip, sign, twinkling star, background lights. |
+| `components/garland-header/geometry.ts` | Where lights, glints and tabs go. |
+| `components/garland-header/noble-star-logo.ts` | The logo's image, ratio and star position. |
+| `components/garland-header/garland-header.css` | Lights, glass, chains, sign star. |
 | `public/brand/noble-star-forest.webp` | Your logo (the wood sign). |
-| `components/garland-header/garland-painter.ts` | Paints the noble fir and western red cedar garland. |
-| `components/garland-header/noble-star-logo.ts` | The sign's image, shape ratio, and where its star is. |
-| `public/brand/noble-star.webp` | The star cut out of the sign, drawn over it so it can glow. |
-| `app/SiteHeader.tsx` | How this demo site uses the header with the tree transition. |
+| `public/brand/noble-star.webp` | The sign's star, cut out so it can glow. |
+| `app/` | The demo site: Home, 4 Shop pages and 3 Us pages (placeholder text). |
+| `preview/` | Builds the single-file preview (`npm run build:garland-preview`). |
 
-## The logo and the garland
-
-**Logo.** The Noble Star Forest sign is `public/brand/noble-star-forest.webp` (your logo, cropped and resized to 1000px wide). It is centred on the page and on the garland, so the garland runs behind it. The garland is 3/8 of the sign's height (44px thick on phones to 69px on large screens). The 8-point star in "STAR" glows and twinkles like a real star: a cut-out copy of the star (`public/brand/noble-star.webp`) is drawn over it, brightened, with a soft warm halo that slowly swells, fine rays along its points that lengthen and fade on their own rhythms, a hot white centre, and a faint irregular flicker between warm and icy white. Its position is in `components/garland-header/noble-star-logo.ts`; the effect is the `.gh-star` styles in `garland-header.css`. To change the sizes, change the sign's height (`--sign-h` near the top of `GarlandHeader.tsx`); the garland thickness (`--g`) follows from it.
-
-**Garland.** The noble fir and western red cedar garland is painted in code by `components/garland-header/garland-painter.ts`, from the reference photos (which are not used in the site):
-
-- Noble fir: dense, short, blue-green to silvery needles that curve upward, on stiff sprigs.
-- Western red cedar: flat, lacy, bright yellow-green sprays on orange-brown stems, drooping below the garland and tucked in along the top.
-- Layers go from dark at the back to bright in front, with a soft shadow under each sprig. It runs the full width of the screen and is repainted to fit when the window changes size.
-- Fairy lights are scattered through the whole garland, from the top sprigs to the hanging cedar and edge to edge, about one per 8px of width. Each is placed only where there is painted foliage, so none float in a gap (`lightsOnFoliage` in `parts.tsx`).
-- To adjust it, edit `LAYERS` (how many sprigs of each kind, how bright, how long) and the colours in `drawFir` and `drawCedar`.
-- To use a photo of a real garland instead, pass `garlandSrc="/garland/your-photo.webp"` to `<GarlandHeader>`.
-
-## Step 3: Change the menu
-
-Open `app/SiteHeader.tsx`. The `pages` list sets the snowflakes, left to right:
+## Use it
 
 ```tsx
+import { GarlandHeader, type GarlandPage } from "@/components/garland-header";
+import { TransitionLink } from "@/components/tree-transition";
+
 const pages: GarlandPage[] = [
+  { label: "Shop", items: [
+    { href: "/statement-trees", label: "Statement Trees" },
+    { href: "/wholesale-trees", label: "Wholesale Trees" },
+    { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
+    { href: "/make-payment", label: "Make Payment" },
+  ] },
   { href: "/", label: "Home" },
-  {
-    label: "Shop",
-    items: [
-      { href: "/statement-trees", label: "Statement Trees" },
-      { href: "/wholesale-trees", label: "Wholesale Trees" },
-      { href: "/wreaths-and-greenery", label: "Wreaths & Greenery" },
-      { href: "/make-payment", label: "Make Payment" },
-    ],
-  },
-  {
-    label: "Us",
-    items: [
-      { href: "/meet-us", label: "Meet Us" },
-      { href: "/contact-us", label: "Contact Us" },
-      { href: "/request-quote", label: "Request Quote" },
-    ],
-  },
+  { label: "Us", items: [
+    { href: "/meet-us", label: "Meet Us" },
+    { href: "/contact-us", label: "Contact Us" },
+    { href: "/request-quote", label: "Request Quote" },
+  ] },
 ];
+
+<GarlandHeader pages={pages} activeHref={pathname} LinkComponent={TransitionLink} />
 ```
 
-- An entry with `href` is a snowflake that goes straight to that page (Home).
-- An entry with `items` is a snowflake that opens a **hanging menu** instead of going to a page (Shop, Contact). Its snowflake lights up while you're on any page in its menu.
-- Labels are typed in normal case and shown in capitals. Screen readers read the normal case.
-- To use "Wreaths & Boughs" instead, change the `label` (and the page heading in `app/wreaths-and-greenery/page.tsx`).
-- Each menu page is a folder in `app/` with a `page.tsx` inside. Their text is placeholder for now.
-
-### How the hanging menu works
-
-- Tapping SHOP or US drops a series of light frosted glass plates (the same glass as the snowflake centres, words etched in dark) on silver chains, down the middle of the page. Two chains hang from the garland behind the logo to the first plate, which hangs just below the snowflakes; each plate below hangs from the one above by two shorter chains nearer its middle.
-- The plates catch white and warm gold light, alternating: a few tiny pinpoint glints (about 4–7px, no glow) on the silver rim and dark lower edge of each plate, where they show against the pale glass. It shows as small glints along the plate's edges and The plates don't glow. Colours: `PLATE_LIGHT_COLORS` in `geometry.ts`.
-- The plates move by **physics**, not a fixed animation (`chain-physics.ts`). Each plate is a rigid body with gravity, air drag and its own chains, which pull when stretched and go slack when not. Because every plate hangs from a moving plate above it, they swing, tilt and twist separately and never in unison, much like a chain of pendulums.
-- Opening: the garland chains lower the first plate with an ease in and out, quick enough that it briefly runs ahead of the chains and gets a soft, bouncy catch. Each plate below starts folded up against the bottom of the plate above and swings down on that edge with a little flutter, its chains paying out quickly so it drops a short way, once the plate above is about half unfolded. Each gets a small random nudge so no two openings look alike. Then they sway and settle.
-- A faint, random breeze keeps each plate drifting slightly on its own. Moving the mouse across a plate, or tapping it, pushes it, and the motion travels up and down the chain.
-- Each plate also twists a few degrees toward and away from you as it moves.
-- Closing reels the plates back up, bottom plate first, until they are hidden behind the garland.
-- Tapping the snowflake again, tapping anywhere else, or pressing Escape rolls the plates back up, bottom plate first, until they are hidden behind the garland.
-- Tapping a plate rolls the menu up and goes to that page, with the wand-tree transition.
-- Only one menu is open at a time. Opening the other one rolls the first one up.
-- With "reduce motion" on, the plates hang still and the menu fades in and out.
-- Each plate is only as wide as its label, with a few pixels of glass on each side. Height and text size: `--menu-h` and `--menu-font` near the top of `GarlandHeader.tsx`. How heavy and lively the plates feel (gravity, drag, breeze, twist, drop and reel timing): the `PHYS` settings at the top of `chain-physics.ts`.
-
-## Use it in another Next.js project
-
-It needs React 18 or newer and Tailwind CSS v4.
-
-1. **Tailwind:** if your project doesn't have Tailwind v4 yet, open a terminal in your project folder and run:
-
-   ```
-   npm install -D tailwindcss @tailwindcss/postcss postcss
-   ```
-
-   Then create a file called `postcss.config.mjs` next to `package.json` containing exactly what is in this repo's `postcss.config.mjs`, and add `@import "tailwindcss";` as the first line of your global CSS file (usually `app/globals.css`).
-2. **Copy** the folder `components/garland-header/` (all 7 files) into your project's `components/` folder.
-3. **Copy** `public/brand/noble-star-forest.webp` and the `public/snowflakes/` folder into the same places in your project's `public/` folder.
-4. **Font:** the menu words use Cuprum (from Google Fonts), through a CSS variable called `--font-cuprum`. Copy the `Cuprum` lines from this repo's `app/layout.tsx` into your layout. Without it, words fall back to Arial Narrow or another narrow sans-serif.
-5. **Create** `app/SiteHeader.tsx` like the one in this repo, and put `<SiteHeader />` at the top of `<body>` in `app/layout.tsx`.
-   - Using the tree transition too? Keep `LinkComponent={TransitionLink}`.
-   - Not using it? Use `import Link from "next/link"` and `LinkComponent={Link}`.
-
-### All the options
+`app/SiteHeader.tsx` is the working example. The `pages` list must have exactly three entries, in the order the tabs first appear left to right. An entry with `href` goes straight to that page; an entry with `items` opens a dropdown.
 
 | Prop | Default | What it does |
 | --- | --- | --- |
-| `pages` | (required) | `{ href, label }` for a page snowflake, or `{ label, items }` for a menu snowflake |
+| `pages` | (required) | The three entries |
 | `activeHref` | (required) | The current path. Pass `usePathname()`. |
-| `garlandSrc` | none (painted garland) | Optional photo of a garland to use instead |
-| `garlandFit` | `"cover"` | `"cover"` stretches one photo, `"repeat"` tiles it |
-| `logoSrc` | `/brand/noble-star-forest.webp` | Your logo file |
-| `logoRatio` | 1.8349 | The logo's width divided by its height |
-| `logoStar` | the sign's star | Where the logo's star is, so it glows; leave out for no star effect |
-| `logo` | none | Any element (like an inline `<svg>`) to use instead of `logoSrc` |
-| `logoAlt` | `"Noble Star Forest"` | Logo description for screen readers |
-| `homeHref` | `"/"` | Where the logo links to |
-| `crystals` | the 3 in `public/stars/` | Crystal pictures, used in turn for each page (see below) |
 | `LinkComponent` | plain `<a>` | `next/link`'s `Link`, `TransitionLink`, or your own |
+| `logoSrc` / `logoRatio` / `logoStar` / `logoAlt` | the Noble Star Forest sign | Your logo file, its width divided by height, where its star is, and its screen-reader text |
+| `logo` | none | Any element to use instead of an image |
+| `homeHref` | `"/"` | Where the logo links to |
+| `garlandSrc` / `garlandFit` | none (painted garland) | Optional photo of a garland to use instead |
 
-### Sizes and colours
+### The tab-swap rules
 
-- **Garland height, snowflake size, logo frame size:** the `[--g:…]`, `[--flake:…]` and `[--logo-w:…]`/`[--logo-h:…]` classes near the top of `GarlandHeader.tsx`, one value per screen width (`sm:` 640px+, `md:` 768px+, `lg:` 1024px+, `xl:` 1280px+).
-- **Ribbon lengths:** `NARROW` and `WIDE` in `placeTabs()` in `geometry.ts`.
-- **Light colour:** `--gh-light` (the bulb, `#FFF5EB`) and `--gh-warm` (the warm glow) at the top of `garland-header.css`.
-- **Garland sparkle:** the `gh-sparkle` keyframes in `garland-header.css`; bulb size: `--gh-core` / `--gh-halo` in `parts.tsx`.
-- **Crystal brightness:** `.gh-crystal` rules in `garland-header.css` (inactive dimness, active shimmer).
-- **Glints:** how many and which colours in `crystalGlints()` in `geometry.ts`; how they flash in the `gh-glint` and `gh-fleck` keyframes.
-- **Swing:** the period (`1.7`) and damping (`0.16`) in `useSwing()` in `hooks.ts`.
-
-### Notes
-
-- The header has its own dark night background. It is designed for dark pages; on a light page the bottom edge will show as a dark band.
-- The header is about 255px tall on phones (stars about 94px wide), 265–295px on tablets and 385–400px on computers. Open menus hang over the page below it. It is not sticky, so it scrolls away with the page.
-- There are about 80 garland and logo lights and 18 glints per snowflake. Most animate only opacity and size, which phones handle well. The lit snowflake also animates its brightness.
-
-### Using different crystal pictures
-
-1. Each picture should be square, with a transparent background, with the snowflake's round plate exactly in the centre.
-2. Save it as WebP or PNG, about 440 × 440 pixels, in `public/snowflakes/`.
-3. Measure the plate: its width inside the silver rim divided by the picture's width. For example a 160px plate in a 440px picture is `0.36`.
-4. Pass them in `app/SiteHeader.tsx`:
-
-   ```tsx
-   crystals={[
-     { src: "/snowflakes/my-flake-1.webp", plate: 0.36 },
-     { src: "/snowflakes/my-flake-2.webp", plate: 0.37 },
-   ]}
-   ```
-
-The word and its frosted fade are drawn over the star's centre. The `plate` number is no longer used for sizing and is kept for compatibility.
-
-To rebuild the preview page after changing the component: `npm run build:garland-preview`.
-
-### The crystal stars
-
-The menu tabs are faceted 8-point crystal stars in the north-star shape of the star on the sign: a tall top point, a longer bottom point, and shorter side and diagonal points. The side and diagonal points are longer than on the sign so the star still reads clearly around its word. Each point is cut into three long facets (a centre face and two bevels), and the centre into 12 facets, like a cut-crystal star ornament, so one half catches the light and the other falls dark. The three pictures differ only in where the light comes from. They are drawn by `scripts/make-crystal-stars.py` (needs Python 3 with numpy and Pillow); if you change the point lengths there, change `STAR_ARMS` in `geometry.ts` to match.
-
-### Plate tabs and how they swap (an alternative to the stars)
-
-Pass `tabStyle="plate"` to `<GarlandHeader>` (as `app/SiteHeader.tsx` does) and the tabs become frosted glass plates, exactly like the menu plates (same glass, etched word, bevel, white or gold reflections), hanging from the garland on two short chains. Without `tabStyle` you get the crystal stars. Plate tabs need exactly three pages, and the order of the `pages` list is the order they first appear left to right (Shop, Home, Us).
-
-**The three tabs sit in fixed left, centre and right slots. The slots never move or change size; only the word inside each changes.** Every plate is as wide as the widest word. The centre tab always shows the page being viewed.
-
-- **Tap a side tab:** the word in that tab and the word in the centre tab fade out (150ms), are swapped, and fade back in (150ms). Nothing slides. Then that page's dropdown unrolls from under the centre tab.
+- **Tap a side tab:** its word and the centre's fade out (150ms), swap, and fade back in (150ms). Nothing slides. Then that page's dropdown unrolls from under the centre tab.
 - **Pick a subpage:** the page loads, the words stay swapped, and that page's word stays in the centre.
-- **Tap outside the dropdown (or press Escape) without picking:** the dropdown rolls up and the two words fade back to how they were.
-- **Tap the centre tab:** its dropdown opens, with no swap. Tap it again to close it (undoing any swap).
-- **Tap Home:** works the same way but Home has no dropdown, so it swaps and then goes to the home page.
-- **Swaps are always worked out from the arrangement that matches the page being viewed**, never from what is on screen. So tapping Shop and then Us without choosing undoes Shop's swap first (the labels that differ fade together in one go). The words on screen are always a rearrangement of the same three, so two tabs can never show the same word, however fast someone taps. A new tap cancels whatever is in progress.
-- The logic is in `components/garland-header/tab-swap.ts`. Home is reached by pressing an out-of-sight link, so the page change still plays your wand-tree transition.
-- The plates are the height of the menu plates (26px on phones, 28px from 768px), smaller than the 44px most touch guidelines recommend for tap targets.
+- **Tap outside the dropdown, or press Escape:** the dropdown rolls up and the two words fade back to how they were.
+- **Tap the centre tab:** its dropdown opens with no swap. Tap it again to close (undoing any swap).
+- **Tap Home:** same swap, but Home has no dropdown, so it then goes to the home page.
+- **Swaps are always worked out from the arrangement that matches the page being viewed**, not from what is on screen. So tapping Shop and then Us without choosing undoes Shop's swap first. The words on screen are always a rearrangement of the same three, so two tabs never show the same word, however fast someone taps. A new tap cancels whatever is in progress.
+- Every plate is as wide as the widest word, so a swap changes only the text. Home is reached by pressing an out-of-sight link, so your page transition still plays.
+
+## Sizes and settings
+
+- **Sign height:** `--sign-h` near the top of `GarlandHeader.tsx` (116px phone, 132px from 640px, 152px from 768px, 168px from 1024px, 184px from 1280px). The garland is 3/8 of it (`--g`), runs behind the sign's middle, and the sign starts 4px from the top.
+- **Words:** `--label-size` (12px, 13px from 768px, 14px from 1024px), set in Cuprum. Plates are `--menu-h` tall (26px, 28px from 768px). These are smaller than the 44px most touch guidelines recommend for tap targets.
+- **Physics feel** (gravity, drag, breeze, twist, timing): the `PHYS` settings at the top of `chain-physics.ts`.
+- **Light colours and sparkle:** `--gh-light` and `--gh-warm` and the `gh-sparkle` keyframes at the top of `garland-header.css`.
+- **Garland look:** `LAYERS` and the colours in `drawFir` / `drawCedar` in `garland-painter.ts`.
+- **Plate light:** white and warm gold, alternating (`PLATE_LIGHT_COLORS` in `geometry.ts`).
+
+## Add it to another Next.js project
+
+It needs React 18 or newer and Tailwind CSS v4.
+
+1. **Tailwind:** if your project doesn't have v4 yet, run `npm install -D tailwindcss @tailwindcss/postcss postcss`, create `postcss.config.mjs` like this repo's, and add `@import "tailwindcss";` as the first line of your global CSS.
+2. **Copy** the folder `components/garland-header/` and the two files in `public/brand/`.
+3. **Font:** copy the `Cuprum` lines from `app/layout.tsx` (it loads the font as the CSS variable `--font-cuprum`).
+4. **Use** `<GarlandHeader />` as shown above, at the top of `<body>`.
+
+## Run the demo site (optional)
+
+Install Node.js (nodejs.org, the "LTS" version), download this repo, open a terminal in its folder, run `npm install`, then `npm run dev`, and open http://localhost:3000.

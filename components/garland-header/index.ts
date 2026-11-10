@@ -1,3 +1,3 @@
-export { GarlandHeader, DEFAULT_CRYSTALS } from "./GarlandHeader";
+export { GarlandHeader } from "./GarlandHeader";
 export type { GarlandHeaderProps } from "./GarlandHeader";
-export type { CrystalImage, GarlandPage, LinkLike, LinkLikeProps } from "./types";
+export type { GarlandLink, GarlandPage, LinkLike, LinkLikeProps } from "./types";

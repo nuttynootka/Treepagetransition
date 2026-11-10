@@ -39,7 +39,7 @@ const copy: Record<string, { title: string; body: string }> = {
   ...Object.fromEntries(
     pages.flatMap((p) => p.items ?? []).map((item) => [
       item.href,
-      { title: item.label, body: "Placeholder text. This page's content goes here. The snowflake for its menu stays lit while you're here." },
+      { title: item.label, body: "Placeholder text. This page's content goes here. Its tab stays in the centre while you're here." },
     ]),
   ),
 };
@@ -92,7 +92,6 @@ function App() {
       <GarlandHeader
         pages={pages}
         activeHref={current}
-        tabStyle="plate"
         LinkComponent={PreviewLink}
         logoSrc={LOGO_URI}
         logoStar={{ ...NOBLE_STAR_LOGO.star, src: STAR_URI }}

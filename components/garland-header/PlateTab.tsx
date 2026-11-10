@@ -74,7 +74,7 @@ export function PlateTab({
         } as CSSProperties
       }
     >
-      <div ref={swingRef} data-active={current ? "true" : "false"} className="gh-flake group relative z-[1] origin-top">
+      <div ref={swingRef} data-active={current ? "true" : "false"} className="gh-tab group relative z-[1] origin-top">
         {/* Two chains from inside the garland to the plate's top corners. */}
         <span aria-hidden className="relative block h-[calc(var(--g)*0.4+var(--rn))] w-full lg:h-[calc(var(--g)*0.4+var(--rw))]">
           <span className="gh-tab-chain left-[20%]" />
